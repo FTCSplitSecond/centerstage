@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.claw
+package org.firstinspires.ftc.teamcode.claw.opmodes
 
 import com.acmerobotics.dashboard.FtcDashboard
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry
