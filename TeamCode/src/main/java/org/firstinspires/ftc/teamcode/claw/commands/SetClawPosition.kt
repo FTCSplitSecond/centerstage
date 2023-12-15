@@ -8,13 +8,10 @@ class SetClawPosition(private val claw : ClawSubsystem, private val position: Cl
     init {
         addRequirements(claw)
     }
-
-    override fun execute() {
+    override fun initialize() {
         claw.position = position
     }
-
-
-
-
-
+  override fun isFinished() : Boolean {
+        return claw.movementShouldBeComplete()
+    }
 }
