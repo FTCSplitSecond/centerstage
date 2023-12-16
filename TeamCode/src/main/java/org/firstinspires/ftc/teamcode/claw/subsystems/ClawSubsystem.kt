@@ -17,10 +17,10 @@ class ClawSubsystem(private val leftServo : ServoImplEx, private val rightServo 
                  robot.hardwareMap.get(ServoImplEx::class.java, "rightClawServo"),
                  robot.telemetry)
     companion object {
-        const val LEFT_SERVO_OPEN_MICROSECONDS = 2500.0
-        const val LEFT_SERVO_CLOSED_MICROSECONDS = 1550.0
-        const val RIGHT_SERVO_OPEN_MICROSECONDS = 500.0
-        const val RIGHT_SERVO_CLOSED_MICROSECONDS = 1450.0
+        const val LEFT_SERVO_OPEN_MICROSECONDS = 500.0
+        const val LEFT_SERVO_CLOSED_MICROSECONDS = 1450.0
+        const val RIGHT_SERVO_OPEN_MICROSECONDS = 2500.0
+        const val RIGHT_SERVO_CLOSED_MICROSECONDS = 1525.0
         const val estimatedTimeToComplete = 100 // 100 ms based on https://axon-robotics.com/products/micro
     }
     private var movementStartTime = System.currentTimeMillis()

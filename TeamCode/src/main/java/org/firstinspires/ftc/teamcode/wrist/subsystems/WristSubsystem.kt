@@ -18,13 +18,16 @@ class WristSubsystem(private val leftServo : ServoImplEx, private val rightServo
                 robot.telemetry)
 
     companion object{
-        const val LEFT_SERVO_RESTING_POSITION = 1384.0
-        const val RIGHT_SERVO_RESTING_POSITION = 1502.0
+        const val LEFT_SERVO_RESTING_POSITION = 1150.0
+        const val RIGHT_SERVO_RESTING_POSITION = 1750.0
+        // left up is positive, right up is negative
+
         //TODO: Find actual values for these
-        const val LEFT_SERVO_UP_POSITION = 500.0
-        const val RIGHT_SERVO_UP_POSITION = 500.0
-        const val LEFT_SERVO_DOWN_POSITION = 2500.0
-        const val RIGHT_SERVO_DOWN_POSITION = 2500.0
+        const val OFFSET = 500.0
+        const val LEFT_SERVO_UP_POSITION = LEFT_SERVO_RESTING_POSITION + OFFSET
+        const val RIGHT_SERVO_UP_POSITION = RIGHT_SERVO_RESTING_POSITION - OFFSET
+        const val LEFT_SERVO_DOWN_POSITION = LEFT_SERVO_RESTING_POSITION - OFFSET
+        const val RIGHT_SERVO_DOWN_POSITION = RIGHT_SERVO_RESTING_POSITION + OFFSET
 
     }
     private var movementStartTime = System.currentTimeMillis()
