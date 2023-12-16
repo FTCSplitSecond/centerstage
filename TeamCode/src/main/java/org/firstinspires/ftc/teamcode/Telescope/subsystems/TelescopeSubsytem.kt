@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
 import org.firstinspires.ftc.teamcode.Telescope.subsystems.TelescopeConfig.*
 import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
+import org.firstinspires.ftc.teamcode.swerve.utils.clamp
 
 
 enum class TelescopePosition {
@@ -32,7 +33,7 @@ class TelescopeSubsytem(private val motor: DcMotorEx, private val telemetry: Tel
     }
 
     val TELESCOPE_MOTOR_PPR = 384.5 // https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-13-7-1-ratio-24mm-length-8mm-rex-shaft-435-rpm-3-3-5v-encoder/
-    val INCHES_PER_REVOLUTION = 30.0/25.4*Math.PI //inches
+    val INCHES_PER_REVOLUTION = 30.0/25.4 * Math.PI //inches
     val PIDTolerance = 0.1 // inches
 
     private fun getEncoderTicksFromExtensionInches(extensionInches : Double) : Double {
@@ -65,8 +66,10 @@ class TelescopeSubsytem(private val motor: DcMotorEx, private val telemetry: Tel
     }
 
     override fun periodic() {
-        if (isEnabled)
-            motor.power = controller.calculate(currentExtensionInches, targetExtenstionInches)
+        if (isEnabled) {
+            val clampedTarget = targetExtenstionInches.clamp(TELESCOPE_MIN, TELESCOPE_MAX)
+            motor.power = controller.calculate(currentExtensionInches, clampedTarget)
+        }
 
         if(isTelemetryEnabled) {
             telemetry.addLine("Telescope: Telemetry Enabled")

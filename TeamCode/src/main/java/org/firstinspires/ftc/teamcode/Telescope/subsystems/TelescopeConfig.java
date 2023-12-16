@@ -8,9 +8,10 @@ public class TelescopeConfig {
     public static double TELESCOPE_KI = 0.0;
     public static double TELESCOPE_KD = 0.04;
 
-    public static double TELESCOPE_EXTENDED_INTAKE = 0.0; //placeholder inches
-    public static double TELESCOPE_CLOSE_INTAKE = 0.0; // placeholder inches
-    public static double TELESCOPE_DEPOSIT = 1.0; //placeholder inches
-    public static double TELESCOPE_TRAVEL = 0.0; //placeholder inches
-
+    public static double TELESCOPE_EXTENDED_INTAKE = 17.0; //  inches
+    public static double TELESCOPE_CLOSE_INTAKE = 1.0; //   inches
+    public static double TELESCOPE_DEPOSIT = 15.0; //  inches
+    public static double TELESCOPE_TRAVEL = 0.5; //  inches
+    public static double TELESCOPE_MAX = 17.0; //  inches
+    public static double TELESCOPE_MIN = 0.0; //  inches
 }
