@@ -1,13 +1,12 @@
-package org.firstinspires.ftc.teamcode.Telescope.subsystems
+package org.firstinspires.ftc.teamcode.telescope.subsystems
 
 import com.arcrobotics.ftclib.command.SubsystemBase
 import com.arcrobotics.ftclib.controller.PIDController
-import com.arcrobotics.ftclib.hardware.motors.MotorEx
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
-import org.firstinspires.ftc.teamcode.Telescope.subsystems.TelescopeConfig.*
+import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeConfig.*
 import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.swerve.utils.clamp
@@ -17,7 +16,8 @@ enum class TelescopePosition {
     EXTENDED_INTAKE,
     CLOSE_INTAKE,
     DEPOSIT,
-    TRAVEL
+    TRAVEL,
+    DEPOSIT_SAFE
 }
 
 class TelescopeSubsytem(private val motor: DcMotorEx, private val telemetry: Telemetry, opModeType: OpModeType) : SubsystemBase() {
@@ -55,6 +55,7 @@ class TelescopeSubsytem(private val motor: DcMotorEx, private val telemetry: Tel
                 TelescopePosition.CLOSE_INTAKE -> TELESCOPE_CLOSE_INTAKE
                 TelescopePosition.DEPOSIT -> TELESCOPE_DEPOSIT
                 TelescopePosition.EXTENDED_INTAKE -> TELESCOPE_EXTENDED_INTAKE
+                TelescopePosition.DEPOSIT_SAFE -> TELESCOPE_DEPOSIT_SAFE
             }
             field = value
         }

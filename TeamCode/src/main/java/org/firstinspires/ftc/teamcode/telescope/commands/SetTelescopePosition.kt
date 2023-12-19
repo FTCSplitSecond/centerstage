@@ -1,7 +1,7 @@
-package org.firstinspires.ftc.teamcode.Telescope.commands
+package org.firstinspires.ftc.teamcode.telescope.commands
 
 import com.arcrobotics.ftclib.command.CommandBase
-import org.firstinspires.ftc.teamcode.Telescope.subsystems.*
+import org.firstinspires.ftc.teamcode.telescope.subsystems.*
 
 class SetTelescopePosition(private val telescope : TelescopeSubsytem, private val position: TelescopePosition) : CommandBase() {
 

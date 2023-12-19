@@ -15,6 +15,7 @@ enum class ElbowPosition{
     EXTENDED_INTAKE,
     CLOSE_INTAKE,
     DEPOSIT,
+    DEPOSIT_SAFE,
     TRAVEL
 }
 class ElbowSubsystem(private val motor: DcMotorEx, private val telemetry: Telemetry, opModeType: OpModeType) : SubsystemBase() {
@@ -53,6 +54,7 @@ class ElbowSubsystem(private val motor: DcMotorEx, private val telemetry: Teleme
                 ElbowPosition.CLOSE_INTAKE -> ElbowConfig.ELBOW_CLOSE_INTAKE
                 ElbowPosition.DEPOSIT -> ElbowConfig.ELBOW_DEPOSIT
                 ElbowPosition.EXTENDED_INTAKE -> ElbowConfig.ELBOW_EXTENDED_INTAKE
+                ElbowPosition.DEPOSIT_SAFE -> ElbowConfig.ELBOW_DEPOSIT_SAFE
             }
             field = value
         }

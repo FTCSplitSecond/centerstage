@@ -7,9 +7,6 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.DcMotorEx
-import org.firstinspires.ftc.teamcode.Telescope.commands.SetTelescopePosition
-import org.firstinspires.ftc.teamcode.Telescope.subsystems.TelescopePosition
-import org.firstinspires.ftc.teamcode.Telescope.subsystems.TelescopeSubsytem
 import org.firstinspires.ftc.teamcode.elbow.commands.SetElbowPosition
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowPosition
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowSubsystem

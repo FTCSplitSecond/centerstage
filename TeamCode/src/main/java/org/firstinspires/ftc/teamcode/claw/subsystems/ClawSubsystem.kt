@@ -16,13 +16,6 @@ class ClawSubsystem(private val leftServo : ServoImplEx, private val rightServo 
             this(robot.hardwareMap.get(ServoImplEx::class.java, "leftClawServo"),
                  robot.hardwareMap.get(ServoImplEx::class.java, "rightClawServo"),
                  robot.telemetry)
-    companion object {
-        const val LEFT_SERVO_OPEN_MICROSECONDS = 500.0
-        const val LEFT_SERVO_CLOSED_MICROSECONDS = 1450.0
-        const val RIGHT_SERVO_OPEN_MICROSECONDS = 2500.0
-        const val RIGHT_SERVO_CLOSED_MICROSECONDS = 1525.0
-        const val estimatedTimeToComplete = 100 // 100 ms based on https://axon-robotics.com/products/micro
-    }
     private var movementStartTime = System.currentTimeMillis()
     init {
         register()
@@ -32,12 +25,12 @@ class ClawSubsystem(private val leftServo : ServoImplEx, private val rightServo 
     var position:ClawPositions = ClawPositions.CLOSED
         set(value) {
             leftServo.position = getServoPositionFromPulseWidth(when(value){
-                ClawPositions.OPEN -> LEFT_SERVO_OPEN_MICROSECONDS
-                ClawPositions.CLOSED -> LEFT_SERVO_CLOSED_MICROSECONDS
+                ClawPositions.OPEN -> ClawConfig.LEFT_SERVO_OPEN_MICROSECONDS
+                ClawPositions.CLOSED -> ClawConfig.LEFT_SERVO_CLOSED_MICROSECONDS
             }, leftServo)
             rightServo.position = getServoPositionFromPulseWidth(when(value){
-                ClawPositions.OPEN -> RIGHT_SERVO_OPEN_MICROSECONDS
-                ClawPositions.CLOSED -> RIGHT_SERVO_CLOSED_MICROSECONDS
+                ClawPositions.OPEN -> ClawConfig.RIGHT_SERVO_OPEN_MICROSECONDS
+                ClawPositions.CLOSED -> ClawConfig.RIGHT_SERVO_CLOSED_MICROSECONDS
             }, rightServo)
             movementStartTime = System.currentTimeMillis()
             field = value
@@ -46,7 +39,7 @@ class ClawSubsystem(private val leftServo : ServoImplEx, private val rightServo 
         return (pulseWidth - servo.pwmRange.usPulseLower) / (servo.pwmRange.usPulseUpper - servo.pwmRange.usPulseLower)
     }
     fun movementShouldBeComplete() : Boolean {
-        return System.currentTimeMillis() - movementStartTime > estimatedTimeToComplete
+        return System.currentTimeMillis() - movementStartTime > ClawConfig.estimatedTimeToComplete
     }
     private var isTelemetryEnabled = false
     override fun periodic(){

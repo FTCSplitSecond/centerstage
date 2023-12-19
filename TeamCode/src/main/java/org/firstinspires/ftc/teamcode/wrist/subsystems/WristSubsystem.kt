@@ -1,64 +1,65 @@
 package org.firstinspires.ftc.teamcode.wrist.subsystems
 
 import com.arcrobotics.ftclib.command.SubsystemBase
+import com.qualcomm.robotcore.hardware.PwmControl
+import com.qualcomm.robotcore.hardware.Servo
 import com.qualcomm.robotcore.hardware.ServoImplEx
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 
-enum class WristPositions{
-    REST,
-    UP,
-    DOWN
+enum class WristPosition {
+    EXTENDED_INTAKE,
+    CLOSE_INTAKE,
+    DEPOSIT,
+    DEPOSIT_SAFE,
+    TRAVEL
 }
 class WristSubsystem(private val leftServo : ServoImplEx, private val rightServo : ServoImplEx, private val telemetry: Telemetry): SubsystemBase() {
     constructor(robot: Robot) :
             this(robot.hardwareMap.get(ServoImplEx::class.java, "leftWristServo"),
                 robot.hardwareMap.get(ServoImplEx::class.java, "rightWristServo"),
                 robot.telemetry)
-
-    companion object{
-        const val LEFT_SERVO_RESTING_POSITION = 1150.0
-        const val RIGHT_SERVO_RESTING_POSITION = 1750.0
-        // left up is positive, right up is negative
-
-        //TODO: Find actual values for these
-        const val OFFSET = 500.0
-        const val LEFT_SERVO_UP_POSITION = LEFT_SERVO_RESTING_POSITION + OFFSET
-        const val RIGHT_SERVO_UP_POSITION = RIGHT_SERVO_RESTING_POSITION - OFFSET
-        const val LEFT_SERVO_DOWN_POSITION = LEFT_SERVO_RESTING_POSITION - OFFSET
-        const val RIGHT_SERVO_DOWN_POSITION = RIGHT_SERVO_RESTING_POSITION + OFFSET
-
-    }
+    var isTelemetryEnabled = false
+    private val degreesPerMicrosecond = 180.0/2000.0
     private var movementStartTime = System.currentTimeMillis()
-
+    var angle = getAngleFromPosition(WristPosition.TRAVEL)
+        private set;
     init {
         register()
+        leftServo.pwmRange = PwmControl.PwmRange(500.0, 2500.0)
+        rightServo.pwmRange = PwmControl.PwmRange(500.0, 2500.0)
+        rightServo.direction = Servo.Direction.REVERSE
     }
-    var position: WristPositions = WristPositions.REST
+    var position: WristPosition = WristPosition.TRAVEL
     set(value) {
-            leftServo.position = getServoPositionFromPulseWidth(when(value){
-                WristPositions.REST -> LEFT_SERVO_RESTING_POSITION
-                WristPositions.UP -> LEFT_SERVO_UP_POSITION
-                WristPositions.DOWN -> LEFT_SERVO_DOWN_POSITION
-            }, leftServo)
-            rightServo.position = getServoPositionFromPulseWidth(when(value){
-                WristPositions.REST -> RIGHT_SERVO_RESTING_POSITION
-                WristPositions.UP -> RIGHT_SERVO_UP_POSITION
-                WristPositions.DOWN -> RIGHT_SERVO_DOWN_POSITION
-            }, rightServo)
+            angle = getAngleFromPosition(value)
+            val leftServoPulseWidth = getServoPulseWidthFromAngle(angle, WristConfig.LEFT_SERVO_ZERO_POSITION)
+            val rightServoPulseWidth = getServoPulseWidthFromAngle(angle, WristConfig.RIGHT_SERVO_ZERO_POSITION)
+
+            leftServo.position = getServoPositionFromPulseWidth(leftServoPulseWidth, leftServo)
+            rightServo.position = getServoPositionFromPulseWidth(rightServoPulseWidth, rightServo)
             movementStartTime = System.currentTimeMillis()
             field = value
         }
     fun getServoPositionFromPulseWidth(pulseWidth : Double, servo : ServoImplEx) : Double {
         return (pulseWidth - servo.pwmRange.usPulseLower) / (servo.pwmRange.usPulseUpper - servo.pwmRange.usPulseLower)
     }
-
+    private fun getServoPulseWidthFromAngle(angle : Double, zeroPosition: Double) : Double {
+        return zeroPosition + (angle / degreesPerMicrosecond)
+    }
+    private fun getAngleFromPosition(position : WristPosition) : Double {
+        return when(position) {
+            WristPosition.TRAVEL -> WristConfig.WRIST_TRAVEL
+            WristPosition.CLOSE_INTAKE -> WristConfig.WRIST_CLOSE_INTAKE
+            WristPosition.EXTENDED_INTAKE -> WristConfig.WRIST_EXTENDED_INTAKE
+            WristPosition.DEPOSIT -> WristConfig.WRIST_DEPOSIT
+            WristPosition.DEPOSIT_SAFE -> WristConfig.WRIST_DEPOSIT_SAFE
+        }
+    }
     fun movementShouldBeComplete() : Boolean {
         return System.currentTimeMillis() - movementStartTime > 100
     }
-
-    private var isTelemetryEnabled = false
 
     override fun periodic() {
         if(isTelemetryEnabled) {
