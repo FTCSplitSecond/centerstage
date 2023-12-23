@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.claw.subsystems
 
 import com.arcrobotics.ftclib.command.SubsystemBase
-import com.arcrobotics.ftclib.util.Timing.Timer
+import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.PwmControl
 import com.qualcomm.robotcore.hardware.ServoImplEx
 import org.firstinspires.ftc.robotcore.external.Telemetry
@@ -38,6 +38,7 @@ class ClawSubsystem(private val leftServo : ServoImplEx, private val rightServo 
     fun getServoPositionFromPulseWidth(pulseWidth : Double, servo : ServoImplEx) : Double {
         return (pulseWidth - servo.pwmRange.usPulseLower) / (servo.pwmRange.usPulseUpper - servo.pwmRange.usPulseLower)
     }
+
     fun movementShouldBeComplete() : Boolean {
         return System.currentTimeMillis() - movementStartTime > ClawConfig.estimatedTimeToComplete
     }

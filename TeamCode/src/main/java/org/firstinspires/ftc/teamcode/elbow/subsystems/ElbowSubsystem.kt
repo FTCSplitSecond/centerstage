@@ -16,7 +16,8 @@ enum class ElbowPosition{
     CLOSE_INTAKE,
     DEPOSIT,
     DEPOSIT_SAFE,
-    TRAVEL
+    TRAVEL,
+    ZERO
 }
 class ElbowSubsystem(private val motor: DcMotorEx, private val telemetry: Telemetry, opModeType: OpModeType) : SubsystemBase() {
     constructor(robot: Robot):
@@ -55,6 +56,7 @@ class ElbowSubsystem(private val motor: DcMotorEx, private val telemetry: Teleme
                 ElbowPosition.DEPOSIT -> ElbowConfig.ELBOW_DEPOSIT
                 ElbowPosition.EXTENDED_INTAKE -> ElbowConfig.ELBOW_EXTENDED_INTAKE
                 ElbowPosition.DEPOSIT_SAFE -> ElbowConfig.ELBOW_DEPOSIT_SAFE
+                ElbowPosition.ZERO -> ElbowConfig.ELBOW_ZERO
             }
             field = value
         }
@@ -73,7 +75,7 @@ class ElbowSubsystem(private val motor: DcMotorEx, private val telemetry: Teleme
                 ElbowConfig.ELBOW_MAX
             )
             motor.power = controller.calculate(currentAngle, clampedTarget)
-        }
+        } else motor.power = 0.0
 
         if(isTelemetryEnabled) {
             telemetry.addLine("Elbow: Telemetry Enabled")

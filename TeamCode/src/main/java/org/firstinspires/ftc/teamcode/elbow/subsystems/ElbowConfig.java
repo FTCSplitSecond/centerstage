@@ -16,5 +16,11 @@ public class ElbowConfig {
     public static double ELBOW_MAX = 160.0; //  degrees
     public static double ELBOW_MIN = 0.0; //  degrees
 
+    public static double ELBOW_ZERO = -7.0;
+
+
+
+
+
 
 }
