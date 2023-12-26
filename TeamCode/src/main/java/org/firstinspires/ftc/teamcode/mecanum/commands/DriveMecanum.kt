@@ -4,13 +4,13 @@ import com.arcrobotics.ftclib.command.CommandBase
 import org.firstinspires.ftc.teamcode.mecanum.subsystems.MecanumDriveBase
 
 class DriveMecanum(val drive: MecanumDriveBase,
-                   private val fwdSupplier: () -> Double,
-                   private val strafeSupplier: () -> Double,
+                   private val xSupplier: () -> Double,
+                   private val ySupplier: () -> Double,
                    private val turnSupplier: () -> Double) : CommandBase() {
     init {
         addRequirements(drive)
     }
     override fun execute() {
-        drive.driveFieldCentric(fwdSupplier(), strafeSupplier(), turnSupplier())
+        drive.driveFieldCentric(xSupplier(), -ySupplier(), -turnSupplier())
     }
 }

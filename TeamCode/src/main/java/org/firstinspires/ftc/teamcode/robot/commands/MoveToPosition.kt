@@ -2,18 +2,19 @@ package org.firstinspires.ftc.teamcode.robot.commands
 
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.arcrobotics.ftclib.command.CommandBase
+import com.arcrobotics.ftclib.controller.PIDFController
 import com.qualcomm.robotcore.util.ElapsedTime
-import org.firstinspires.ftc.teamcode.robot.commands.PositionConfig.hController
-import org.firstinspires.ftc.teamcode.robot.commands.PositionConfig.xController
-import org.firstinspires.ftc.teamcode.robot.commands.PositionConfig.yController
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
-import kotlin.math.*
+import kotlin.math.abs
 
 
 class MoveToPosition(val robot: Robot, private val targetPose: Pose2d): CommandBase() {
 
     private val timeout = ElapsedTime()
     private val stableTime = ElapsedTime()
+    val xController = PIDFController(PositionConfig.xP, 0.0, PositionConfig.xD, 0.0)
+    val yController = PIDFController(PositionConfig.yP, 0.0, PositionConfig.yD, 0.0)
+    val hController = PIDFController(PositionConfig.hP, 0.0, PositionConfig.hD, 0.0)
 
     override fun initialize() {
         timeout.reset()
@@ -42,9 +43,7 @@ class MoveToPosition(val robot: Robot, private val targetPose: Pose2d): CommandB
         val headingError = angleWrap(targetPose.heading- robotPose.heading)
         val xPower = xController.calculate(robotPose.x, targetPose.x)
         val yPower = yController.calculate(robotPose.y, targetPose.y)
-        var hPower = -hController.calculate(headingError, 0.0)
-
-
+        val hPower = -hController.calculate(headingError, 0.0)
 
         return Pose2d(xPower, yPower, hPower)
     }

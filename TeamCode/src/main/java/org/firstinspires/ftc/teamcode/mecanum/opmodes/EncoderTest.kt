@@ -11,10 +11,10 @@ import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder
 class EncoderTest() : LinearOpMode() {
     override fun runOpMode() {
         val leftEncoder = Encoder(hardwareMap.get<DcMotorEx>(DcMotorEx::class.java, "fL"))
-        val rightEncoder = Encoder(hardwareMap.get<DcMotorEx>(DcMotorEx::class.java, "bL"))
+        val rightEncoder = Encoder(hardwareMap.get<DcMotorEx>(DcMotorEx::class.java, "bR"))
         rightEncoder.direction = Encoder.Direction.REVERSE
 
-        val frontEncoder = Encoder(hardwareMap.get<DcMotorEx>(DcMotorEx::class.java, "fR"))
+        val frontEncoder = Encoder(hardwareMap.get<DcMotorEx>(DcMotorEx::class.java, "bL"))
 
         val telemetry = MultipleTelemetry(FtcDashboard.getInstance().telemetry, telemetry)
         waitForStart()

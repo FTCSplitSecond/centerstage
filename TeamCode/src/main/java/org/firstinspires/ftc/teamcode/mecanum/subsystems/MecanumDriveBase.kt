@@ -14,14 +14,14 @@ class MecanumDriveBase(hardwareMap: HardwareMap, val telemetry: Telemetry) : Cen
     init {
         this.register()
     }
-    fun driveFieldCentric(forwardSpeed: Double, strafeSpeed: Double, turnSpeed: Double) {
-        val forwardSpeed = MathUtils.clamp(forwardSpeed, -1.0, 1.0)
-        val strafeSpeed = MathUtils.clamp(strafeSpeed, -1.0, 1.0)
-        val turnSpeed = MathUtils.clamp(turnSpeed, -1.0, 1.0)
+    fun driveFieldCentric(xVel: Double, yVel : Double, turnVel: Double) {
+        val xVelocity = MathUtils.clamp(xVel, -1.0, 1.0)
+        val yVelocity = MathUtils.clamp(yVel, -1.0, 1.0)
+        val turnVelocity = MathUtils.clamp(turnVel, -1.0, 1.0)
 
-        var input = com.arcrobotics.ftclib.geometry.Vector2d(forwardSpeed, strafeSpeed)
+        var input = com.arcrobotics.ftclib.geometry.Vector2d(xVelocity, yVelocity)
         input = input.rotateBy(Math.toDegrees(this.rawExternalHeading))
-        setWeightedDrivePower(Pose2d(input.x, -input.y, -turnSpeed))
+        setWeightedDrivePower(Pose2d(input.x, input.y, turnVelocity))
     }
     override fun periodic() {
         update()
