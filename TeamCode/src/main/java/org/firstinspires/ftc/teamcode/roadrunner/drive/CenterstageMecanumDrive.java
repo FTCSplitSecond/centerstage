@@ -199,10 +199,33 @@ public class CenterstageMecanumDrive extends MecanumDrive {
 
     public void update() {
         updatePoseEstimate();
+        updateForGryrodometry();
         DriveSignal signal = trajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
         if (signal != null) setDriveSignal(signal);
     }
-
+    private double lastGyroHeading = 0.0;
+    private double lastOdoHeading = 0.0;
+    private double lastHeading = 0.0;
+    public void updateForGryrodometry() {
+        double gyroHeading = getRawExternalHeading();
+        double odoHeading = getPoseEstimate().getHeading();
+        double deltaGyro = gyroHeading - lastGyroHeading;
+        double deltaOdo = odoHeading - lastOdoHeading;
+        double deltaGOHeading = deltaGyro - deltaOdo;
+        double threshold = Math.toRadians(0.125);
+        if(Math.abs(deltaGOHeading) > threshold) {
+            double newHeading = lastHeading + deltaGyro;
+            Pose2d newPose = new Pose2d(getPoseEstimate().getX(), getPoseEstimate().getY(), newHeading);
+            setPoseEstimate(newPose);
+        } else {
+            double newHeading = lastHeading + deltaOdo;
+            Pose2d newPose = new Pose2d(getPoseEstimate().getX(), getPoseEstimate().getY(), newHeading);
+            setPoseEstimate(newPose);
+        }
+        lastGyroHeading = getPoseEstimate().getHeading();
+        lastOdoHeading = odoHeading;
+        lastHeading = gyroHeading;
+    }
     public void waitForIdle() {
         while (!Thread.currentThread().isInterrupted() && isBusy())
             update();
