@@ -207,24 +207,25 @@ public class CenterstageMecanumDrive extends MecanumDrive {
     private double lastOdoHeading = 0.0;
     private double lastHeading = 0.0;
     public void updateForGryrodometry() {
+        Pose2d poseEstimate = getPoseEstimate();
         double gyroHeading = getRawExternalHeading();
-        double odoHeading = getPoseEstimate().getHeading();
+        double odoHeading = poseEstimate.getHeading();
         double deltaGyro = gyroHeading - lastGyroHeading;
         double deltaOdo = odoHeading - lastOdoHeading;
         double deltaGOHeading = deltaGyro - deltaOdo;
         double threshold = Math.toRadians(0.125);
+
+        lastGyroHeading = poseEstimate.getHeading();
+        lastOdoHeading = odoHeading;
+
         if(Math.abs(deltaGOHeading) > threshold) {
             double newHeading = lastHeading + deltaGyro;
-            Pose2d newPose = new Pose2d(getPoseEstimate().getX(), getPoseEstimate().getY(), newHeading);
-            setPoseEstimate(newPose);
+            setPoseEstimate(new Pose2d(poseEstimate.getX(), poseEstimate.getY(), newHeading));
         } else {
             double newHeading = lastHeading + deltaOdo;
-            Pose2d newPose = new Pose2d(getPoseEstimate().getX(), getPoseEstimate().getY(), newHeading);
-            setPoseEstimate(newPose);
+            setPoseEstimate(new Pose2d(poseEstimate.getX(), poseEstimate.getY(), newHeading));
         }
-        lastGyroHeading = getPoseEstimate().getHeading();
-        lastOdoHeading = odoHeading;
-        lastHeading = gyroHeading;
+        lastHeading = getPoseEstimate().getHeading();
     }
     public void waitForIdle() {
         while (!Thread.currentThread().isInterrupted() && isBusy())
