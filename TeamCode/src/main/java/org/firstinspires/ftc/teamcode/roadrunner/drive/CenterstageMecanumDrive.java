@@ -49,6 +49,8 @@ import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kA;
 import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kStatic;
 import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kV;
 
+import android.util.Log;
+
 /*
  * Simple mecanum drive hardware implementation for REV hardware.
  */
@@ -217,13 +219,18 @@ public class CenterstageMecanumDrive extends MecanumDrive {
 
         lastGyroHeading = poseEstimate.getHeading();
         lastOdoHeading = odoHeading;
-
+        Log.i("DG", "deltaGOHeading, threshold"+ deltaGOHeading+","+threshold);
+        Log.i("DG", "pose x,y"+ poseEstimate.getX() + "," + poseEstimate.getY());
         if(Math.abs(deltaGOHeading) > threshold) {
             double newHeading = lastHeading + deltaGyro;
-            setPoseEstimate(new Pose2d(poseEstimate.getX(), poseEstimate.getY(), newHeading));
+            Pose2d newPose = new Pose2d(poseEstimate.getX(), poseEstimate.getY(), newHeading);
+            Log.i("DG", "gyro pose x,y"+ newPose.getX() + "," + newPose.getY());
+          //  setPoseEstimate(newPose);
         } else {
             double newHeading = lastHeading + deltaOdo;
-            setPoseEstimate(new Pose2d(poseEstimate.getX(), poseEstimate.getY(), newHeading));
+            Pose2d newPose = new Pose2d(poseEstimate.getX(), poseEstimate.getY(), newHeading);
+            Log.i("DG", "odo pose x,y"+ newPose.getX() + "," + newPose.getY());
+            //setPoseEstimate(newPose);
         }
         lastHeading = getPoseEstimate().getHeading();
     }

@@ -20,7 +20,7 @@ class MecanumDriveBase(hardwareMap: HardwareMap, val telemetry: Telemetry) : Cen
         val turnVelocity = MathUtils.clamp(turnVel, -1.0, 1.0)
 
         var input = com.arcrobotics.ftclib.geometry.Vector2d(xVelocity, yVelocity)
-        input = input.rotateBy(Math.toDegrees(this.rawExternalHeading))
+        input = input.rotateBy(Math.toDegrees(-this.rawExternalHeading))
         setWeightedDrivePower(Pose2d(input.x, input.y, turnVelocity))
     }
     override fun periodic() {

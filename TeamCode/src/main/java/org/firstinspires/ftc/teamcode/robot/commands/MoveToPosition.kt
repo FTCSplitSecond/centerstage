@@ -43,7 +43,7 @@ class MoveToPosition(val robot: Robot, private val targetPose: Pose2d): CommandB
         val headingError = angleWrap(targetPose.heading- robotPose.heading)
         val xPower = xController.calculate(robotPose.x, targetPose.x)
         val yPower = yController.calculate(robotPose.y, targetPose.y)
-        val hPower = -hController.calculate(headingError, 0.0)
+        val hPower = hController.calculate(headingError, 0.0)
 
         return Pose2d(xPower, yPower, hPower)
     }

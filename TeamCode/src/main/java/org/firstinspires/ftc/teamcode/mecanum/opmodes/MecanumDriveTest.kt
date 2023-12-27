@@ -20,8 +20,8 @@ public class MecanumDriveTest : CommandOpMode() {
         val mecanumDrive = MecanumDriveBase(hardwareMap, multiTelemetry)
         val command = DriveMecanum(mecanumDrive,
             { driver.leftY.pow(2) * sign(driver.leftY) },
-            { driver.leftX.pow(2) * sign(driver.leftX) },
-            { driver.rightX })
+            { driver.leftX.pow(2) * - sign(driver.leftX) },
+            { - driver.rightX })
         schedule(command)
         schedule(OutputDriveTelemetry(multiTelemetry, mecanumDrive))
     }
