@@ -19,13 +19,17 @@ class EncoderTest() : LinearOpMode() {
         val telemetry = MultipleTelemetry(FtcDashboard.getInstance().telemetry, telemetry)
         waitForStart()
 
+        val leftStart = leftEncoder.currentPosition
+        val rightStart = rightEncoder.currentPosition
+        val frontStart = frontEncoder.currentPosition
+
         while (opModeIsActive()) {
             // Get the current position of the motor
 
             // Show the position of the motor on telemetry
-            telemetry.addData("leftEncoder", leftEncoder.currentPosition)
-            telemetry.addData("rightEncoder", rightEncoder.currentPosition)
-            telemetry.addData("frontEncoder", frontEncoder.currentPosition)
+            telemetry.addData("leftEncoder", leftEncoder.currentPosition - leftStart)
+            telemetry.addData("rightEncoder", rightEncoder.currentPosition - rightStart)
+            telemetry.addData("frontEncoder", frontEncoder.currentPosition - frontStart)
             telemetry.update()
         }
     }
