@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
+import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_HOME
 import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.swerve.utils.clamp
@@ -17,7 +18,7 @@ enum class ElbowPosition{
     DEPOSIT,
     DEPOSIT_SAFE,
     TRAVEL,
-    ZERO
+    HOME
 }
 class ElbowSubsystem(private val motor: DcMotorEx, private val telemetry: Telemetry, opModeType: OpModeType) : SubsystemBase() {
     constructor(robot: Robot):
@@ -39,7 +40,7 @@ class ElbowSubsystem(private val motor: DcMotorEx, private val telemetry: Teleme
         return angle/ DEGREES_PER_REVOLUTION * ELBOW_MOTOR_PPR // ticks
     }
     private fun getAngleFromEncoderTicks(encoderTicks : Int) : Double {
-        return  encoderTicks/ ELBOW_MOTOR_PPR * DEGREES_PER_REVOLUTION // degrees
+        return  encoderTicks/ ELBOW_MOTOR_PPR * DEGREES_PER_REVOLUTION + ELBOW_HOME // degrees
     }
 
     val currentAngle : Double
@@ -56,7 +57,7 @@ class ElbowSubsystem(private val motor: DcMotorEx, private val telemetry: Teleme
                 ElbowPosition.DEPOSIT -> ElbowConfig.ELBOW_DEPOSIT
                 ElbowPosition.EXTENDED_INTAKE -> ElbowConfig.ELBOW_EXTENDED_INTAKE
                 ElbowPosition.DEPOSIT_SAFE -> ElbowConfig.ELBOW_DEPOSIT_SAFE
-                ElbowPosition.ZERO -> ElbowConfig.ELBOW_ZERO
+                ElbowPosition.HOME -> ElbowConfig.ELBOW_HOME
             }
             field = value
         }
