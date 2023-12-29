@@ -11,6 +11,6 @@ class DriveMecanum(val drive: MecanumDriveBase,
         addRequirements(drive)
     }
     override fun execute() {
-        drive.driveFieldCentric(xSupplier(), -ySupplier(), -turnSupplier())
+        drive.driveFieldCentric(xSupplier(), ySupplier(), turnSupplier())
     }
 }
