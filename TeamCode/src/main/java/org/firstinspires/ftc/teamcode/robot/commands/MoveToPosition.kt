@@ -4,6 +4,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.arcrobotics.ftclib.command.CommandBase
 import com.arcrobotics.ftclib.controller.PIDFController
 import com.qualcomm.robotcore.util.ElapsedTime
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import kotlin.math.abs
 
@@ -20,13 +21,11 @@ class MoveToPosition(val robot: Robot, private val targetPose: Pose2d): CommandB
         timeout.reset()
         stableTime.reset()
     }
-
     override fun execute() {
         val robotPose = robot.driveBase.poseEstimate
         val powers = getPower(robotPose)
         robot.driveBase.driveFieldCentric(powers.x, powers.y, powers.heading)
     }
-
     override fun isFinished(): Boolean {
         val robotPose = Pose2d()
         val delta = targetPose.minus(robotPose)
@@ -38,27 +37,12 @@ class MoveToPosition(val robot: Robot, private val targetPose: Pose2d): CommandB
 
         return timeout.milliseconds()>5000 || stableTime.milliseconds() > 250
     }
-
     private fun getPower(robotPose: Pose2d): Pose2d {
-        val headingError = angleWrap(targetPose.heading- robotPose.heading)
+        val headingError = AngleUnit.normalizeRadians(targetPose.heading- robotPose.heading)
         val xPower = xController.calculate(robotPose.x, targetPose.x)
         val yPower = yController.calculate(robotPose.y, targetPose.y)
         val hPower = -hController.calculate(headingError, 0.0)
-
         return Pose2d(xPower, yPower, hPower)
-    }
-
-
-    private fun angleWrap(radians: Double): Double {
-        var radians = radians
-        while (radians > Math.PI) {
-            radians -= 2 * Math.PI
-        }
-        while (radians < -Math.PI) {
-            radians += 2 * Math.PI
-        }
-
-        return radians
     }
 
 
