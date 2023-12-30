@@ -8,7 +8,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 
-public class PropDetectorTest extends LinearOpMode {
+class PropDetectorTest extends LinearOpMode {
 
     OpenCvCamera webcam;
 
@@ -18,7 +18,7 @@ public class PropDetectorTest extends LinearOpMode {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
-        
+
 
     }
 }
