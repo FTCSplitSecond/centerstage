@@ -22,8 +22,6 @@ class MoveToTravel(val robot : Robot) : ConfigurableCommandBase()  {
 
     override fun configure(): CommandBase {
         return SequentialCommandGroup(
-            CloseBothClaw(robot.leftclaw, robot.rightClaw),
-            WaitCommand(250),
             ParallelCommandGroup(
                 SetElbowPosition(robot.elbow, ElbowPosition.TRAVEL),
                 SetTelescopePosition(robot.telescope, TelescopePosition.TRAVEL),

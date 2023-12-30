@@ -7,8 +7,13 @@ import com.arcrobotics.ftclib.command.button.Trigger
 import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import org.firstinspires.ftc.teamcode.claw.commands.CloseBothClaw
 import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
+import org.firstinspires.ftc.teamcode.claw.commands.ToggleLeftClaw
+import org.firstinspires.ftc.teamcode.claw.commands.ToggleRightClaw
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
+import org.firstinspires.ftc.teamcode.claw.subsystems.LeftClawSubsystem
+import org.firstinspires.ftc.teamcode.claw.subsystems.RightClawSubsystem
 import org.firstinspires.ftc.teamcode.mecanum.commands.DriveMecanum
 import org.firstinspires.ftc.teamcode.robot.commands.DecreasePixelLevel
 import org.firstinspires.ftc.teamcode.robot.commands.IncreasePixelLevel
@@ -47,13 +52,22 @@ class MainTeleOp() : CommandOpMode() {
         val driverDPADUpButton = driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
         val driverDPADDownButton = driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
 
-        driverLeftTrigger.whenActive(MoveToExtendedIntake(robot)).whenInactive(MoveToTravel(robot))
-        driverLeftBumper.whenActive(MoveToCloseIntake(robot)).whenInactive(MoveToTravel(robot))
+        driverLeftTrigger.whenActive(MoveToExtendedIntake(robot))
+            .whenInactive(SequentialCommandGroup(
+                CloseBothClaw(robot.leftclaw, robot.rightClaw), WaitCommand(250), MoveToTravel(robot)))
+        driverCrossButton.whenActive(MoveToCloseIntake(robot))
+            .whenInactive(SequentialCommandGroup(
+                CloseBothClaw(robot.leftclaw, robot.rightClaw), WaitCommand(250), MoveToTravel(robot)))
 
         driverRightTrigger.whenActive(MoveToDeposit(robot))
             .whenInactive(SequentialCommandGroup(
                 OpenBothClaw(robot.leftclaw, robot.rightClaw), WaitCommand(350), MoveToTravel(robot)))
 
+
+        driverLeftBumper.whenPressed(ToggleLeftClaw(LeftClawSubsystem(robot)))
+        driverRightBumper.whenPressed(ToggleRightClaw(RightClawSubsystem(robot)))
+
+        
         driverTriangleButton.whenPressed(MoveToTravel(robot))
 
         driverDPADUpButton.whenPressed(IncreasePixelLevel(robot))
