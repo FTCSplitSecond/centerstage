@@ -33,9 +33,12 @@ class WristSubsystem(private val leftServo : ServoImplEx, private val rightServo
     }
     var position: WristPosition = WristPosition.TRAVEL
     set(value) {
-        angle = getAngleFromPosition(value)
-        updateServoFromAngle(angle)
-        field = value
+        if(value != position) {
+            angle = getAngleFromPosition(value)
+            updateServoFromAngle(angle)
+            field = value
+            movementStartTime = System.currentTimeMillis()
+        }
     }
     fun updateServoFromAngle(angle: Double) {
         val leftServoPulseWidth = getServoPulseWidthFromAngle(angle, WristConfig.LEFT_SERVO_ZERO_POSITION)
@@ -43,7 +46,6 @@ class WristSubsystem(private val leftServo : ServoImplEx, private val rightServo
 
         leftServo.position = getServoPositionFromPulseWidth(leftServoPulseWidth, leftServo)
         rightServo.position = getServoPositionFromPulseWidth(rightServoPulseWidth, rightServo)
-        movementStartTime = System.currentTimeMillis()
     }
     fun getServoPositionFromPulseWidth(pulseWidth : Double, servo : ServoImplEx) : Double {
         return (pulseWidth - servo.pwmRange.usPulseLower) / (servo.pwmRange.usPulseUpper - servo.pwmRange.usPulseLower)
@@ -62,7 +64,7 @@ class WristSubsystem(private val leftServo : ServoImplEx, private val rightServo
     var pixelLevel : Int = 0
         set (value){
             if(position == WristPosition.DEPOSIT) {
-                angle = InverseKinematics.calculateArmInverseKinematics(pixelLevel).wristAngle
+                angle = InverseKinematics.calculateArmInverseKinematics(value).wristAngle
                 updateServoFromAngle(angle)
             }
             field = value

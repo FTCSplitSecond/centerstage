@@ -26,9 +26,8 @@ class MoveToTravel(val robot : Robot) : ConfigurableCommandBase()  {
             WaitCommand(250),
             ParallelCommandGroup(
                 SetElbowPosition(robot.elbow, ElbowPosition.TRAVEL),
-                SetTelescopePosition(robot.telescope, TelescopePosition.TRAVEL)),
-            WaitCommand(250),
-            SetWristPosition(robot.wrist, WristPosition.TRAVEL)
+                SetTelescopePosition(robot.telescope, TelescopePosition.TRAVEL),
+                SetWristPosition(robot.wrist, WristPosition.TRAVEL))
         )
     }
 }

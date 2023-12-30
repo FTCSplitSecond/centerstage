@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.robot.commands.MoveToCloseIntake
 import org.firstinspires.ftc.teamcode.robot.commands.MoveToDeposit
 import org.firstinspires.ftc.teamcode.robot.commands.MoveToExtendedIntake
 import org.firstinspires.ftc.teamcode.robot.commands.MoveToTravel
+import org.firstinspires.ftc.teamcode.robot.commands.UpdateTelemetry
 import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import kotlin.math.pow
@@ -46,13 +47,10 @@ class MainTeleOp() : CommandOpMode() {
         val driverDPADUpButton = driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
         val driverDPADDownButton = driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
 
-
-
         driverLeftTrigger.whenActive(MoveToExtendedIntake(robot)).whenInactive(MoveToTravel(robot))
         driverLeftBumper.whenActive(MoveToCloseIntake(robot)).whenInactive(MoveToTravel(robot))
 
         driverRightTrigger.whenActive(MoveToDeposit(robot))
-
             .whenInactive(SequentialCommandGroup(
                 OpenBothClaw(robot.leftclaw, robot.rightClaw), WaitCommand(350), MoveToTravel(robot)))
 
@@ -61,5 +59,16 @@ class MainTeleOp() : CommandOpMode() {
         driverDPADUpButton.whenPressed(IncreasePixelLevel(robot))
         driverDPADDownButton.whenPressed(DecreasePixelLevel(robot))
 
+        schedule(UpdateTelemetry(robot) {
+            robot.telemetry.addData("X", robot.driveBase.poseEstimate.x)
+            robot.telemetry.addData("Y", robot.driveBase.poseEstimate.y)
+            robot.telemetry.addData("Elbow Angle", robot.elbow.currentAngle)
+            robot.telemetry.addData("Wrist Angle", robot.wrist.angle)
+            robot.telemetry.addData("Telescope Ext", robot.telescope.currentExtensionInches)
+            robot.telemetry.addData("pixel level", robot.elbow.pixelLevel)
+            robot.telemetry.addData("left claw", robot.leftclaw.position)
+            robot.telemetry.addData("right claw", robot.rightClaw.position)
+            robot.telemetry.update()
+        })
     }
 }
