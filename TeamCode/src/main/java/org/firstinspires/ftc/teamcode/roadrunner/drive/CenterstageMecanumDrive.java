@@ -54,8 +54,8 @@ import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kV;
  */
 @Config
 public class CenterstageMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(12.0, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(3.0, 0, 0.8);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(8.0, 0, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(8.0, 0, 0);
 
     public static double LATERAL_MULTIPLIER = 1;
 
@@ -110,6 +110,8 @@ public class CenterstageMecanumDrive extends MecanumDrive {
             MotorConfigurationType motorConfigurationType = motor.getMotorType().clone();
             motorConfigurationType.setAchieveableMaxRPMFraction(1.0);
             motor.setMotorType(motorConfigurationType);
+            motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+
         }
 
         if (RUN_USING_ENCODER) {
