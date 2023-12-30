@@ -10,8 +10,6 @@ public class WristConfig {
 
         public static double WRIST_EXTENDED_INTAKE = 3.0; //  degrees
         public static double WRIST_CLOSE_INTAKE = 6.0; //   degrees
-        public static double WRIST_DEPOSIT = -22.5; //  degrees
-        public static double WRIST_DEPOSIT_SAFE = -12; //  degrees
         public static double WRIST_TRAVEL = 90.0; //  degrees
         public static double WRIST_MAX = 90.0; //  degrees
         public static double WRIST_MIN = -30.0; //  degrees

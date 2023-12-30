@@ -9,6 +9,9 @@ class SetWristPosition(private val wrist: WristSubsystem, private val position: 
         addRequirements(wrist)
     }
     override fun initialize() {
+    }
+
+    override fun execute() {
         wrist.position = position
     }
     override fun isFinished(): Boolean {

@@ -3,8 +3,7 @@ package org.firstinspires.ftc.teamcode.robot.commands
 import com.arcrobotics.ftclib.command.CommandBase
 import com.arcrobotics.ftclib.command.ParallelCommandGroup
 import com.arcrobotics.ftclib.command.SequentialCommandGroup
-import com.arcrobotics.ftclib.command.WaitCommand
-import org.firstinspires.ftc.teamcode.claw.commands.SetClawPosition
+import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.elbow.commands.SetElbowPosition
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowPosition
@@ -21,7 +20,7 @@ class MoveToCloseIntake(val robot : Robot) : ConfigurableCommandBase()  {
 
     override fun configure(): CommandBase {
         return SequentialCommandGroup(
-            SetClawPosition(robot.claw, ClawPositions.OPEN),
+            OpenBothClaw(robot.leftclaw, robot.rightClaw),
             SetWristPosition(robot.wrist, WristPosition.CLOSE_INTAKE),
             ParallelCommandGroup(
                 SetElbowPosition(robot.elbow, ElbowPosition.CLOSE_INTAKE),

@@ -7,14 +7,21 @@ import com.arcrobotics.ftclib.command.button.Trigger
 import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import org.firstinspires.ftc.teamcode.claw.commands.SetClawPosition
+import org.firstinspires.ftc.teamcode.claw.commands.CloseBothClaw
+import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
+import org.firstinspires.ftc.teamcode.claw.commands.ToggleLeftClaw
+import org.firstinspires.ftc.teamcode.claw.commands.ToggleRightClaw
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
+import org.firstinspires.ftc.teamcode.claw.subsystems.LeftClawSubsystem
+import org.firstinspires.ftc.teamcode.claw.subsystems.RightClawSubsystem
 import org.firstinspires.ftc.teamcode.mecanum.commands.DriveMecanum
+import org.firstinspires.ftc.teamcode.robot.commands.DecreasePixelLevel
+import org.firstinspires.ftc.teamcode.robot.commands.IncreasePixelLevel
 import org.firstinspires.ftc.teamcode.robot.commands.MoveToCloseIntake
 import org.firstinspires.ftc.teamcode.robot.commands.MoveToDeposit
-import org.firstinspires.ftc.teamcode.robot.commands.MoveToDepositSafe
 import org.firstinspires.ftc.teamcode.robot.commands.MoveToExtendedIntake
 import org.firstinspires.ftc.teamcode.robot.commands.MoveToTravel
+import org.firstinspires.ftc.teamcode.robot.commands.UpdateTelemetry
 import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import kotlin.math.pow
@@ -42,15 +49,40 @@ class MainTeleOp() : CommandOpMode() {
         val driverSquareButton = driver.getGamepadButton(GamepadKeys.Button.X)
         val driverCrossButton = driver.getGamepadButton(GamepadKeys.Button.A)
         val driverDPADLeftButton = driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
+        val driverDPADUpButton = driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+        val driverDPADDownButton = driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
 
-        driverLeftTrigger.whenActive(MoveToExtendedIntake(robot)).whenInactive(MoveToTravel(robot))
-        driverLeftBumper.whenActive(MoveToCloseIntake(robot)).whenInactive(MoveToTravel(robot))
-        driverRightTrigger.whenActive(MoveToDeposit(robot)).whenInactive(SequentialCommandGroup(
-            SetClawPosition(robot.claw, ClawPositions.OPEN), WaitCommand(250), MoveToTravel(robot)))
-        driverRightBumper.whenActive(MoveToDepositSafe(robot)).whenInactive(SequentialCommandGroup(
-            SetClawPosition(robot.claw, ClawPositions.OPEN), WaitCommand(250), MoveToTravel(robot)))
+        driverLeftTrigger.whenActive(MoveToExtendedIntake(robot))
+            .whenInactive(SequentialCommandGroup(
+                CloseBothClaw(robot.leftclaw, robot.rightClaw), WaitCommand(250), MoveToTravel(robot)))
+        driverCrossButton.whenActive(MoveToCloseIntake(robot))
+            .whenInactive(SequentialCommandGroup(
+                CloseBothClaw(robot.leftclaw, robot.rightClaw), WaitCommand(250), MoveToTravel(robot)))
+
+        driverRightTrigger.whenActive(MoveToDeposit(robot))
+            .whenInactive(SequentialCommandGroup(
+                OpenBothClaw(robot.leftclaw, robot.rightClaw), WaitCommand(350), MoveToTravel(robot)))
+
+
+        driverLeftBumper.whenPressed(ToggleLeftClaw(LeftClawSubsystem(robot)))
+        driverRightBumper.whenPressed(ToggleRightClaw(RightClawSubsystem(robot)))
+
+        
         driverTriangleButton.whenPressed(MoveToTravel(robot))
 
+        driverDPADUpButton.whenPressed(IncreasePixelLevel(robot))
+        driverDPADDownButton.whenPressed(DecreasePixelLevel(robot))
 
+        schedule(UpdateTelemetry(robot) {
+            robot.telemetry.addData("X", robot.driveBase.poseEstimate.x)
+            robot.telemetry.addData("Y", robot.driveBase.poseEstimate.y)
+            robot.telemetry.addData("Elbow Angle", robot.elbow.currentAngle)
+            robot.telemetry.addData("Wrist Angle", robot.wrist.angle)
+            robot.telemetry.addData("Telescope Ext", robot.telescope.currentExtensionInches)
+            robot.telemetry.addData("pixel level", robot.elbow.pixelLevel)
+            robot.telemetry.addData("left claw", robot.leftclaw.position)
+            robot.telemetry.addData("right claw", robot.rightClaw.position)
+            robot.telemetry.update()
+        })
     }
 }

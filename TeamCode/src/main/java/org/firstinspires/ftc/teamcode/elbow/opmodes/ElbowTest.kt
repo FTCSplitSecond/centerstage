@@ -11,25 +11,26 @@ import org.firstinspires.ftc.teamcode.elbow.commands.SetElbowPosition
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowPosition
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowSubsystem
 import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
+import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
+import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
 
 @TeleOp
 class ElbowTest() : CommandOpMode() {
     override fun initialize() {
+
+        val robot = Robot(hardwareMap, telemetry)
         val driver = GamepadEx(gamepad1)
-        val telemetry = MultipleTelemetry(FtcDashboard.getInstance().telemetry, telemetry)
-        val motor = hardwareMap.get(DcMotorEx::class.java, "elbow")
-        val elbow = ElbowSubsystem(motor, telemetry, OpModeType.AUTONOMOUS)
-        elbow.isTelemetryEnabled = true
-        elbow.isEnabled = false
+        robot.elbow.isTelemetryEnabled = true
+        robot.elbow.isEnabled = false
 
         val gamePadA = driver.getGamepadButton(GamepadKeys.Button.A)
         val gamePadB = driver.getGamepadButton(GamepadKeys.Button.B)
         val gamePadX = driver.getGamepadButton(GamepadKeys.Button.X)
         val gamePadY = driver.getGamepadButton(GamepadKeys.Button.Y)
-        gamePadA.whenPressed(SetElbowPosition(elbow, ElbowPosition.TRAVEL))
-        gamePadB.whenPressed(SetElbowPosition(elbow, ElbowPosition.DEPOSIT))
-        gamePadX.whenPressed(SetElbowPosition(elbow, ElbowPosition.CLOSE_INTAKE))
-        gamePadY.whenPressed(SetElbowPosition(elbow, ElbowPosition.EXTENDED_INTAKE))
+        gamePadA.whenPressed(SetElbowPosition(robot.elbow, ElbowPosition.TRAVEL))
+        gamePadB.whenPressed(SetElbowPosition(robot.elbow, ElbowPosition.DEPOSIT))
+        gamePadX.whenPressed(SetElbowPosition(robot.elbow, ElbowPosition.CLOSE_INTAKE))
+        gamePadY.whenPressed(SetElbowPosition(robot.elbow, ElbowPosition.EXTENDED_INTAKE))
 
     }
 }
