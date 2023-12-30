@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
+import org.firstinspires.ftc.teamcode.Util.IKResults
+import org.firstinspires.ftc.teamcode.Util.InverseKinematics
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_HOME
 import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
@@ -16,7 +18,6 @@ enum class ElbowPosition{
     EXTENDED_INTAKE,
     CLOSE_INTAKE,
     DEPOSIT,
-    DEPOSIT_SAFE,
     TRAVEL,
     HOME
 }
@@ -48,16 +49,22 @@ class ElbowSubsystem(private val motor: DcMotorEx, private val telemetry: Teleme
             return getAngleFromEncoderTicks(motor.currentPosition)
         }
     var targetAngle : Double = 0.0
-
+        private set
     var position : ElbowPosition = ElbowPosition.TRAVEL
         set(value) {
             targetAngle = when(value) {
                 ElbowPosition.TRAVEL -> ElbowConfig.ELBOW_TRAVEL
                 ElbowPosition.CLOSE_INTAKE -> ElbowConfig.ELBOW_CLOSE_INTAKE
-                ElbowPosition.DEPOSIT -> ElbowConfig.ELBOW_DEPOSIT
+                ElbowPosition.DEPOSIT -> InverseKinematics.calculateArmInverseKinematics(pixelLevel).elbowAngle
                 ElbowPosition.EXTENDED_INTAKE -> ElbowConfig.ELBOW_EXTENDED_INTAKE
-                ElbowPosition.DEPOSIT_SAFE -> ElbowConfig.ELBOW_DEPOSIT_SAFE
                 ElbowPosition.HOME -> ElbowConfig.ELBOW_HOME
+            }
+            field = value
+        }
+    var pixelLevel : Int = 0
+        set (value){
+            if (position == ElbowPosition.DEPOSIT){
+                targetAngle = InverseKinematics.calculateArmInverseKinematics(pixelLevel).elbowAngle
             }
             field = value
         }

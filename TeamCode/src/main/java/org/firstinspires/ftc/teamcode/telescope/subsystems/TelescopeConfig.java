@@ -11,8 +11,8 @@ public class TelescopeConfig {
     public static double TELESCOPE_MIN = 0.0; //  inches
     public static double TELESCOPE_EXTENDED_INTAKE = 17.0; //  inches
     public static double TELESCOPE_CLOSE_INTAKE = 1.0; //   inches
-    public static double TELESCOPE_DEPOSIT = 15.0; //  inches
-    public static double TELESCOPE_DEPOSIT_SAFE = 4.0; //  inches
+
+
     public static double TELESCOPE_TRAVEL = 3.0; //  inches
 
 }

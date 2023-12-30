@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
+import org.firstinspires.ftc.teamcode.Util.InverseKinematics
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeConfig.*
 import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
@@ -16,8 +17,7 @@ enum class TelescopePosition {
     EXTENDED_INTAKE,
     CLOSE_INTAKE,
     DEPOSIT,
-    TRAVEL,
-    DEPOSIT_SAFE
+    TRAVEL
 }
 
 class TelescopeSubsytem(private val motor: DcMotorEx, private val telemetry: Telemetry, opModeType: OpModeType) : SubsystemBase() {
@@ -43,22 +43,31 @@ class TelescopeSubsytem(private val motor: DcMotorEx, private val telemetry: Tel
         return  encoderTicks/ TELESCOPE_MOTOR_PPR * INCHES_PER_REVOLUTION // inches
     }
 
-    val currentExtensionInches : Double
+    val  currentExtensionInches : Double
         get() {
             return getExtensionInchesFromEncoderTicks(motor.currentPosition)
         }
     var targetExtenstionInches : Double = 0.0
+        private set
     var position : TelescopePosition = TelescopePosition.TRAVEL
         set(value) {
             targetExtenstionInches = when(value) {
                 TelescopePosition.TRAVEL -> TELESCOPE_TRAVEL
                 TelescopePosition.CLOSE_INTAKE -> TELESCOPE_CLOSE_INTAKE
-                TelescopePosition.DEPOSIT -> TELESCOPE_DEPOSIT
+                TelescopePosition.DEPOSIT -> InverseKinematics.calculateArmInverseKinematics(pixelLevel).telescopeExtension
                 TelescopePosition.EXTENDED_INTAKE -> TELESCOPE_EXTENDED_INTAKE
-                TelescopePosition.DEPOSIT_SAFE -> TELESCOPE_DEPOSIT_SAFE
+
             }
             field = value
         }
+    var pixelLevel : Int = 0
+        set (value){
+            if (position == TelescopePosition.DEPOSIT) {
+                targetExtenstionInches = InverseKinematics.calculateArmInverseKinematics(pixelLevel).telescopeExtension
+            }
+            field = value
+        }
+
 
     private val controller = PIDController(TELESCOPE_KP, TELESCOPE_KI, TELESCOPE_KD)
 

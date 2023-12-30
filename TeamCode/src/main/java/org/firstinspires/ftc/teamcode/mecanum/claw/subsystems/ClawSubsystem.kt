@@ -1,7 +1,6 @@
-package org.firstinspires.ftc.teamcode.claw.subsystems
+package org.firstinspires.ftc.teamcode.mecanum.claw.subsystems
 
 import com.arcrobotics.ftclib.command.SubsystemBase
-import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.PwmControl
 import com.qualcomm.robotcore.hardware.ServoImplEx
 import org.firstinspires.ftc.robotcore.external.Telemetry
@@ -22,7 +21,7 @@ class ClawSubsystem(private val leftServo : ServoImplEx, private val rightServo 
         leftServo.pwmRange = PwmControl.PwmRange(500.0, 2500.0)
         rightServo.pwmRange = PwmControl.PwmRange(500.0, 2500.0)
     }
-    var position:ClawPositions = ClawPositions.CLOSED
+    var position: ClawPositions = ClawPositions.CLOSED
         set(value) {
             leftServo.position = getServoPositionFromPulseWidth(when(value){
                 ClawPositions.OPEN -> ClawConfig.LEFT_SERVO_OPEN_MICROSECONDS

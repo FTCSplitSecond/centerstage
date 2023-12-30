@@ -4,8 +4,8 @@ import com.arcrobotics.ftclib.command.CommandBase
 import com.arcrobotics.ftclib.command.ParallelCommandGroup
 import com.arcrobotics.ftclib.command.SequentialCommandGroup
 import com.arcrobotics.ftclib.command.WaitCommand
-import org.firstinspires.ftc.teamcode.claw.commands.SetClawPosition
-import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
+import org.firstinspires.ftc.teamcode.mecanum.claw.commands.SetClawPosition
+import org.firstinspires.ftc.teamcode.mecanum.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.telescope.commands.SetTelescopePosition
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopePosition
 import org.firstinspires.ftc.teamcode.elbow.commands.SetElbowPosition

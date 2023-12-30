@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.claw.opmodes
+package org.firstinspires.ftc.teamcode.mecanum.claw.opmodes
 
 import com.acmerobotics.dashboard.FtcDashboard
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry
@@ -7,9 +7,9 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.ServoImplEx
-import org.firstinspires.ftc.teamcode.claw.commands.SetClawPosition
-import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
-import org.firstinspires.ftc.teamcode.claw.subsystems.ClawSubsystem
+import org.firstinspires.ftc.teamcode.mecanum.claw.commands.SetClawPosition
+import org.firstinspires.ftc.teamcode.mecanum.claw.subsystems.ClawPositions
+import org.firstinspires.ftc.teamcode.mecanum.claw.subsystems.ClawSubsystem
 
 @TeleOp
 class ClawTest() : CommandOpMode() {
