@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.mecanum.claw.subsystems
+package org.firstinspires.ftc.teamcode.claw.subsystems
 
 import com.arcrobotics.ftclib.command.SubsystemBase
 import com.qualcomm.robotcore.hardware.PwmControl
@@ -10,23 +10,17 @@ enum class ClawPositions{
     OPEN,
     CLOSED
 }
-class ClawSubsystem(private val leftServo : ServoImplEx, private val rightServo : ServoImplEx, private val telemetry: Telemetry) : SubsystemBase() {
+class RightClawSubsystem( private val rightServo : ServoImplEx, private val telemetry: Telemetry) : SubsystemBase() {
     constructor(robot: Robot) :
-            this(robot.hardwareMap.get(ServoImplEx::class.java, "leftClawServo"),
-                 robot.hardwareMap.get(ServoImplEx::class.java, "rightClawServo"),
+            this(robot.hardwareMap.get(ServoImplEx::class.java, "rightClawServo"),
                  robot.telemetry)
     private var movementStartTime = System.currentTimeMillis()
     init {
         register()
-        leftServo.pwmRange = PwmControl.PwmRange(500.0, 2500.0)
         rightServo.pwmRange = PwmControl.PwmRange(500.0, 2500.0)
     }
     var position: ClawPositions = ClawPositions.CLOSED
         set(value) {
-            leftServo.position = getServoPositionFromPulseWidth(when(value){
-                ClawPositions.OPEN -> ClawConfig.LEFT_SERVO_OPEN_MICROSECONDS
-                ClawPositions.CLOSED -> ClawConfig.LEFT_SERVO_CLOSED_MICROSECONDS
-            }, leftServo)
             rightServo.position = getServoPositionFromPulseWidth(when(value){
                 ClawPositions.OPEN -> ClawConfig.RIGHT_SERVO_OPEN_MICROSECONDS
                 ClawPositions.CLOSED -> ClawConfig.RIGHT_SERVO_CLOSED_MICROSECONDS
@@ -44,9 +38,8 @@ class ClawSubsystem(private val leftServo : ServoImplEx, private val rightServo 
     private var isTelemetryEnabled = false
     override fun periodic(){
         if(isTelemetryEnabled) {
-            telemetry.addLine("Claw: Telemetry Enabled")
-            telemetry.addData("claw position", position.toString())
-            telemetry.addData("leftServo.position", leftServo.position)
+            telemetry.addLine("Right Claw: Telemetry Enabled")
+            telemetry.addData("right claw position", position.toString())
             telemetry.addData("rightServo.position", rightServo.position)
             telemetry.update()
         }

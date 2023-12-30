@@ -82,6 +82,8 @@ class ElbowSubsystem(private val motor: DcMotorEx, private val telemetry: Teleme
                 ElbowConfig.ELBOW_MIN,
                 ElbowConfig.ELBOW_MAX
             )
+            // power = cos(arm_angle) * (measured_distance_from_pibot/max_distance_from_pivot) * kG
+            val kG = 1.0 //tbd
             motor.power = controller.calculate(currentAngle, clampedTarget)
         } else motor.power = 0.0
 

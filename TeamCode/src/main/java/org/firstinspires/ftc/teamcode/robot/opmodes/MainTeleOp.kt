@@ -7,8 +7,8 @@ import com.arcrobotics.ftclib.command.button.Trigger
 import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import org.firstinspires.ftc.teamcode.mecanum.claw.commands.SetClawPosition
-import org.firstinspires.ftc.teamcode.mecanum.claw.subsystems.ClawPositions
+import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
+import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.mecanum.commands.DriveMecanum
 import org.firstinspires.ftc.teamcode.robot.commands.DecreasePixelLevel
 import org.firstinspires.ftc.teamcode.robot.commands.IncreasePixelLevel
@@ -52,8 +52,9 @@ class MainTeleOp() : CommandOpMode() {
         driverLeftBumper.whenActive(MoveToCloseIntake(robot)).whenInactive(MoveToTravel(robot))
 
         driverRightTrigger.whenActive(MoveToDeposit(robot))
+
             .whenInactive(SequentialCommandGroup(
-                SetClawPosition(robot.claw, ClawPositions.OPEN), WaitCommand(350), MoveToTravel(robot)))
+                OpenBothClaw(robot.leftclaw, robot.rightClaw), WaitCommand(350), MoveToTravel(robot)))
 
         driverTriangleButton.whenPressed(MoveToTravel(robot))
 

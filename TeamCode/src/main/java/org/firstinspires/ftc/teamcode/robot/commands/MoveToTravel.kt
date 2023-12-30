@@ -4,8 +4,9 @@ import com.arcrobotics.ftclib.command.CommandBase
 import com.arcrobotics.ftclib.command.ParallelCommandGroup
 import com.arcrobotics.ftclib.command.SequentialCommandGroup
 import com.arcrobotics.ftclib.command.WaitCommand
-import org.firstinspires.ftc.teamcode.mecanum.claw.commands.SetClawPosition
-import org.firstinspires.ftc.teamcode.mecanum.claw.subsystems.ClawPositions
+import org.firstinspires.ftc.teamcode.claw.commands.CloseBothClaw
+import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
+import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.telescope.commands.SetTelescopePosition
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopePosition
 import org.firstinspires.ftc.teamcode.elbow.commands.SetElbowPosition
@@ -21,7 +22,7 @@ class MoveToTravel(val robot : Robot) : ConfigurableCommandBase()  {
 
     override fun configure(): CommandBase {
         return SequentialCommandGroup(
-            SetClawPosition(robot.claw, ClawPositions.CLOSED),
+            CloseBothClaw(robot.leftclaw, robot.rightClaw),
             WaitCommand(250),
             ParallelCommandGroup(
                 SetElbowPosition(robot.elbow, ElbowPosition.TRAVEL),
