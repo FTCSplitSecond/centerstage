@@ -31,7 +31,7 @@ class HomingTest() : CommandOpMode() {
         //val gamePadY = driver.getGamepadButton(GamepadKeys.Button.Y)
         gamePadA.whenPressed(InstantCommand({ elbow.targetAngle -= 1.0 }))
         gamePadB.whenPressed(InstantCommand({ elbow.targetAngle += 1.0 }))
-        gamePadX.whenPressed(SetElbowPosition(elbow, ElbowPosition.ZERO))
+        gamePadX.whenPressed(SetElbowPosition(elbow, ElbowPosition.HOME))
 
     }
 }
