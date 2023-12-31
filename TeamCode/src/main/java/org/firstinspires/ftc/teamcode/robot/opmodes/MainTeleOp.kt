@@ -55,11 +55,12 @@ class MainTeleOp() : CommandOpMode() {
         driverLeftTrigger.whenActive(MoveToExtendedIntake(robot))
             .whenInactive(SequentialCommandGroup(
                 CloseBothClaw(robot.leftclaw, robot.rightClaw), WaitCommand(250), MoveToTravel(robot)))
-        driverCrossButton.whenPressed(MoveToCloseIntake(robot))
+        driverCircleButton.whenPressed(MoveToCloseIntake(robot))
 
-        driverRightTrigger.whenActive(MoveToDeposit(robot))
-            .whenInactive(SequentialCommandGroup(
-                OpenBothClaw(robot.leftclaw, robot.rightClaw), WaitCommand(350), MoveToTravel(robot)))
+        driverRightTrigger.toggleWhenActive(MoveToDeposit(robot))
+        driverCrossButton.whenPressed(OpenBothClaw(robot.leftclaw, robot.rightClaw))
+
+
 
 
         driverLeftBumper.whenPressed(ToggleLeftClaw(LeftClawSubsystem(robot)))
