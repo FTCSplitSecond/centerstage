@@ -4,16 +4,13 @@ import com.arcrobotics.ftclib.command.SubsystemBase
 import com.arcrobotics.ftclib.controller.PIDController
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorEx
-import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
-import org.firstinspires.ftc.teamcode.Util.IKResults
 import org.firstinspires.ftc.teamcode.Util.InverseKinematics
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_HOME
 import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.swerve.utils.clamp
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeConfig.TELESCOPE_MAX
-import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
 
 
 enum class ElbowPosition{
@@ -86,11 +83,11 @@ class ElbowSubsystem(private val robot : Robot) : SubsystemBase() {
                 ElbowConfig.ELBOW_MIN,
                 ElbowConfig.ELBOW_MAX
             )
-            // power = cos(arm_angle) * (measured_distance_from_pibot/max_distance_from_pivot) * kG
-            val kG = 0.06
             val minExtension = 13.5
-            val maxExtensionInches = minExtension + TELESCOPE_MAX
-            motor.power = controller.calculate(currentAngle, clampedTarget) + (minExtension + telescope.currentExtensionInches)/maxExtensionInches * ElbowConfig.KG
+            val maxTotalExtension = minExtension + TELESCOPE_MAX
+            val currentTotalExtension = minExtension + telescope.currentExtensionInches
+            val gravityAdjustment = Math.cos(Math.toRadians(currentAngle)) * currentTotalExtension/maxTotalExtension * ElbowConfig.KG
+            motor.power = controller.calculate(currentAngle, clampedTarget) + gravityAdjustment
         } else motor.power = 0.0
 
         if(isTelemetryEnabled) {
