@@ -15,7 +15,7 @@ enum class PropZone {
     RIGHT,
     UNKNOWN
 }
-class PropDetector(val propColor: PropColor) : VisionProcessor {
+public class PropDetector(val propColor: PropColor) : VisionProcessor {
     var propZone = PropZone.UNKNOWN
         private set
     override fun init(width: Int, height: Int, calibration: CameraCalibration?) {
