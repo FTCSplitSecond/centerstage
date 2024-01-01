@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Util
+package org.firstinspires.ftc.teamcode.util
 
 import android.util.Log
 import com.arcrobotics.ftclib.kotlin.extensions.util.clamp
@@ -23,13 +23,13 @@ class InverseKinematics {
          val distanceToBackDrop = 6.5
          val distanceFromBackToPivot = 2.684 //from cad
          val zHeightOfPivot = 3.6 //from cad
-         val totalX = layerHeightX + distanceToBackDrop + distanceFromBackToPivot
+         val totalX = layerHeightX + distanceToBackDrop + distanceFromBackToPivot + TelescopeConfig.IK_X_OFFSET
          val totalZ = layerHeightZ - zHeightOfPivot
          val elbowAngle = Math.PI - atan(totalZ/totalX)
          val retractedTelescopeLength = 13.5
          val telescopeOffset = 1.25
          val offsetLength = telescopeOffset * Math.tan(elbowAngle - Math.PI * 5.0/6.0)
-         val telescopeExtension = sqrt(Math.pow(totalX, 2.0) + Math.pow(totalZ, 2.0)) - retractedTelescopeLength + offsetLength + TelescopeConfig.IK_OFFSET_CONFIG
+         val telescopeExtension = sqrt(Math.pow(totalX, 2.0) + Math.pow(totalZ, 2.0)) - retractedTelescopeLength + offsetLength
          val wristAngle = Math.PI * 2.0/3.0 - elbowAngle
          Log.i("IK","pixelLevel = " + pixelLevel)
          Log.i("IK","layerHeight = " + layerHeight)

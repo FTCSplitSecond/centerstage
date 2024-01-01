@@ -13,6 +13,6 @@ public class TelescopeConfig {
     public static double TELESCOPE_CLOSE_INTAKE = 1.0; //   inches
 
     public static double TELESCOPE_TRAVEL = 3.0; //  inches
-    public static double IK_OFFSET_CONFIG = -1.0; //inches
+        public static double IK_X_OFFSET = 0.0; //inches
 
 }

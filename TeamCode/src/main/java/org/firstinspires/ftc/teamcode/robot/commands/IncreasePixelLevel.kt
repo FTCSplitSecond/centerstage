@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.robot.commands
 import android.util.Log
 import com.arcrobotics.ftclib.command.CommandBase
 import com.arcrobotics.ftclib.kotlin.extensions.util.clamp
-import org.firstinspires.ftc.teamcode.Util.InverseKinematics
+import org.firstinspires.ftc.teamcode.util.InverseKinematics
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 
 class IncreasePixelLevel(val robot : Robot) : CommandBase()  {
