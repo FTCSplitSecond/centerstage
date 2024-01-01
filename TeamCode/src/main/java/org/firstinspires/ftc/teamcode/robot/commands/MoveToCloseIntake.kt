@@ -20,7 +20,7 @@ class MoveToCloseIntake(val robot : Robot) : ConfigurableCommandBase()  {
 
     override fun configure(): CommandBase {
         return SequentialCommandGroup(
-            OpenBothClaw(robot.leftclaw, robot.rightClaw),
+//            OpenBothClaw(robot.leftclaw, robot.rightClaw),
             SetWristPosition(robot.wrist, WristPosition.CLOSE_INTAKE),
             ParallelCommandGroup(
                 SetElbowPosition(robot.elbow, ElbowPosition.CLOSE_INTAKE),
