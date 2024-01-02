@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robot.commands
 import com.arcrobotics.ftclib.command.CommandBase
 import com.arcrobotics.ftclib.command.ParallelCommandGroup
 import com.arcrobotics.ftclib.command.SequentialCommandGroup
+import com.arcrobotics.ftclib.command.WaitCommand
 import org.firstinspires.ftc.teamcode.elbow.commands.SetElbowPosition
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowPosition
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
@@ -17,10 +18,11 @@ class MoveToDeposit(val robot : Robot) : ConfigurableCommandBase()  {
     }
 
     override fun configure(): CommandBase {
-        return SequentialCommandGroup(
-            ParallelCommandGroup(
-                SetWristPosition(robot.wrist, WristPosition.DEPOSIT),
-                SetElbowPosition(robot.elbow, ElbowPosition.DEPOSIT),
+        return ParallelCommandGroup(
+            SetWristPosition(robot.wrist, WristPosition.DEPOSIT),
+            SetElbowPosition(robot.elbow, ElbowPosition.DEPOSIT),
+            SequentialCommandGroup(
+                WaitCommand(500),
                 SetTelescopePosition(robot.telescope, TelescopePosition.DEPOSIT)
             )
         )
