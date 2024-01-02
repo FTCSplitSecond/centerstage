@@ -5,8 +5,7 @@ import com.qualcomm.robotcore.hardware.PwmControl
 import com.qualcomm.robotcore.hardware.Servo
 import com.qualcomm.robotcore.hardware.ServoImplEx
 import org.firstinspires.ftc.robotcore.external.Telemetry
-import org.firstinspires.ftc.teamcode.Util.InverseKinematics
-import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
+import org.firstinspires.ftc.teamcode.util.InverseKinematics
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 
 enum class WristPosition {
