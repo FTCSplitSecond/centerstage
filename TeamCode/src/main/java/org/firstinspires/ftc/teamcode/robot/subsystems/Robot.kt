@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry
 import com.qualcomm.robotcore.hardware.HardwareMap
 import org.firstinspires.ftc.robotcore.external.Telemetry
+import org.firstinspires.ftc.teamcode.DroneLaunch.Subsystems.DroneSubsystem
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
 import org.firstinspires.ftc.teamcode.claw.subsystems.LeftClawSubsystem
 import org.firstinspires.ftc.teamcode.claw.subsystems.RightClawSubsystem
@@ -26,5 +27,6 @@ class Robot(val hardwareMap: HardwareMap, t: Telemetry, val opModeType: OpModeTy
     val wrist = WristSubsystem(this)
     val telescope = TelescopeSubsytem(this)
     val elbow = ElbowSubsystem(this)
+    val droneLauncher = DroneSubsystem(this)
 
 }
