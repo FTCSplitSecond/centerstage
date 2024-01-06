@@ -10,6 +10,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import org.firstinspires.ftc.teamcode.DroneLaunch.Commands.SetDroneForInit
 import org.firstinspires.ftc.teamcode.claw.commands.CloseBothClaw
 import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
 import org.firstinspires.ftc.teamcode.claw.commands.ToggleLeftClaw
@@ -32,13 +33,14 @@ import kotlin.math.absoluteValue
 import kotlin.math.pow
 import kotlin.math.sign
 
-@Autonomous
+@TeleOp
 class MainTeleOp() : CommandOpMode() {
     override fun initialize() {
         val driver = GamepadEx(gamepad1)
         val robot = Robot(hardwareMap, telemetry)
         robot.elbow.isEnabled = true
 
+        schedule(SetDroneForInit(robot.droneLauncher))
         val command = DriveMecanum(robot.driveBase,
             { driver.leftY.absoluteValue.pow(3) * sign(driver.leftY) },
             { driver.leftX.absoluteValue.pow(3) * - sign(driver.leftX) },
@@ -67,7 +69,11 @@ class MainTeleOp() : CommandOpMode() {
         driverCrossButton.whenPressed(
             SequentialCommandGroup(
                 OpenBothClaw(robot.leftclaw, robot.rightClaw),
-                MoveToPlace(robot)
+                MoveToPlace(robot),
+                ParallelCommandGroup(
+                    CloseBothClaw(robot.leftclaw, robot.rightClaw),
+                    MoveToTravel(robot)
+                )
             )
         )
 

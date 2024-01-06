@@ -8,6 +8,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.ServoImplEx
+import org.firstinspires.ftc.teamcode.DroneLaunch.Commands.SetDroneForInit
 import org.firstinspires.ftc.teamcode.DroneLaunch.Subsystems.DroneSubsystem
 
 @TeleOp
@@ -23,6 +24,8 @@ class DroneTest() : CommandOpMode() {
         val gamePadY = driver.getGamepadButton(GamepadKeys.Button.Y)
         val gamePadX = driver.getGamepadButton(GamepadKeys.Button.X)
         gamePadA.whenPressed(LaunchDrone(drone))
+        gamePadB.whenPressed(SetDroneForInit(drone))
+
 
     }
 
