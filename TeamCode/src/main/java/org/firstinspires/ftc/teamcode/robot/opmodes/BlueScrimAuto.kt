@@ -4,29 +4,29 @@ import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.arcrobotics.ftclib.command.CommandOpMode
 import com.arcrobotics.ftclib.command.SequentialCommandGroup
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
-
 import org.firstinspires.ftc.teamcode.robot.commands.MoveToPosition
-import org.firstinspires.ftc.teamcode.robot.commands.PositionConfig
 import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import kotlin.math.PI
 
+//+x is left
+//+y is
 
 @Autonomous
-class SimpleAutoTest: CommandOpMode() {
+class BlueScrimAuto: CommandOpMode() {
     override fun initialize() {
         val robot = Robot(hardwareMap, telemetry, OpModeType.AUTONOMOUS)
-
         val startPose = Pose2d(0.0, 0.0, 0.0)
         robot.driveBase.poseEstimate = startPose
 
         val autoCommands = SequentialCommandGroup(
-            MoveToPosition(robot, Pose2d(12.0,12.0 ,PI/2.0 )),
-//            MoveToPosition(robot, Pose2d(12.0, 12.0, PI/2.0))
+            MoveToPosition(robot, Pose2d(0.0,0.0 , PI/2)),
+            //MoveToPosition(robot, Pose2d(12.0,12.0, 0.0)),
+            //MoveToPosition(robot, Pose2d(12.0, 12.0, -PI/2))
+
         )
 
 
         schedule(autoCommands)
-
     }
 }
