@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.robot.opmodes
 
 import com.arcrobotics.ftclib.command.CommandOpMode
+import com.arcrobotics.ftclib.command.ParallelCommandGroup
 import com.arcrobotics.ftclib.command.SequentialCommandGroup
 import com.arcrobotics.ftclib.command.WaitCommand
 import com.arcrobotics.ftclib.command.button.Trigger
 import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.gamepad.GamepadKeys
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.claw.commands.CloseBothClaw
 import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
@@ -20,23 +22,26 @@ import org.firstinspires.ftc.teamcode.robot.commands.IncreasePixelLevel
 import org.firstinspires.ftc.teamcode.robot.commands.MoveToCloseIntake
 import org.firstinspires.ftc.teamcode.robot.commands.MoveToDeposit
 import org.firstinspires.ftc.teamcode.robot.commands.MoveToExtendedIntake
+import org.firstinspires.ftc.teamcode.robot.commands.MoveToPlace
 import org.firstinspires.ftc.teamcode.robot.commands.MoveToTravel
 import org.firstinspires.ftc.teamcode.robot.commands.UpdateTelemetry
 import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
+import kotlin.math.absoluteValue
 import kotlin.math.pow
 import kotlin.math.sign
 
-@TeleOp
+@Autonomous
 class MainTeleOp() : CommandOpMode() {
     override fun initialize() {
         val driver = GamepadEx(gamepad1)
-        val robot = Robot(hardwareMap, telemetry, OpModeType.AUTONOMOUS)
+        val robot = Robot(hardwareMap, telemetry)
+        robot.elbow.isEnabled = true
 
         val command = DriveMecanum(robot.driveBase,
-            { driver.leftY.pow(2) * sign(driver.leftY) },
-            { driver.leftX.pow(2) * -sign(driver.leftX) },
-            { -driver.rightX })
+            { driver.leftY.absoluteValue.pow(3) * sign(driver.leftY) },
+            { driver.leftX.absoluteValue.pow(3) * - sign(driver.leftX) },
+            { - driver.rightX })
         schedule(command)
 
         val triggerThreshold = 0.2
@@ -58,7 +63,13 @@ class MainTeleOp() : CommandOpMode() {
         driverCircleButton.whenPressed(MoveToCloseIntake(robot))
 
         driverRightTrigger.toggleWhenActive(MoveToDeposit(robot))
-        driverCrossButton.whenPressed(OpenBothClaw(robot.leftclaw, robot.rightClaw))
+        driverCrossButton.whenPressed(
+            SequentialCommandGroup(
+                OpenBothClaw(robot.leftclaw, robot.rightClaw),
+                MoveToPlace(robot)
+            )
+        )
+
 
 
 

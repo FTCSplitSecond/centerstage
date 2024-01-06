@@ -6,7 +6,7 @@ import org.firstinspires.ftc.teamcode.claw.subsystems.LeftClawSubsystem
 
 class ToggleLeftClaw(private val LeftClaw : LeftClawSubsystem) : CommandBase(){
     init {
-        addRequirements(LeftClaw)
+            addRequirements(LeftClaw)
     }
     override fun initialize() {
         LeftClaw.position = when(LeftClaw.position) {

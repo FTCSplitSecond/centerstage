@@ -4,6 +4,7 @@ import android.util.Log
 import com.arcrobotics.ftclib.kotlin.extensions.util.clamp
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeConfig
+import org.firstinspires.ftc.teamcode.wrist.subsystems.WristConfig.WRIST_OFFSET
 import java.lang.Math.atan
 import java.lang.Math.sqrt
 
@@ -16,7 +17,7 @@ class InverseKinematics {
    companion object {
       val MAX_PIXEL_LEVEL = 11
       fun calculateArmInverseKinematics (pixelLevel : Int) : IKResults {
-         //TODO: remember to update with new versions of cad latest revision v4
+         // TODO: remember to update with new versions of cad latest revision v4
          val layerHeight = 10.5 + 3.0 * pixelLevel.clamp(0, MAX_PIXEL_LEVEL)
          val layerHeightZ = sqrt(3.0)*layerHeight/2.0
          val layerHeightX = layerHeight/2.0
@@ -30,7 +31,7 @@ class InverseKinematics {
          val telescopeOffset = 1.25
          val offsetLength = telescopeOffset * Math.tan(elbowAngle - Math.PI * 5.0/6.0)
          val telescopeExtension = sqrt(Math.pow(totalX, 2.0) + Math.pow(totalZ, 2.0)) - retractedTelescopeLength + offsetLength
-         val wristAngle = Math.PI * 2.0/3.0 - elbowAngle
+         val wristAngle = Math.PI * 2.0/3.0 - elbowAngle + WRIST_OFFSET
          Log.i("IK","pixelLevel = " + pixelLevel)
          Log.i("IK","layerHeight = " + layerHeight)
          Log.i("IK","layerHeightZ = " + layerHeightZ)
@@ -38,7 +39,6 @@ class InverseKinematics {
          Log.i("IK","totalX = " + totalX)
          Log.i("IK","totalZ = " + totalZ)
          Log.i("IK","offsetLength = " + offsetLength)
-
          val ik = IKResults(AngleUnit.DEGREES.fromRadians(elbowAngle), telescopeExtension, AngleUnit.DEGREES.fromRadians(wristAngle))
 
          Log.i("IK","elbowAngle = " + ik.elbowAngle)

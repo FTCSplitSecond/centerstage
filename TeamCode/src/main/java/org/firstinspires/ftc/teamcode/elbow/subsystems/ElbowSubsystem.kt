@@ -28,8 +28,8 @@ enum class ElbowPosition{
 }
 class ElbowSubsystem(private val robot : Robot) : SubsystemBase() {
 
-    var isEnabled = true
-    var isTelemetryEnabled = false
+    var isEnabled = false
+    var isTelemetryEnabled = true
     private val telescope = robot.telescope
     private val motor = robot.hardwareMap.get(DcMotorEx::class.java, "elbow")
 
@@ -40,8 +40,9 @@ class ElbowSubsystem(private val robot : Robot) : SubsystemBase() {
         motor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
     }
 
-    val ELBOW_MOTOR_PPR = 751.8 // https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-13-7-1-ratio-24mm-length-8mm-rex-shaft-435-rpm-3-3-5v-encoder/
-    val DEGREES_PER_REVOLUTION = 360.0 * 10.0/42.0  //degrees
+
+    val ELBOW_MOTOR_PPR = 8192.0 // https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-13-7-1-ratio-24mm-length-8mm-rex-shaft-435-rpm-3-3-5v-encoder/
+    val DEGREES_PER_REVOLUTION = 360.0  //degrees
     val PIDTolerance = 1.0 // degrees
     var targetAngle : Double = 0.0
         private set
@@ -130,6 +131,7 @@ class ElbowSubsystem(private val robot : Robot) : SubsystemBase() {
             robot.telemetry.addData("motor.getCurrrent (mA)", motor.getCurrent(CurrentUnit.MILLIAMPS))
             robot.telemetry.addData("motor.position", motor.currentPosition)
             robot.telemetry.addData("motor.power", motor.power)
+            robot.telemetry.addData("Apple", motionProfile[motionProfileTimer.seconds()].x)
             robot.telemetry.update()
         }
     }
