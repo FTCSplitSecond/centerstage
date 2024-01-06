@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot.opmodes
 
+import LaunchDrone
 import com.arcrobotics.ftclib.command.CommandOpMode
 import com.arcrobotics.ftclib.command.ParallelCommandGroup
 import com.arcrobotics.ftclib.command.SequentialCommandGroup
@@ -80,8 +81,12 @@ class MainTeleOp() : CommandOpMode() {
 
         driverTriangleButton.whenPressed(MoveToTravel(robot))
 
+
         driverDPADUpButton.whenPressed(IncreasePixelLevel(robot))
         driverDPADDownButton.whenPressed(DecreasePixelLevel(robot))
+        driverDPADLeftButton.whenPressed(LaunchDrone(robot.droneLauncher))
+
+
 
         schedule(UpdateTelemetry(robot) {
             robot.telemetry.addData("X", robot.driveBase.poseEstimate.x)
