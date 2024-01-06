@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.claw.subsystems
+package org.firstinspires.ftc.teamcode.DroneLaunch.Subsystems
 
 import com.arcrobotics.ftclib.command.SubsystemBase
 import com.qualcomm.robotcore.hardware.PwmControl
@@ -23,7 +23,7 @@ class DroneSubsystem( private val Servo : ServoImplEx, private val telemetry: Te
     var position: DronePositions = DronePositions.HELD
         set(value) {
             Servo.position = getServoPositionFromPulseWidth(when(value){
-                DronePositions.HELD-> DroneConfig.HELD_MICROSECONDS
+                DronePositions.HELD -> DroneConfig.HELD_MICROSECONDS
                 DronePositions.LAUNCH -> DroneConfig.LAUNCH_MICROSECONDS
             }, Servo)
             movementStartTime = System.currentTimeMillis()

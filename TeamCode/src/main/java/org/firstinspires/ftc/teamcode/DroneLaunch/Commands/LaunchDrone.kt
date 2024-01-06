@@ -1,6 +1,6 @@
 import com.arcrobotics.ftclib.command.CommandBase
-import org.firstinspires.ftc.teamcode.claw.subsystems.DronePositions
-import org.firstinspires.ftc.teamcode.claw.subsystems.DroneSubsystem
+import org.firstinspires.ftc.teamcode.DroneLaunch.Subsystems.DronePositions
+import org.firstinspires.ftc.teamcode.DroneLaunch.Subsystems.DroneSubsystem
 
 class LaunchDrone(private val launchDrone : DroneSubsystem) : CommandBase() {
     init {

@@ -8,14 +8,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.ServoImplEx
-import org.firstinspires.ftc.teamcode.claw.commands.CloseBothClaw
-import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
-import org.firstinspires.ftc.teamcode.claw.commands.ToggleLeftClaw
-import org.firstinspires.ftc.teamcode.claw.commands.ToggleRightClaw
-import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
-import org.firstinspires.ftc.teamcode.claw.subsystems.DroneSubsystem
-import org.firstinspires.ftc.teamcode.claw.subsystems.LeftClawSubsystem
-import org.firstinspires.ftc.teamcode.claw.subsystems.RightClawSubsystem
+import org.firstinspires.ftc.teamcode.DroneLaunch.Subsystems.DroneSubsystem
 
 @TeleOp
 class DroneTest() : CommandOpMode() {
