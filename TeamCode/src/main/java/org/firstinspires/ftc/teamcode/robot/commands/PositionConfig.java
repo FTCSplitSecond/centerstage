@@ -4,10 +4,10 @@ import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.controller.PIDFController;
 @Config
 public class PositionConfig {
-    public static double xP = 0.05;
+    public static double xP = 0.06;
     public static double xD = 0;
 
-    public static double yP = 0.06;
+    public static double yP = 0.03;
     public static double yD = 0;
 
     public static double hP = 0.55;

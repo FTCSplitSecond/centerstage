@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import kotlin.math.PI
 
 @Autonomous
-class BluePlaceAuto: CommandOpMode() {
+class RedPlaceAuto: CommandOpMode() {
     override fun initialize() {
         val robot = Robot(hardwareMap, telemetry, OpModeType.AUTONOMOUS)
 
@@ -31,23 +31,24 @@ class BluePlaceAuto: CommandOpMode() {
         val autoCommands = SequentialCommandGroup(
             CloseBothClaw(robot.leftclaw, robot.rightClaw),
             MoveToPosition(robot, Pose2d(48.0, 0.0, 0.0)),
-            MoveToPosition(robot, Pose2d(48.0, 72.0, -PI/2)),
+            MoveToPosition(robot, Pose2d(48.0, 0.0, PI/2)),
+            MoveToPosition(robot, Pose2d(48.0, -72.0, PI/2)),
             ParallelCommandGroup(
-                MoveToPosition(robot, Pose2d(28.0, 82.0,-PI/2)),
+                MoveToPosition(robot, Pose2d(24.0, -72.0, PI/2)),
                 MoveToDeposit(robot),
             ),
+            MoveToPosition(robot, Pose2d(24.0, -78.0, PI/2)),
             ParallelCommandGroup(
                 SequentialCommandGroup(
                     OpenBothClaw(robot.leftclaw, robot.rightClaw),
                     MoveToPlace(robot),
                     ParallelCommandGroup(
                         CloseBothClaw(robot.leftclaw, robot.rightClaw),
-                        MoveToTravel(robot))),
-                SequentialCommandGroup(
-                        WaitCommand(500),
-                        MoveToPosition(robot, Pose2d(48.0, 94.0 , -PI/2)))
+                        MoveToTravel(robot)),
+                    MoveToPosition(robot, Pose2d(48.0, -86.0 , PI/2))))
 
-            )
+
+
 
         )
         schedule(autoCommands)
