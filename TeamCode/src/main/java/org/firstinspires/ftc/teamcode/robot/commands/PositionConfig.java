@@ -7,10 +7,10 @@ public class PositionConfig {
     public static double xP = 0.05;
     public static double xD = 0;
 
-    public static double yP = 0.05;
+    public static double yP = 0.06;
     public static double yD = 0;
 
-    public static double hP = 0.5;
+    public static double hP = 0.55;
     public static double hD = 0;
 
     public static double ALLOWED_TRANSLATIONAL_ERROR = 2;
