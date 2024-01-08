@@ -1,21 +1,19 @@
 package org.firstinspires.ftc.teamcode.telescope.commands
 
 import com.arcrobotics.ftclib.command.CommandBase
+import dev.turtles.anchor.component.Component
+import dev.turtles.anchor.component.FinishReason
 import org.firstinspires.ftc.teamcode.telescope.subsystems.*
 
-class SetTelescopePosition(private val telescope : TelescopeSubsytem, private val position: TelescopePosition) : CommandBase() {
+open class SetTelescopePosition(val telescope: TelescopeSubsytem, private val position: TelescopePosition) : Component() {
+    override fun end(reason: FinishReason) {}
 
-    init {
-        addRequirements(telescope)
-    }
+    override fun isComplete() = telescope.isAtTarget()
 
-    override fun initialize() {
+    override fun loop() {}
+
+    override fun start() {
         telescope.position = position
     }
-
-    override fun isFinished(): Boolean {
-        return telescope.isAtTarget()
-    }
-
 }
 

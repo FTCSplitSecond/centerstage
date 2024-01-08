@@ -22,7 +22,7 @@ class MoveToPosition(val robot: Robot, private val targetPose: Pose2d): CommandB
         stableTime.reset()
     }
     override fun execute() {
-        val robotPose = robot.driveBase.poseEstimate
+        val robotPose = robot.driveBase.poseEstimate()
         val powers = getPower(robotPose)
         robot.driveBase.driveFieldCentric(powers.x, powers.y, powers.heading)
     }

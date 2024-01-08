@@ -4,7 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class TelescopeConfig {
-    public static double TELESCOPE_KP = 0.75;
+    public static double TELESCOPE_KP = 0.6;
     public static double TELESCOPE_KI = 0.0;
     public static double TELESCOPE_KD = 0.0;
     public static double TELESCOPE_MAX = 16.0; //  inches

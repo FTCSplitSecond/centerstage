@@ -15,18 +15,18 @@ import kotlin.math.PI
 @Autonomous
 class SimpleAutoTest: CommandOpMode() {
     override fun initialize() {
-        val robot = Robot(hardwareMap, telemetry, OpModeType.AUTONOMOUS)
-
-        val startPose = Pose2d(0.0, 0.0, 0.0)
-        robot.driveBase.poseEstimate = startPose
-
-        val autoCommands = SequentialCommandGroup(
-            MoveToPosition(robot, Pose2d(12.0,12.0 ,PI/2.0 )),
-//            MoveToPosition(robot, Pose2d(12.0, 12.0, PI/2.0))
-        )
-
-
-        schedule(autoCommands)
+//        val robot = Robot(hardwareMap, telemetry, OpModeType.AUTONOMOUS)
+//
+//        val startPose = Pose2d(0.0, 0.0, 0.0)
+//        robot.driveBase.poseEstimate = startPose
+//
+//        val autoCommands = SequentialCommandGroup(
+//            MoveToPosition(robot, Pose2d(12.0,12.0 ,PI/2.0 )),
+////            MoveToPosition(robot, Pose2d(12.0, 12.0, PI/2.0))
+//        )
+//
+//
+//        schedule(autoCommands)
 
     }
 }

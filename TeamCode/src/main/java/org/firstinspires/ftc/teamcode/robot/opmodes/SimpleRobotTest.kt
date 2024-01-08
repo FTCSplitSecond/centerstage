@@ -12,15 +12,15 @@ import kotlin.math.sign
 
 @TeleOp
 class SimpleRobotTest() : CommandOpMode() {
-    private val r = Robot(hardwareMap, telemetry)
+//    private val r = Robot(hardwareMap, telemetry)
     override fun initialize() {
-        val driver = GamepadEx(gamepad1)
-        val robot = Robot(hardwareMap, telemetry, OpModeType.TELEOP)
-
-        val command = DriveMecanum(robot.driveBase,
-            { driver.leftY.pow(2) * sign(driver.leftY) },
-            { driver.leftX.pow(2) * sign(driver.leftX) },
-            { driver.rightX })
-        schedule(command)
+//        val driver = GamepadEx(gamepad1)
+//        val robot = Robot(hardwareMap, telemetry, OpModeType.TELEOP)
+//
+//        val command = DriveMecanum(robot.driveBase,
+//            { driver.leftY.pow(2) * sign(driver.leftY) },
+//            { driver.leftX.pow(2) * sign(driver.leftX) },
+//            { driver.rightX })
+//        schedule(command)
     }
 }

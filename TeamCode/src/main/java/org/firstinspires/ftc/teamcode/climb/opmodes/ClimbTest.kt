@@ -20,24 +20,24 @@ import org.firstinspires.ftc.teamcode.claw.subsystems.ClimbPulleySubsystem
 @TeleOp
 class ClimbTest() : CommandOpMode() {
     override fun initialize() {
-        val leftHookServo = hardwareMap.get(ServoImplEx::class.java, "leftHookServo")
-        val rightHookServo = hardwareMap.get(ServoImplEx::class.java, "rightHookServo")
-        val leftPulley = hardwareMap.get(CRServoImplEx::class.java, "leftClimbServo")
-        val rightPulley = hardwareMap.get(CRServoImplEx::class.java, "rightClimbServo")
-        val telemetry = MultipleTelemetry(FtcDashboard.getInstance().telemetry, telemetry)
-        val bothArms = ClimbArmSubsystem(leftHookServo, rightHookServo, telemetry)
-        val bothPulley = ClimbPulleySubsystem(leftPulley, rightPulley, telemetry)
-        val driver = GamepadEx(gamepad1)
-
-        val gamePadA = driver.getGamepadButton(GamepadKeys.Button.A)
-        val gamePadB = driver.getGamepadButton(GamepadKeys.Button.B)
-        val gamePadY = driver.getGamepadButton(GamepadKeys.Button.Y)
-        val gamePadX = driver.getGamepadButton(GamepadKeys.Button.X)
-
-
-        gamePadA.whenPressed(RaiseClimbArms(bothArms))
-        gamePadX.whenPressed(SuspendRobot(bothPulley))
-
+//        val leftHookServo = hardwareMap.get(ServoImplEx::class.java, "leftHookServo")
+//        val rightHookServo = hardwareMap.get(ServoImplEx::class.java, "rightHookServo")
+//        val leftPulley = hardwareMap.get(CRServoImplEx::class.java, "leftClimbServo")
+//        val rightPulley = hardwareMap.get(CRServoImplEx::class.java, "rightClimbServo")
+//        val telemetry = MultipleTelemetry(FtcDashboard.getInstance().telemetry, telemetry)
+//        val bothArms = ClimbArmSubsystem(leftHookServo, rightHookServo, telemetry)
+//        val bothPulley = ClimbPulleySubsystem(leftPulley, rightPulley, telemetry)
+//        val driver = GamepadEx(gamepad1)
+//
+//        val gamePadA = driver.getGamepadButton(GamepadKeys.Button.A)
+//        val gamePadB = driver.getGamepadButton(GamepadKeys.Button.B)
+//        val gamePadY = driver.getGamepadButton(GamepadKeys.Button.Y)
+//        val gamePadX = driver.getGamepadButton(GamepadKeys.Button.X)
+//
+//
+//        gamePadA.whenPressed(RaiseClimbArms(bothArms))
+//        gamePadX.whenPressed(SuspendRobot(bothPulley))
+//
 
     }
 

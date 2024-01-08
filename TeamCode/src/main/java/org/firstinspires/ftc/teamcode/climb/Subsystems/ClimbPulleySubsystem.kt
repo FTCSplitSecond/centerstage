@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.CRServoImplEx
 import com.qualcomm.robotcore.hardware.PwmControl
 import com.qualcomm.robotcore.hardware.ServoImplEx
 import org.firstinspires.ftc.robotcore.external.Telemetry
-import org.firstinspires.ftc.teamcode.Climb.Subsystems.ClimbConfig
+import org.firstinspires.ftc.teamcode.climb.Subsystems.ClimbConfig
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 
 enum class PulleyPower {
