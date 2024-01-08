@@ -68,6 +68,8 @@ class WristSubsystem(private val leftServo : ServoImplEx, private val rightServo
             }
             field = value
         }
+
+
     fun movementShouldBeComplete() : Boolean {
         return System.currentTimeMillis() - movementStartTime > 100
     }

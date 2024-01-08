@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.swerve.utils.clamp
 
 
-enum class TelescopePosition {
+enum class  TelescopePosition {
     EXTENDED_INTAKE,
     CLOSE_INTAKE,
     DEPOSIT,
