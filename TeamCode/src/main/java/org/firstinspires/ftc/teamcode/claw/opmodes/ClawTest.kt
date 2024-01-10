@@ -18,21 +18,21 @@ import org.firstinspires.ftc.teamcode.claw.subsystems.RightClawSubsystem
 @TeleOp
 class ClawTest() : CommandOpMode() {
     override fun initialize() {
-        val leftClawServo = hardwareMap.get(ServoImplEx::class.java, "leftClawServo")
-        val rightClawServo = hardwareMap.get(ServoImplEx::class.java, "rightClawServo")
-        val telemetry = MultipleTelemetry(FtcDashboard.getInstance().telemetry, telemetry)
-        val leftClaw = LeftClawSubsystem(leftClawServo, telemetry)
-        val rightClaw = RightClawSubsystem(rightClawServo, telemetry)
-        val driver = GamepadEx(gamepad1)
-
-        val gamePadA = driver.getGamepadButton(GamepadKeys.Button.A)
-        val gamePadB = driver.getGamepadButton(GamepadKeys.Button.B)
-        val gamePadY = driver.getGamepadButton(GamepadKeys.Button.Y)
-        val gamePadX = driver.getGamepadButton(GamepadKeys.Button.X)
-        gamePadA.whenPressed(OpenBothClaw(leftClaw, rightClaw))
-        gamePadY.whenPressed(CloseBothClaw(leftClaw, rightClaw))
-        gamePadX.whenPressed(ToggleLeftClaw(leftClaw))
-        gamePadB.whenPressed((ToggleRightClaw(rightClaw)))
+//        val leftClawServo = hardwareMap.get(ServoImplEx::class.java, "leftClawServo")
+//        val rightClawServo = hardwareMap.get(ServoImplEx::class.java, "rightClawServo")
+//        val telemetry = MultipleTelemetry(FtcDashboard.getInstance().telemetry, telemetry)
+//        val leftClaw = LeftClawSubsystem(leftClawServo, telemetry)
+//        val rightClaw = RightClawSubsystem(rightClawServo, telemetry)
+//        val driver = GamepadEx(gamepad1)
+//
+//        val gamePadA = driver.getGamepadButton(GamepadKeys.Button.A)
+//        val gamePadB = driver.getGamepadButton(GamepadKeys.Button.B)
+//        val gamePadY = driver.getGamepadButton(GamepadKeys.Button.Y)
+//        val gamePadX = driver.getGamepadButton(GamepadKeys.Button.X)
+//        gamePadA.whenPressed(OpenBothClaw(leftClaw, rightClaw))
+//        gamePadY.whenPressed(CloseBothClaw(leftClaw, rightClaw))
+//        gamePadX.whenPressed(ToggleLeftClaw(leftClaw))
+//        gamePadB.whenPressed((ToggleRightClaw(rightClaw)))
     }
 
 }

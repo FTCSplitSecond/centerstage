@@ -19,24 +19,24 @@ import kotlin.math.PI
 @Autonomous
 class BlueScrimAuto: CommandOpMode() {
     override fun initialize() {
-        val robot = Robot(hardwareMap, telemetry, OpModeType.AUTONOMOUS)
-        val startPose = Pose2d(0.0, 0.0, 0.0)
-        robot.driveBase.poseEstimate = startPose
-
-        val autoCommands = SequentialCommandGroup(
-            MoveToPosition(robot, Pose2d(24.0,24.0 , -PI/2)),
-            SetTelescopePosition(robot.telescope, TelescopePosition.CLOSE_INTAKE),
-            ToggleRightClaw(robot.rightClaw),
-            SetTelescopePosition(robot.telescope, TelescopePosition.DEPOSIT),
-            ToggleLeftClaw(robot.leftclaw),
-            MoveToPosition(robot, Pose2d(5.0, 30.0, -PI/2))
-
-            //MoveToPosition(robot, Pose2d(12.0,12.0, 0.0)),
-            //MoveToPosition(robot, Pose2d(12.0, 12.0, -PI/2))
-
-        )
-
-
-        schedule(autoCommands)
+//        val robot = Robot(hardwareMap, telemetry, OpModeType.AUTONOMOUS)
+//        val startPose = Pose2d(0.0, 0.0, 0.0)
+//        robot.driveBase.poseEstimate = startPose
+//
+//        val autoCommands = SequentialCommandGroup(
+//            MoveToPosition(robot, Pose2d(24.0,24.0 , -PI/2)),
+//            SetTelescopePosition(robot.telescope, TelescopePosition.CLOSE_INTAKE),
+//            ToggleRightClaw(robot.rightClaw),
+//            SetTelescopePosition(robot.telescope, TelescopePosition.DEPOSIT),
+//            ToggleLeftClaw(robot.leftclaw),
+//            MoveToPosition(robot, Pose2d(5.0, 30.0, -PI/2))
+//
+//            //MoveToPosition(robot, Pose2d(12.0,12.0, 0.0)),
+//            //MoveToPosition(robot, Pose2d(12.0, 12.0, -PI/2))
+//
+//        )
+//
+//
+//        schedule(autoCommands)
     }
 }

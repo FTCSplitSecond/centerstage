@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Climb.Subsystems;
+package org.firstinspires.ftc.teamcode.climb.Subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 

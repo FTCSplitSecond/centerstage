@@ -9,7 +9,7 @@ enum class AlliancePosition{
     RIGHT
 }
 class GoToBlueTopSpike(val robot: Robot, val alliancePosition: AlliancePosition): CommandBase() {
-    val currentPose = robot.driveBase.poseEstimate
+    val currentPose = robot.driveBase.poseEstimate()
     val sequenceBuilder = robot.driveBase.trajectorySequenceBuilder(currentPose)
     val endPose = when (alliancePosition){
         AlliancePosition.LEFT -> Pose2d(0.0,0.0,0.0)

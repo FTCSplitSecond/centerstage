@@ -15,15 +15,15 @@ import kotlin.math.sign
 public class MecanumDriveTest : CommandOpMode() {
 
     override fun initialize() {
-        val driver = GamepadEx(gamepad1)
-        val multiTelemetry = MultipleTelemetry(FtcDashboard.getInstance().telemetry, telemetry)
-        val mecanumDrive = MecanumDriveBase(hardwareMap, multiTelemetry)
-        val command = DriveMecanum(mecanumDrive,
-            { driver.leftY.pow(2) * sign(driver.leftY) },
-            { driver.leftX.pow(2) * - sign(driver.leftX) },
-            { - driver.rightX })
-        schedule(command)
-        schedule(OutputDriveTelemetry(multiTelemetry, mecanumDrive))
+//        val driver = GamepadEx(gamepad1)
+//        val multiTelemetry = MultipleTelemetry(FtcDashboard.getInstance().telemetry, telemetry)
+//        val mecanumDrive = MecanumDriveBase(hardwareMap, multiTelemetry)
+//        val command = DriveMecanum(mecanumDrive,
+//            { driver.leftY.pow(2) * sign(driver.leftY) },
+//            { driver.leftX.pow(2) * - sign(driver.leftX) },
+//            { - driver.rightX })
+//        schedule(command)
+//        schedule(OutputDriveTelemetry(multiTelemetry, mecanumDrive))
     }
 
 

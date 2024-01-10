@@ -1,21 +1,19 @@
 package org.firstinspires.ftc.teamcode.claw.commands
 
-import com.arcrobotics.ftclib.command.CommandBase
+import org.firstinspires.ftc.teamcode.SplitSecondComponent
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.claw.subsystems.LeftClawSubsystem
+import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
 
-class ToggleLeftClaw(private val LeftClaw : LeftClawSubsystem) : CommandBase(){
-    init {
-            addRequirements(LeftClaw)
-    }
-    override fun initialize() {
-        LeftClaw.position = when(LeftClaw.position) {
+class ToggleLeftClaw(private val leftClaw : LeftClawSubsystem) : SplitSecondComponent(){
+    override fun start() {
+        leftClaw.position = when(leftClaw.position) {
             ClawPositions.OPEN -> ClawPositions.CLOSED
             ClawPositions.CLOSED -> ClawPositions.OPEN
         }
 
     }
-    override fun isFinished() : Boolean {
-        return LeftClaw.movementShouldBeComplete()
+    override fun isComplete() : Boolean {
+        return leftClaw.movementShouldBeComplete()
     }
 }

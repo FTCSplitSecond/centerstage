@@ -4,6 +4,9 @@ import com.arcrobotics.ftclib.command.CommandBase
 import com.arcrobotics.ftclib.command.ParallelCommandGroup
 import com.arcrobotics.ftclib.command.SequentialCommandGroup
 import com.arcrobotics.ftclib.command.WaitCommand
+import dev.turtles.anchor.component.stock.SequentialParent
+import dev.turtles.anchor.component.stock.parallel
+import dev.turtles.anchor.component.stock.series
 import org.firstinspires.ftc.teamcode.claw.commands.CloseBothClaw
 import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
@@ -15,17 +18,10 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.wrist.commands.SetWristPosition
 import org.firstinspires.ftc.teamcode.wrist.subsystems.WristPosition
 
-class MoveToTravel(val robot : Robot) : ConfigurableCommandBase()  {
-    override fun initialize() {
-        super.initialize()
-    }
-
-    override fun configure(): CommandBase {
-        return SequentialCommandGroup(
-            ParallelCommandGroup(
+class MoveToTravel(val robot : Robot) : SequentialParent(mutableListOf(
+        parallel(
                 SetElbowPosition(robot.elbow, ElbowPosition.TRAVEL),
                 SetTelescopePosition(robot.telescope, TelescopePosition.TRAVEL),
-                SetWristPosition(robot.wrist, WristPosition.TRAVEL))
+                SetWristPosition(robot.wrist, WristPosition.TRAVEL)
         )
-    }
-}
+))

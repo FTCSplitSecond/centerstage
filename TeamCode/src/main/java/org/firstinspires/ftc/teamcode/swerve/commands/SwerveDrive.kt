@@ -8,9 +8,6 @@ import org.firstinspires.ftc.teamcode.swerve.subsystems.SwerveDriveBase
 class SwerveDrive(private val leapfrog: SwerveDriveBase,
                   private val initialPose : Pose2d,
                   private val chassisSpeedsProvider : () -> ChassisSpeeds) : CommandBase() {
-    init {
-        addRequirements(leapfrog)
-    }
     override fun initialize() {
         leapfrog.initialize(initialPose)
     }
