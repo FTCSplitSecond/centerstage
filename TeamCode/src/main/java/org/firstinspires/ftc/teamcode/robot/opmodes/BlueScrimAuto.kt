@@ -4,8 +4,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.arcrobotics.ftclib.command.CommandOpMode
 import com.arcrobotics.ftclib.command.SequentialCommandGroup
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
-import org.firstinspires.ftc.teamcode.claw.commands.ToggleLeftClaw
-import org.firstinspires.ftc.teamcode.claw.commands.ToggleRightClaw
+
 import org.firstinspires.ftc.teamcode.robot.commands.MoveToPosition
 import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot

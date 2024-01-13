@@ -12,7 +12,8 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 
 enum class ClawPositions{
     OPEN,
-    CLOSED
+    CLOSED,
+    DROP
 }
 class RightClawSubsystem(private val rightServo : Servo, private val telemetry: Telemetry) : Subsystem() {
     constructor(hw: HardwareManager, telemetry: Telemetry) : this(hw.servo("rightClawServo"), telemetry)
@@ -30,6 +31,7 @@ class RightClawSubsystem(private val rightServo : Servo, private val telemetry: 
             lastPos = getServoPositionFromPulseWidth(when(value){
                 ClawPositions.OPEN -> ClawConfig.RIGHT_SERVO_OPEN_MICROSECONDS
                 ClawPositions.CLOSED -> ClawConfig.RIGHT_SERVO_CLOSED_MICROSECONDS
+                ClawPositions.DROP -> ClawConfig.RIGHT_SERVO_DROP_MICROSECONDS
             }, rightServo)
 
             rightServo goto lastPos

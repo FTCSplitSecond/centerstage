@@ -17,6 +17,7 @@ public class ElbowConfig {
     public static double KG = 0.07;
     public static double ELBOW_MAX_ANGULAR_VELOCITY = 800.0;
     public static double ELBOW_MAX_ANGULAR_ACCELERATION = 800.0;
+    public static double ELBOW_CLIMB = 90.0;
 
 
 

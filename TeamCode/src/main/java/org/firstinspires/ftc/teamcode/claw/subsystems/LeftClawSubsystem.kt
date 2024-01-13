@@ -27,6 +27,7 @@ class LeftClawSubsystem(private val hw: HardwareManager, private val leftServo :
             lastPos = getServoPositionFromPulseWidth(when (value) {
                 ClawPositions.OPEN -> ClawConfig.LEFT_SERVO_OPEN_MICROSECONDS
                 ClawPositions.CLOSED -> ClawConfig.LEFT_SERVO_CLOSED_MICROSECONDS
+                ClawPositions.DROP -> ClawConfig.LEFT_SERVO_DROP_MICROSECONDS
             }, leftServo)
 
             leftServo goto lastPos

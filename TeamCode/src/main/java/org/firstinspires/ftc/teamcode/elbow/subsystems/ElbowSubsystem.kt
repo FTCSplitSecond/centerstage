@@ -24,7 +24,8 @@ enum class ElbowPosition{
     CLOSE_INTAKE,
     ADJUST,
     TRAVEL,
-    HOME
+    HOME,
+    CLIMB
 }
 class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager, val telescope: TelescopeSubsytem) : Subsystem() {
 
@@ -83,6 +84,7 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
                 ElbowPosition.ADJUST -> depositAngle
                 ElbowPosition.EXTENDED_INTAKE -> ElbowConfig.ELBOW_EXTENDED_INTAKE
                 ElbowPosition.HOME -> ElbowConfig.ELBOW_HOME
+                ElbowPosition.CLIMB -> ElbowConfig.ELBOW_CLIMB
             }
             field = value
         }
@@ -107,18 +109,18 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
         // using the current motion profile target as the starting point for the next motion profile
         // this is to ensure continuity between motion profiles (eliminates jitter where the motor as moved past current angle
         // and the motion profile will generate a first location that is backwards from the current direction of motion)
-//        val currentMotionProfileX = motionProfile[motionProfileTimer.seconds()].x
+        val currentMotionProfileX = motionProfile[motionProfileTimer.seconds()].x
         val clampedTarget = targetAngle.clamp(
             ElbowConfig.ELBOW_MIN,
             ElbowConfig.ELBOW_MAX)
-//        generateMotionProfile(clampedTarget, currentMotionProfileX, angularV, angularA)
+        generateMotionProfile(clampedTarget, currentMotionProfileX, angularV, angularA)
 
         if (isEnabled) {
             val minExtension = 13.5
             val maxTotalExtension = minExtension + TELESCOPE_MAX
             val currentTotalExtension = minExtension + telescope.currentExtensionInches
             val gravityAdjustment = Math.cos(Math.toRadians(currentAngle)) * currentTotalExtension/maxTotalExtension * ElbowConfig.KG
-            motor power controller.calculate(currentAngle, clampedTarget) + gravityAdjustment
+            motor power controller.calculate(currentAngle, motionProfile[motionProfileTimer.seconds()].x) + gravityAdjustment
         } else motor power 0.0
 
         if(isTelemetryEnabled) {

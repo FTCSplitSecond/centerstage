@@ -3,11 +3,14 @@ package org.firstinspires.ftc.teamcode.robot.subsystems
 import dev.turtles.anchor.component.FinishReason
 import dev.turtles.anchor.entity.Subsystem
 import dev.turtles.anchor.util.Timer
+import org.firstinspires.ftc.teamcode.Util.InverseKinematicsConfig
+import org.firstinspires.ftc.teamcode.Util.InverseKinematicsConfig.WRIST_ANGLE
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.claw.subsystems.LeftClawSubsystem
 import org.firstinspires.ftc.teamcode.claw.subsystems.RightClawSubsystem
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowPosition
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowSubsystem
+import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeConfig
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopePosition
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
 import org.firstinspires.ftc.teamcode.wrist.subsystems.WristPosition
@@ -25,21 +28,24 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
                        private val elbow: ElbowSubsystem) : Subsystem() {
     data class KinematicResults(val elbowAngle : Double, val telescopeExtension : Double, val wristAngle : Double)
     enum class State {
+        CLOSE_INTAKE,
         INTAKE,
         IDLE,
         TRAVEL,
-        DEPOSIT
+        DEPOSIT,
+        CLIMB,
+        DROP
     }
 
-    private var state = State.TRAVEL
+    var state = State.TRAVEL
     private var ikResults = KinematicResults(0.0, 0.0, 0.0)
 
-    private var leftClawState = ClawPositions.OPEN
-    private var rightClawState = ClawPositions.OPEN
+    var leftClawState = ClawPositions.OPEN
+    var rightClawState = ClawPositions.OPEN
 
     private var currentStateTimer = Timer()
+    var pixelHeight = 0.0;
 
-    var elbowTesting = 0.0
 
     fun switch(state: State) {
         this.currentStateTimer.reset()
@@ -59,17 +65,17 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
      * </ul>
      */
     fun runKinematics() {
-        val retractedTelescopeLength = 15.0
+        val retractedTelescopeLength = InverseKinematicsConfig.MINIMUM_EXTENSION
 
-        val goalTrans = elbowTesting * 30.0 + 15.0 // distance along the backdrop from the bottom
+        val goalTrans = pixelHeight * 3.0 + 8.25 // distance along the backdrop from the bottom
 
-        val backdropClawDistance = 3.0 // distance "off" of the backdrop to target
+        val backdropClawDistance = InverseKinematicsConfig.BACKBOARD_OFFSET // distance "off" of the backdrop to target
 
-        val offset = 1.25 // offset off of the pivot point
+        val offset = InverseKinematicsConfig.TELESCOPE_OFFSET // offset off of the pivot point
 
-        val backdropAngle = Math.toRadians(60.0) // angle the backdrop is to the ground
+        val backdropAngle = Math.toRadians(InverseKinematicsConfig.BACKBOARD_ANGLE) // angle the backdrop is to the ground
 
-        val tPivot = Vector2d(-15.5, 6.0) // relative to the bottom of the backdrop
+        val tPivot = Vector2d(-InverseKinematicsConfig.PIVOT_DISTANCE, InverseKinematicsConfig.PIVOT_HEIGHT) // relative to the bottom of the backdrop
 
         val backdropFacing: Vector2d = Vector2d(Math.cos(backdropAngle), Math.sin(backdropAngle)).normalize() // backdrop normal
 
@@ -96,7 +102,7 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
         ikResults = KinematicResults(
                 180.0 - elbow,
                 telescopeLength - retractedTelescopeLength,
-                -(actualElbow - 180)
+                -(actualElbow - 180) + WRIST_ANGLE
         )
     }
 
@@ -105,6 +111,12 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
         // This is a crude state machine.
         // A state machine library, such as the WIP one in Nautilus could be used
         when (state) {
+
+            State.CLOSE_INTAKE -> {
+                wrist.position = WristPosition.CLOSE_INTAKE
+                elbow.position = ElbowPosition.CLOSE_INTAKE
+                telescope.position = TelescopePosition.CLOSE_INTAKE
+            }
             State.INTAKE -> {
                 wrist.position = WristPosition.EXTENDED_INTAKE
                 elbow.position = ElbowPosition.EXTENDED_INTAKE
@@ -130,6 +142,17 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
                 wrist.depositAngle = ikResults.wristAngle
                 elbow.depositAngle = ikResults.elbowAngle
                 telescope.targetExtenstionInches = ikResults.telescopeExtension
+            }
+
+            State.CLIMB -> {
+                wrist.position = WristPosition.EXTENDED_INTAKE
+                elbow.position = ElbowPosition.CLIMB
+                telescope.position = TelescopePosition.ADJUST
+                telescope.targetExtenstionInches = TelescopeConfig.TELESCOPE_CLIMB
+            }
+
+            State.DROP -> {
+                telescope.position = TelescopePosition.TRAVEL
             }
         }
 
