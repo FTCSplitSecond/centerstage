@@ -5,10 +5,10 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public class ElbowConfig {
 
-    public static double ELBOW_KP = 0.0135;
+    public static double ELBOW_KP = 0.02;
     public static double ELBOW_KI = 0.0;
-    public static double ELBOW_KD = 0.0006;
-    public static double ELBOW_MAX = 170.0; //  degrees
+    public static double ELBOW_KD = 0.0008;
+    public static double ELBOW_MAX = 100.0; //  degrees
     public static double ELBOW_MIN = -8.0; //  degrees
     public static double ELBOW_HOME = -8.0; //  degrees
     public static double ELBOW_EXTENDED_INTAKE = -1.5; //  degrees
@@ -16,7 +16,7 @@ public class ElbowConfig {
     public static double ELBOW_TRAVEL = 0.0; //  degrees
     public static double KG = 0.07;
     public static double ELBOW_MAX_ANGULAR_VELOCITY = 800.0;
-    public static double ELBOW_MAX_ANGULAR_ACCELERATION = 800.0;
+    public static double ELBOW_MAX_ANGULAR_ACCELERATION = 400.0; // (REMEMBER TO CHANGE THIS TO 600!!!!!)
     public static double ELBOW_CLIMB = 90.0;
 
 

@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 class MecanumDriveBase(hardwareMap: HardwareMap, val telemetry: Telemetry) : Subsystem() {
     constructor(robot: Robot) : this(robot.hardwareMap, robot.telemetry)
 
-    private val dt  = CenterstageMecanumDrive(hardwareMap)
+    private val dt = CenterstageMecanumDrive(hardwareMap)
 
     fun driveFieldCentric(xVel: Double, yVel : Double, turnVel: Double) {
         val xVelocity = MathUtils.clamp(xVel, -1.0, 1.0)
