@@ -20,6 +20,7 @@ enum class OpModeType {
 }
 class Robot(val hardwareMap: HardwareMap, val hw: HardwareManager, t: Telemetry, val opModeType: OpModeType = OpModeType.TELEOP) {
 
+
     // add multiple telemetry here for dashboard here
     val telemetry = MultipleTelemetry(FtcDashboard.getInstance().telemetry, t)
 

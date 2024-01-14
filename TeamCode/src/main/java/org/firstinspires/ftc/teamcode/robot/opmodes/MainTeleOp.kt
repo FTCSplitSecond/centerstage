@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot.opmodes
 
+import LaunchDrone
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.turtles.anchor.component.stock.SequentialParent
 import dev.turtles.anchor.component.stock.delay
@@ -14,6 +15,7 @@ import dev.turtles.lilypad.EventTrigger
 import dev.turtles.lilypad.impl.FTCGamepad
 import dev.turtles.lilypad.module.RoutineModule
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
+import org.firstinspires.ftc.teamcode.drone_launcher.Subsystems.DronePositions
 import org.firstinspires.ftc.teamcode.mecanum.commands.DriveMecanum
 import org.firstinspires.ftc.teamcode.robot.commands.UpdateTelemetry
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
@@ -31,9 +33,12 @@ class MainTeleOp : AnchorOpMode() {
         val smec = robot.scoringMechanism
 
         robot.init(this.world)
-
         robot.elbow.isEnabled = true
-
+        schedule(
+        instant {
+            robot.droneLauncher.position = DronePositions.HELD
+        }
+        )
 
         val command = DriveMecanum(robot.driveBase,
             {
@@ -237,8 +242,10 @@ class MainTeleOp : AnchorOpMode() {
             else
                 smec.switch(ScoringMechanism.State.CLIMB)
 
-
         }
+
+        driver[Button.Key.DPAD_UP] onActivate LaunchDrone(robot.droneLauncher)
+
 
 //        driver[Button.Key.SHARE] onActivate instant {
 //            LaunchDrone(robot.droneLauncher)

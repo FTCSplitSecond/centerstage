@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.drone_launcher.Subsystems.DroneSubsystem
 
 class SetDroneForInit(private val setDrone : DroneSubsystem): SplitSecondComponent(){
     override fun start() {
-        setDrone.position = DronePositions.LAUNCH
+        setDrone.position = DronePositions.HELD
     }
 
     override fun isComplete() = setDrone.movementShouldBeComplete()
