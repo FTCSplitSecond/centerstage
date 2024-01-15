@@ -31,7 +31,7 @@ import org.openftc.easyopencv.OpenCvWebcam
 import kotlin.math.PI
 
 @Autonomous
-class BlueFarAuto : AnchorOpMode() {
+class RedFarAuto : AnchorOpMode() {
     lateinit var robot : Robot
     lateinit var smec : ScoringMechanism
     lateinit var drive : CenterstageMecanumDrive
@@ -98,7 +98,6 @@ class BlueFarAuto : AnchorOpMode() {
         webcam.stopStreaming()
         zone = detector.zone
         val startPose = Pose2d(0.0, 0.0, 0.0)
-        // set testing zones
         zone = when (AutoConfig.MODE) {
             0 -> PropZone.CENTER
             1 -> PropZone.RIGHT
@@ -108,20 +107,21 @@ class BlueFarAuto : AnchorOpMode() {
         if (zone == PropZone.UNKNOWN) {
             zone = PropZone.CENTER
         }
+
         // Treat unknown as if it is right
 
         // Move to spike mark
         val p1traj = when (zone) {
             PropZone.CENTER -> drive.trajectoryBuilder(startPose)
-                .lineToLinearHeading(Pose2d(AutoConfig.BLUE_FAR_CENTER_X[0], AutoConfig.BLUE_FAR_CENTER_Y[0], 0.0))
+                .lineToLinearHeading(Pose2d(AutoConfig.RED_FAR_CENTER_X[0], AutoConfig.RED_FAR_CENTER_Y[0], 0.0))
                 .build()
 
             PropZone.RIGHT -> drive.trajectoryBuilder(startPose)
-                .lineToLinearHeading(Pose2d(AutoConfig.BLUE_FAR_RIGHT_X[0], AutoConfig.BLUE_FAR_RIGHT_Y[0], PI/2))
+                .lineToLinearHeading(Pose2d(-9.75, AutoConfig.FAR_LANE_START_Y, PI/2))
                 .build()
 
             PropZone.LEFT -> drive.trajectoryBuilder(startPose)
-                .lineToLinearHeading(Pose2d(-22.0, AutoConfig.FAR_LANE_START_Y, PI/2))
+                .lineToLinearHeading(Pose2d(AutoConfig.RED_FAR_LEFT_X[0], AutoConfig.RED_FAR_LEFT_Y[0], PI/2))
                 .build()
             else -> TODO()
         }
@@ -130,13 +130,13 @@ class BlueFarAuto : AnchorOpMode() {
         // Move to deposit purple pixel
         val p2traj = when (zone) {
             PropZone.CENTER -> drive.trajectoryBuilder(p1traj.end())
-                .strafeTo(Vector2d(AutoConfig.BLUE_FAR_CENTER_X[1], AutoConfig.BLUE_FAR_CENTER_Y[1]))
+                .strafeTo(Vector2d(AutoConfig.RED_FAR_CENTER_X[1], AutoConfig.RED_FAR_CENTER_Y[1]))
                 .build()
             PropZone.RIGHT -> drive.trajectoryBuilder(p1traj.end())
-                .strafeTo(Vector2d(AutoConfig.BLUE_FAR_RIGHT_X[1], AutoConfig.BLUE_FAR_RIGHT_Y[1]))
+                .strafeTo(Vector2d(-28.0, 3.0))
                 .build()
             PropZone.LEFT -> drive.trajectoryBuilder(p1traj.end())
-                .strafeTo(Vector2d(-25.0, -16.0))
+                .strafeTo(Vector2d(AutoConfig.RED_FAR_LEFT_X[1], AutoConfig.RED_FAR_LEFT_Y[1]))
                 .build()
             else -> TODO()
         }
@@ -144,13 +144,13 @@ class BlueFarAuto : AnchorOpMode() {
         // Move to close side
         val p3traj = when (zone) {
             PropZone.CENTER -> drive.trajectoryBuilder(p2traj.end())
-                .lineToLinearHeading(Pose2d(AutoConfig.BLUE_FAR_CENTER_X[2], AutoConfig.BLUE_FAR_CENTER_Y[2], PI/2))// TODO: MOVE CLOSER TO BACKDROP (-y)
+                .lineToLinearHeading(Pose2d(AutoConfig.RED_FAR_CENTER_X[2], AutoConfig.RED_FAR_CENTER_Y[2], -PI/2))// TODO: MOVE CLOSER TO BACKDROP (-y)
                 .build()
             PropZone.RIGHT -> drive.trajectoryBuilder(p2traj.end())
-                .strafeTo(Vector2d(AutoConfig.BLUE_FAR_RIGHT_X[2], AutoConfig.BLUE_FAR_RIGHT_Y[2]))// TODO: MOVE CLOSER TO BACKDROP (-y)
+                .strafeTo(Vector2d(AutoConfig.FAR_LANE_START_Y, -16.0))// TODO: MOVE CLOSER TO BACKDROP (-y)
                 .build()
             PropZone.LEFT -> drive.trajectoryBuilder(p2traj.end())
-                .strafeTo(Vector2d(AutoConfig.FAR_LANE_START_Y, -16.0))// TODO: MOVE CLOSER TO BACKDROP (-y)
+                .strafeTo(Vector2d(AutoConfig.RED_FAR_LEFT_X[2], AutoConfig.RED_FAR_LEFT_Y[2]))// TODO: MOVE CLOSER TO BACKDROP (-y)
                 .build()
             else -> TODO()
         }
@@ -173,22 +173,19 @@ class BlueFarAuto : AnchorOpMode() {
         + series (
             p1follower,
             parallel (
-                series (
-                    delay(1.0),
-                    instant {
-                        smec.state = ScoringMechanism.State.CLOSE_INTAKE
-                    }
-                ),
+                instant {
+                    smec.state = ScoringMechanism.State.CLOSE_INTAKE
+                },
                 p2follower,
             ),
             instant {
                 smec.leftClawState = ClawPositions.OPEN
             },
-            parallel(
+            parallel (
                 instant {
                     smec.state = ScoringMechanism.State.TRAVEL
                 },
-                p3follower,
+                p3follower
             )
 //            instant {
 //                smec.pixelHeight = 1.0

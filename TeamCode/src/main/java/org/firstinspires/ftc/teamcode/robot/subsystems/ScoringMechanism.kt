@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode.robot.subsystems
 import dev.turtles.anchor.component.FinishReason
 import dev.turtles.anchor.entity.Subsystem
 import dev.turtles.anchor.util.Timer
-import org.firstinspires.ftc.teamcode.Util.InverseKinematicsConfig
-import org.firstinspires.ftc.teamcode.Util.InverseKinematicsConfig.WRIST_ANGLE
+import org.firstinspires.ftc.teamcode.util.InverseKinematicsConfig
+import org.firstinspires.ftc.teamcode.util.InverseKinematicsConfig.WRIST_ANGLE
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.claw.subsystems.LeftClawSubsystem
 import org.firstinspires.ftc.teamcode.claw.subsystems.RightClawSubsystem
@@ -102,7 +102,7 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
         ikResults = KinematicResults(
                 180.0 - elbow,
                 telescopeLength - retractedTelescopeLength,
-                -(actualElbow - 180) + WRIST_ANGLE
+            (-(actualElbow - 180) + WRIST_ANGLE)/2
         )
     }
 

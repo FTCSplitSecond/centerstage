@@ -9,6 +9,7 @@ import dev.turtles.anchor.component.stock.instant
 import dev.turtles.anchor.component.stock.parallel
 import dev.turtles.anchor.component.stock.series
 import dev.turtles.electriceel.opmode.AnchorOpMode
+import dev.turtles.electriceel.util.AngleUnit
 import dev.turtles.electriceel.util.epsilonEquals
 import dev.turtles.lilypad.Button
 import dev.turtles.lilypad.EventTrigger
@@ -20,6 +21,7 @@ import org.firstinspires.ftc.teamcode.mecanum.commands.DriveMecanum
 import org.firstinspires.ftc.teamcode.robot.commands.UpdateTelemetry
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMechanism
+import kotlin.math.PI
 import kotlin.math.absoluteValue
 import kotlin.math.pow
 import kotlin.math.sign
@@ -31,6 +33,8 @@ class MainTeleOp : AnchorOpMode() {
 
         val robot = Robot(hardwareMap, this.hardwareManager, telemetry)
         val smec = robot.scoringMechanism
+
+        val dt = robot.driveBase
 
         robot.init(this.world)
         robot.elbow.isEnabled = true
@@ -105,7 +109,9 @@ class MainTeleOp : AnchorOpMode() {
 //        }
 
 
-
+        driver[Button.Key.DPAD_DOWN] onActivate instant {
+            dt.dt().IMU_OFFSET += dt.dt().rawExternalHeading
+        }
 
 
         driver[Button.Key.LEFT_BUMPER] onActivate instant {
@@ -114,7 +120,7 @@ class MainTeleOp : AnchorOpMode() {
                 ClawPositions.CLOSED -> {
                     if (smec.state == ScoringMechanism.State.INTAKE)
                         ClawPositions.OPEN
-                    else if (smec.state == ScoringMechanism.State.INTAKE )
+                    else if (smec.state == ScoringMechanism.State.CLOSE_INTAKE )
                         ClawPositions.OPEN
                     else ClawPositions.DROP
                 }
@@ -138,6 +144,8 @@ class MainTeleOp : AnchorOpMode() {
                 }
             }
         }
+
+
 
         driverLeftTrigger onActivate
                 instant {

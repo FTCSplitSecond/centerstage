@@ -4,9 +4,6 @@ import PropDetector
 import PropZone
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
-import com.arcrobotics.ftclib.command.ParallelCommandGroup
-import com.arcrobotics.ftclib.command.SequentialCommandGroup
-import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.fasterxml.jackson.databind.annotation.JsonAppend.Prop
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import dev.turtles.anchor.component.stock.delay
@@ -31,7 +28,7 @@ import org.openftc.easyopencv.OpenCvWebcam
 import kotlin.math.PI
 
 @Autonomous
-class BlueFarAuto : AnchorOpMode() {
+class RedCloseAuto : AnchorOpMode() {
     lateinit var robot : Robot
     lateinit var smec : ScoringMechanism
     lateinit var drive : CenterstageMecanumDrive
@@ -71,13 +68,14 @@ class BlueFarAuto : AnchorOpMode() {
                 ClawPositions.CLOSED -> {
                     if (smec.state == ScoringMechanism.State.INTAKE)
                         ClawPositions.OPEN
-                    else if (smec.state == ScoringMechanism.State.INTAKE )
+                    else if (smec.state == ScoringMechanism.State.CLOSE_INTAKE )
                         ClawPositions.OPEN
                     else ClawPositions.DROP
                 }
                 ClawPositions.DROP -> ClawPositions.CLOSED
             }
         }
+
         driver[Button.Key.DPAD_RIGHT] onActivate instant {
             smec.rightClawState = when (smec.rightClawState) {
                 ClawPositions.OPEN -> ClawPositions.CLOSED
@@ -98,7 +96,8 @@ class BlueFarAuto : AnchorOpMode() {
         webcam.stopStreaming()
         zone = detector.zone
         val startPose = Pose2d(0.0, 0.0, 0.0)
-        // set testing zones
+
+       // set testing zones
         zone = when (AutoConfig.MODE) {
             0 -> PropZone.CENTER
             1 -> PropZone.RIGHT
@@ -113,91 +112,90 @@ class BlueFarAuto : AnchorOpMode() {
         // Move to spike mark
         val p1traj = when (zone) {
             PropZone.CENTER -> drive.trajectoryBuilder(startPose)
-                .lineToLinearHeading(Pose2d(AutoConfig.BLUE_FAR_CENTER_X[0], AutoConfig.BLUE_FAR_CENTER_Y[0], 0.0))
+                .lineToLinearHeading(Pose2d(AutoConfig.RED_CLOSE_CENTER_X[0], AutoConfig.RED_CLOSE_CENTER_Y[0], -PI / 2))
                 .build()
 
             PropZone.RIGHT -> drive.trajectoryBuilder(startPose)
-                .lineToLinearHeading(Pose2d(AutoConfig.BLUE_FAR_RIGHT_X[0], AutoConfig.BLUE_FAR_RIGHT_Y[0], PI/2))
+                .lineToLinearHeading(Pose2d(AutoConfig.BLUE_CLOSE_RIGHT_X[0], 0.0, -PI/2))
                 .build()
 
             PropZone.LEFT -> drive.trajectoryBuilder(startPose)
-                .lineToLinearHeading(Pose2d(-22.0, AutoConfig.FAR_LANE_START_Y, PI/2))
+                .lineToLinearHeading(Pose2d(AutoConfig.BLUE_CLOSE_LEFT_X[0], AutoConfig.BLUE_CLOSE_LEFT_Y[0], -PI/2))
                 .build()
             else -> TODO()
         }
 
-
-        // Move to deposit purple pixel
+        // Move to purple pixel deposit
         val p2traj = when (zone) {
             PropZone.CENTER -> drive.trajectoryBuilder(p1traj.end())
-                .strafeTo(Vector2d(AutoConfig.BLUE_FAR_CENTER_X[1], AutoConfig.BLUE_FAR_CENTER_Y[1]))
+                .strafeTo(Vector2d(AutoConfig.RED_CLOSE_CENTER_X[1], AutoConfig.RED_CLOSE_CENTER_Y[1]))
                 .build()
             PropZone.RIGHT -> drive.trajectoryBuilder(p1traj.end())
-                .strafeTo(Vector2d(AutoConfig.BLUE_FAR_RIGHT_X[1], AutoConfig.BLUE_FAR_RIGHT_Y[1]))
+                .strafeTo(Vector2d(AutoConfig.BLUE_CLOSE_RIGHT_X[1], 3.0))
                 .build()
             PropZone.LEFT -> drive.trajectoryBuilder(p1traj.end())
-                .strafeTo(Vector2d(-25.0, -16.0))
+                .strafeTo(Vector2d(AutoConfig.BLUE_CLOSE_LEFT_X[1], AutoConfig.BLUE_CLOSE_LEFT_Y[1]))
                 .build()
             else -> TODO()
         }
 
-        // Move to close side
+        // Move to yellow pixel deposit
         val p3traj = when (zone) {
             PropZone.CENTER -> drive.trajectoryBuilder(p2traj.end())
-                .lineToLinearHeading(Pose2d(AutoConfig.BLUE_FAR_CENTER_X[2], AutoConfig.BLUE_FAR_CENTER_Y[2], PI/2))// TODO: MOVE CLOSER TO BACKDROP (-y)
+                .strafeTo(Vector2d(AutoConfig.RED_CLOSE_CENTER_X[2], AutoConfig.RED_CLOSE_CENTER_Y[2]))// TODO: MOVE CLOSER TO BACKDROP (-y)
                 .build()
             PropZone.RIGHT -> drive.trajectoryBuilder(p2traj.end())
-                .strafeTo(Vector2d(AutoConfig.BLUE_FAR_RIGHT_X[2], AutoConfig.BLUE_FAR_RIGHT_Y[2]))// TODO: MOVE CLOSER TO BACKDROP (-y)
+                .strafeTo(Vector2d(AutoConfig.BACKDROP_RIGHT_X, AutoConfig.BACKDROP_Y))// TODO: MOVE CLOSER TO BACKDROP (-y)
                 .build()
             PropZone.LEFT -> drive.trajectoryBuilder(p2traj.end())
-                .strafeTo(Vector2d(AutoConfig.FAR_LANE_START_Y, -16.0))// TODO: MOVE CLOSER TO BACKDROP (-y)
+                .strafeTo(Vector2d(AutoConfig.BACKDROP_LEFT_X, AutoConfig.BACKDROP_Y))// TODO: MOVE CLOSER TO BACKDROP (-y)
                 .build()
             else -> TODO()
         }
 
-//        // Move to yellow pixel deposit
-//        val p4traj = when (zone) {
-//
-//        }
-//
 //        // Move to park
-//        val p5traj = drive.trajectoryBuilder()
+//        val p4traj = when (zone) {
+//            PropZone.CENTER ->
+//            PropZone.RIGHT -> TODO()
+//        }
 
 
-//        val follower = TrajectoryFollower(drive, drive.trajectoryBuilder(Pose2d(0.0, 0.0, -PI / 2))
-//            .lineToLinearHeading(Pose2d(0.0, 24.0, Math.toRadians(0z0./**/0)))
-//            .build());
         val p1follower = TrajectoryFollower(drive, p1traj)
         val p2follower = TrajectoryFollower(drive, p2traj)
         val p3follower = TrajectoryFollower(drive, p3traj)
         + series (
             p1follower,
             parallel (
-                series (
-                    delay(1.0),
-                    instant {
-                        smec.state = ScoringMechanism.State.CLOSE_INTAKE
-                    }
-                ),
+                instant {
+                    smec.state = ScoringMechanism.State.CLOSE_INTAKE
+                },
                 p2follower,
             ),
             instant {
                 smec.leftClawState = ClawPositions.OPEN
             },
-            parallel(
+            parallel (
                 instant {
                     smec.state = ScoringMechanism.State.TRAVEL
                 },
-                p3follower,
-            )
-//            instant {
-//                smec.pixelHeight = 1.0
-//                smec.state = ScoringMechanism.State.DEPOSIT
-//            },
-//            delay(2.0),
-//            instant {
-//                smec.rightClawState = ClawPositions.OPEN
-//            }
+                p3follower
+            ),
+            instant {
+                smec.pixelHeight = 0.0
+                smec.state = ScoringMechanism.State.DEPOSIT
+            },
+            delay(2.0),
+            instant {
+                smec.rightClawState = ClawPositions.OPEN
+            },
+            delay(0.5),
+            instant {
+                smec.state = ScoringMechanism.State.DROP
+            },
+            delay(0.5),
+            instant {
+                smec.state = ScoringMechanism.State.TRAVEL
+            }
         )
 
 

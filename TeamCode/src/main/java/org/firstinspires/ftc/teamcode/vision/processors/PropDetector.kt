@@ -17,9 +17,6 @@ class PropDetector(val telemetry : Telemetry) : OpenCvPipeline() {
     var zone = PropZone.UNKNOWN
     val out = Mat()
     val HSV = Mat()
-    val red = Scalar(255.0, 0.0, 0.0)
-    val green = Scalar(0.0, 255.0, 0.0)
-    val blue = Scalar(0.0, 0.0, 255.0)
     val black = Scalar(0.0, 0.0, 0.0)
 
     override fun processFrame(input: Mat): Mat {

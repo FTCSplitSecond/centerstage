@@ -4,10 +4,6 @@ import PropDetector
 import PropZone
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
-import com.arcrobotics.ftclib.command.ParallelCommandGroup
-import com.arcrobotics.ftclib.command.SequentialCommandGroup
-import com.arcrobotics.ftclib.gamepad.GamepadKeys
-import com.fasterxml.jackson.databind.annotation.JsonAppend.Prop
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import dev.turtles.anchor.component.stock.delay
 import dev.turtles.anchor.component.stock.instant
@@ -21,6 +17,7 @@ import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.roadrunner.TrajectoryFollower
 import org.firstinspires.ftc.teamcode.roadrunner.drive.CenterstageMecanumDrive
+import org.firstinspires.ftc.teamcode.robot.subsystems.AutoConfig
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMechanism
 import org.openftc.easyopencv.OpenCvCamera
@@ -68,15 +65,16 @@ class BlueCloseAuto : AnchorOpMode() {
             smec.leftClawState = when (smec.leftClawState) {
                 ClawPositions.OPEN -> ClawPositions.CLOSED
                 ClawPositions.CLOSED -> {
-                    if (smec.state == ScoringMechanism.State.INTAKE)
-                        ClawPositions.OPEN
-                    else if (smec.state == ScoringMechanism.State.INTAKE )
-                        ClawPositions.OPEN
-                    else ClawPositions.DROP
-                }
+                if (smec.state == ScoringMechanism.State.INTAKE)
+                    ClawPositions.OPEN
+                else if (smec.state == ScoringMechanism.State.CLOSE_INTAKE )
+                    ClawPositions.OPEN
+                else ClawPositions.DROP
+            }
                 ClawPositions.DROP -> ClawPositions.CLOSED
             }
         }
+
         driver[Button.Key.DPAD_RIGHT] onActivate instant {
             smec.rightClawState = when (smec.rightClawState) {
                 ClawPositions.OPEN -> ClawPositions.CLOSED
@@ -99,47 +97,63 @@ class BlueCloseAuto : AnchorOpMode() {
         val startPose = Pose2d(0.0, 0.0, 0.0)
 
         // Treat unknown as if it is right
+        zone = when (AutoConfig.MODE) {
+            0 -> PropZone.CENTER
+            1 -> PropZone.RIGHT
+            2 -> PropZone.LEFT
+            else -> zone
+        }
+        if (zone == PropZone.UNKNOWN) {
+            zone = PropZone.CENTER
+        }
+        // Move to spike mark
         val p1traj = when (zone) {
             PropZone.CENTER -> drive.trajectoryBuilder(startPose)
-                .lineToLinearHeading(Pose2d(-24.0, -11.0, PI / 2))
+                .lineToLinearHeading(Pose2d(AutoConfig.BLUE_CLOSE_CENTER_X[0], -11.0, PI / 2))
                 .build()
 
             PropZone.RIGHT -> drive.trajectoryBuilder(startPose)
-                .lineToLinearHeading(Pose2d(-35.0, -18.0, 0.0))
+                .lineToLinearHeading(Pose2d(AutoConfig.BLUE_CLOSE_RIGHT_X[0], 0.0, PI/2))
                 .build()
 
             PropZone.LEFT -> drive.trajectoryBuilder(startPose)
-                .lineToLinearHeading(Pose2d(0.0, 0.0, 0.0))
+                .lineToLinearHeading(Pose2d(AutoConfig.BLUE_CLOSE_LEFT_X[0], AutoConfig.BLUE_CLOSE_LEFT_Y[0], PI/2))
                 .build()
-
-            PropZone.UNKNOWN -> drive.trajectoryBuilder(startPose)
-                .lineToLinearHeading(Pose2d(0.0, 0.0, 0.0))
-                .build()
+            else -> TODO()
         }
 
-
+        // Move to purple pixel deposit
         val p2traj = when (zone) {
             PropZone.CENTER -> drive.trajectoryBuilder(p1traj.end())
-                .strafeTo(Vector2d(-36.0, -11.0))
+                .strafeTo(Vector2d(AutoConfig.BLUE_CLOSE_CENTER_X[1], -11.0))
                 .build()
             PropZone.RIGHT -> drive.trajectoryBuilder(p1traj.end())
-                .strafeTo(Vector2d(-12.0, -3.0))
+                .strafeTo(Vector2d(AutoConfig.BLUE_CLOSE_RIGHT_X[1], 3.0))
                 .build()
             PropZone.LEFT -> drive.trajectoryBuilder(p1traj.end())
-                .strafeTo(Vector2d(-33.0, -29.0))
+                .strafeTo(Vector2d(AutoConfig.BLUE_CLOSE_LEFT_X[1], AutoConfig.BLUE_CLOSE_LEFT_Y[1]))
                 .build()
-            PropZone.UNKNOWN -> drive.trajectoryBuilder(p1traj.end())
-                .strafeTo(Vector2d(-12.0, -34.0))
-                .build()
+            else -> TODO()
         }
-//
-        val p3traj = drive.trajectoryBuilder(p2traj.end())
-            .strafeTo(Vector2d(-24.0, -20.0))
-            .build()
 
-//        val follower = TrajectoryFollower(drive, drive.trajectoryBuilder(Pose2d(0.0, 0.0, -PI / 2))
-//            .lineToLinearHeading(Pose2d(0.0, 24.0, Math.toRadians(0z0./**/0)))
-//            .build());
+        // Move to yellow pixel deposit
+        val p3traj = when (zone) {
+            PropZone.CENTER -> drive.trajectoryBuilder(p2traj.end())
+                .strafeTo(Vector2d(AutoConfig.BACKDROP_CENTER_X, AutoConfig.BACKDROP_Y))// TODO: MOVE CLOSER TO BACKDROP (-y)
+                .build()
+            PropZone.RIGHT -> drive.trajectoryBuilder(p2traj.end())
+                .strafeTo(Vector2d(AutoConfig.BACKDROP_RIGHT_X, AutoConfig.BACKDROP_Y))// TODO: MOVE CLOSER TO BACKDROP (-y)
+                .build()
+            PropZone.LEFT -> drive.trajectoryBuilder(p2traj.end())
+                .strafeTo(Vector2d(AutoConfig.BACKDROP_LEFT_X, AutoConfig.BACKDROP_Y))// TODO: MOVE CLOSER TO BACKDROP (-y)
+                .build()
+            else -> TODO()
+        }
+
+//        // Move to park
+//        val p4traj =
+
+
         val p1follower = TrajectoryFollower(drive, p1traj)
         val p2follower = TrajectoryFollower(drive, p2traj)
         val p3follower = TrajectoryFollower(drive, p3traj)
@@ -154,14 +168,27 @@ class BlueCloseAuto : AnchorOpMode() {
             instant {
                 smec.leftClawState = ClawPositions.OPEN
             },
-            p3follower,
+            parallel (
+                instant {
+                    smec.state = ScoringMechanism.State.TRAVEL
+                },
+                p3follower
+            ),
             instant {
-                smec.pixelHeight = 1.0
+                smec.pixelHeight = 0.0
                 smec.state = ScoringMechanism.State.DEPOSIT
             },
             delay(2.0),
             instant {
                 smec.rightClawState = ClawPositions.OPEN
+            },
+            delay(0.5),
+            instant {
+                smec.state = ScoringMechanism.State.DROP
+            },
+            delay(0.5),
+            instant {
+                smec.state = ScoringMechanism.State.TRAVEL
             }
         )
 

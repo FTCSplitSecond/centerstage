@@ -56,6 +56,7 @@ import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kV;
 public class CenterstageMecanumDrive extends MecanumDrive {
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(8.0, 0, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(8.0, 0, 0);
+    public double IMU_OFFSET = 0.0;
 
     public static double LATERAL_MULTIPLIER = 1;
 
@@ -300,7 +301,7 @@ public class CenterstageMecanumDrive extends MecanumDrive {
 
     @Override
     public double getRawExternalHeading() {
-        return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        return AngleUnit.normalizeRadians(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - IMU_OFFSET);
     }
 
     @Override

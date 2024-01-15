@@ -8,7 +8,7 @@ public class ElbowConfig {
     public static double ELBOW_KP = 0.02;
     public static double ELBOW_KI = 0.0;
     public static double ELBOW_KD = 0.0008;
-    public static double ELBOW_MAX = 100.0; //  degrees
+    public static double ELBOW_MAX = 170.0; //  degrees
     public static double ELBOW_MIN = -8.0; //  degrees
     public static double ELBOW_HOME = -8.0; //  degrees
     public static double ELBOW_EXTENDED_INTAKE = -1.5; //  degrees
