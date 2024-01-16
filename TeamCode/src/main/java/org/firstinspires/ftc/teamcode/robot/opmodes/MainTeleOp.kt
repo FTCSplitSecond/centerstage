@@ -151,6 +151,7 @@ class MainTeleOp : AnchorOpMode() {
                 instant {
                     if (smec.state == ScoringMechanism.State.CLOSE_INTAKE)
                         smec.state = ScoringMechanism.State.INTAKE
+
                     else if (smec.state == ScoringMechanism.State.INTAKE)
                         smec.state = ScoringMechanism.State.CLOSE_INTAKE
                     else
@@ -175,6 +176,8 @@ class MainTeleOp : AnchorOpMode() {
                 smec.state = ScoringMechanism.State.TRAVEL
             else
                 smec.state = ScoringMechanism.State.CLOSE_INTAKE
+                smec.rightClawState = ClawPositions.OPEN
+                smec.leftClawState = ClawPositions.OPEN
 
 
         }
