@@ -1,3 +1,4 @@
+import dev.turtles.electriceel.util.epsilonEquals
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.opencv.core.Core
 import org.opencv.core.Mat
@@ -42,12 +43,12 @@ class PropDetector(val telemetry : Telemetry) : OpenCvPipeline() {
 //            Core.extractChannel(rightCrop, rightCrop, 1)
 
         val averages = arrayOf(Core.mean(leftCrop).`val`[0], Core.mean(centerCrop).`val`[0], Core.mean(rightCrop).`val`[0])
+        val max = averages.max()
 
-
-        if (averages.max() == averages[0]) {
+        if (max epsilonEquals averages[0]) {
             telemetry.addLine("Left")
             zone = PropZone.LEFT
-        } else if (averages.max() == averages[1]) {
+        } else if (max epsilonEquals averages[1]) {
             telemetry.addLine("Center")
             zone = PropZone.CENTER
         } else {

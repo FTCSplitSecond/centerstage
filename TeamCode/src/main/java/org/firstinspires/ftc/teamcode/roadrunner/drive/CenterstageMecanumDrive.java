@@ -142,6 +142,10 @@ public class CenterstageMecanumDrive extends MecanumDrive {
         );
     }
 
+    public void setStartPose(Pose2d startPose) {
+        IMU_OFFSET = startPose.getHeading();
+    }
+
     public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
         return new TrajectoryBuilder(startPose, VEL_CONSTRAINT, ACCEL_CONSTRAINT);
     }

@@ -109,11 +109,11 @@ class BlueCloseAuto : AnchorOpMode() {
         // Move to spike mark
         val p1traj = when (zone) {
             PropZone.CENTER -> drive.trajectoryBuilder(startPose)
-                .lineToLinearHeading(Pose2d(AutoConfig.BLUE_CLOSE_CENTER_X[0], -11.0, PI / 2))
+                .lineToLinearHeading(Pose2d(AutoConfig.BLUE_CLOSE_CENTER_X[0], AutoConfig.BLUE_CLOSE_CENTER_Y[0], PI / 2))
                 .build()
 
             PropZone.RIGHT -> drive.trajectoryBuilder(startPose)
-                .lineToLinearHeading(Pose2d(AutoConfig.BLUE_CLOSE_RIGHT_X[0], 0.0, PI/2))
+                .lineToLinearHeading(Pose2d(AutoConfig.BLUE_CLOSE_RIGHT_X[0], AutoConfig.BLUE_CLOSE_RIGHT_Y[0], PI/2))
                 .build()
 
             PropZone.LEFT -> drive.trajectoryBuilder(startPose)
@@ -125,10 +125,10 @@ class BlueCloseAuto : AnchorOpMode() {
         // Move to purple pixel deposit
         val p2traj = when (zone) {
             PropZone.CENTER -> drive.trajectoryBuilder(p1traj.end())
-                .strafeTo(Vector2d(AutoConfig.BLUE_CLOSE_CENTER_X[1], -11.0))
+                .strafeTo(Vector2d(AutoConfig.BLUE_CLOSE_CENTER_X[1], AutoConfig.BLUE_CLOSE_CENTER_Y[1]))
                 .build()
             PropZone.RIGHT -> drive.trajectoryBuilder(p1traj.end())
-                .strafeTo(Vector2d(AutoConfig.BLUE_CLOSE_RIGHT_X[1], 3.0))
+                .strafeTo(Vector2d(AutoConfig.BLUE_CLOSE_RIGHT_X[1], AutoConfig.BLUE_CLOSE_RIGHT_Y[1]))
                 .build()
             PropZone.LEFT -> drive.trajectoryBuilder(p1traj.end())
                 .strafeTo(Vector2d(AutoConfig.BLUE_CLOSE_LEFT_X[1], AutoConfig.BLUE_CLOSE_LEFT_Y[1]))
@@ -139,13 +139,13 @@ class BlueCloseAuto : AnchorOpMode() {
         // Move to yellow pixel deposit
         val p3traj = when (zone) {
             PropZone.CENTER -> drive.trajectoryBuilder(p2traj.end())
-                .strafeTo(Vector2d(AutoConfig.BACKDROP_CENTER_X, AutoConfig.BACKDROP_Y))// TODO: MOVE CLOSER TO BACKDROP (-y)
+                .strafeTo(Vector2d(AutoConfig.BACKDROP_CENTER_X, AutoConfig.BLUE_CLOSE_CENTER_Y[2]))// TODO: MOVE CLOSER TO BACKDROP (-y)
                 .build()
             PropZone.RIGHT -> drive.trajectoryBuilder(p2traj.end())
-                .strafeTo(Vector2d(AutoConfig.BACKDROP_RIGHT_X, AutoConfig.BACKDROP_Y))// TODO: MOVE CLOSER TO BACKDROP (-y)
+                .strafeTo(Vector2d(AutoConfig.BACKDROP_RIGHT_X, AutoConfig.BLUE_CLOSE_RIGHT_Y[2]))// TODO: MOVE CLOSER TO BACKDROP (-y)
                 .build()
             PropZone.LEFT -> drive.trajectoryBuilder(p2traj.end())
-                .strafeTo(Vector2d(AutoConfig.BACKDROP_LEFT_X, AutoConfig.BACKDROP_Y))// TODO: MOVE CLOSER TO BACKDROP (-y)
+                .strafeTo(Vector2d(AutoConfig.BACKDROP_LEFT_X, AutoConfig.BLUE_CLOSE_LEFT_Y[2]))// TODO: MOVE CLOSER TO BACKDROP (-y)
                 .build()
             else -> TODO()
         }

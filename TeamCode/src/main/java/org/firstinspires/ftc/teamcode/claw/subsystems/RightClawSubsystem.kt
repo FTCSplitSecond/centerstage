@@ -1,14 +1,10 @@
 package org.firstinspires.ftc.teamcode.claw.subsystems
 
-import com.arcrobotics.ftclib.command.SubsystemBase
-import com.qualcomm.robotcore.hardware.PwmControl
-import com.qualcomm.robotcore.hardware.ServoImplEx
 import dev.turtles.anchor.component.FinishReason
 import dev.turtles.anchor.entity.Subsystem
 import dev.turtles.electriceel.wrapper.HardwareManager
 import dev.turtles.electriceel.wrapper.interfaces.Servo
 import org.firstinspires.ftc.robotcore.external.Telemetry
-import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 
 enum class ClawPositions{
     OPEN,
