@@ -164,14 +164,9 @@ class MainTeleOp : AnchorOpMode() {
                         smec.pixelHeight -= 1.0
                 }
 
-        driverRightTrigger onActivate
-                instant {
+        driverRightTrigger onActivate instant {
                         smec.pixelHeight += 1.0
                     }
-
-
-
-
 
         driver[Button.Key.LEFT_JOSTICK_PRESS] onActivate instant {
             if  (smec.state == ScoringMechanism.State.DEPOSIT)

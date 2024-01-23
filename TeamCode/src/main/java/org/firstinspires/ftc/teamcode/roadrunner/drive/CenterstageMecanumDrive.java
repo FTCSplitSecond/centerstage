@@ -9,6 +9,7 @@ import com.acmerobotics.roadrunner.drive.MecanumDrive;
 import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
 import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectory.constraints.AngularVelocityConstraint;
@@ -36,6 +37,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.util.LynxModuleUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
 
 import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MAX_ACCEL;
 import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MAX_ANG_ACCEL;
@@ -49,6 +51,8 @@ import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kA;
 import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kStatic;
 import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kV;
 
+import dev.turtles.electriceel.util.Vector2;
+
 /*
  * Simple mecanum drive hardware implementation for REV hardware.
  */
@@ -57,6 +61,9 @@ public class CenterstageMecanumDrive extends MecanumDrive {
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(8.0, 0, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(8.0, 0, 0);
     public double IMU_OFFSET = 0.0;
+    public double X_OFFSET = 0.0;
+    public double Y_OFFSET = 0.0;
+    public Pose2d startPose = new Pose2d();
 
     public static double LATERAL_MULTIPLIER = 1;
 
@@ -64,7 +71,7 @@ public class CenterstageMecanumDrive extends MecanumDrive {
     public static double VY_WEIGHT = 1;
     public static double OMEGA_WEIGHT = 1;
 
-    private TrajectorySequenceRunner trajectorySequenceRunner;
+    public TrajectorySequenceRunner trajectorySequenceRunner;
 
     private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(MAX_VEL, MAX_ANG_VEL, TRACK_WIDTH);
     private static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(MAX_ACCEL);
@@ -143,7 +150,13 @@ public class CenterstageMecanumDrive extends MecanumDrive {
     }
 
     public void setStartPose(Pose2d startPose) {
-        IMU_OFFSET = startPose.getHeading();
+        getLocalizer().setPoseEstimate(startPose);
+    }
+
+    public Pose2d rotatePose(Pose2d pose) {
+        Vector2d vec = pose.vec();
+        Vector2d rotatedVec = vec.rotated(pose.getHeading());
+        return new Pose2d(rotatedVec.getX(), rotatedVec.getY(), pose.getHeading());
     }
 
     public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
@@ -305,6 +318,10 @@ public class CenterstageMecanumDrive extends MecanumDrive {
 
     @Override
     public double getRawExternalHeading() {
+        return AngleUnit.normalizeRadians(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
+    }
+
+    public double getExternalHeadingWithOffset() {
         return AngleUnit.normalizeRadians(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - IMU_OFFSET);
     }
 
