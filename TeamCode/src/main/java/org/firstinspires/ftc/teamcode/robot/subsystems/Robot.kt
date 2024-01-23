@@ -2,11 +2,13 @@ package org.firstinspires.ftc.teamcode.robot.subsystems
 
 import com.acmerobotics.dashboard.FtcDashboard
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry
+import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.qualcomm.robotcore.hardware.HardwareMap
 import dev.turtles.anchor.entity.Entity
 import dev.turtles.anchor.world.World
 import dev.turtles.electriceel.wrapper.HardwareManager
 import org.firstinspires.ftc.robotcore.external.Telemetry
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.teamcode.drone_launcher.Subsystems.DroneSubsystem
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
 import org.firstinspires.ftc.teamcode.claw.subsystems.LeftClawSubsystem
@@ -18,8 +20,24 @@ import org.firstinspires.ftc.teamcode.wrist.subsystems.WristSubsystem
 enum class OpModeType {
     TELEOP, AUTONOMOUS
 }
-class Robot(val hardwareMap: HardwareMap, val hw: HardwareManager, t: Telemetry, val opModeType: OpModeType = OpModeType.TELEOP) {
+enum class Alliance {
+    RED, BLUE
+}
 
+class Robot(val hardwareMap: HardwareMap, val hw: HardwareManager, t: Telemetry,
+            val opModeType: OpModeType = OpModeType.TELEOP,
+            val alliance: Alliance = Alliance.RED,
+            val startPose : Pose2d = lastKnownAutoPose
+) {
+
+    companion object {
+        var lastKnownAutoPose = Pose2d(0.0, 0.0, 0.0)
+    }
+    // this just uses the start pose assumption of the robot is facing the driver station
+    var awayFromDriverStationHeading = when (alliance) {
+        Alliance.RED -> Math.PI / 2.0
+        Alliance.BLUE -> -Math.PI / 2.0
+    }
 
     // add multiple telemetry here for dashboard here
     val telemetry = MultipleTelemetry(FtcDashboard.getInstance().telemetry, t)

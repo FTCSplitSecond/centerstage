@@ -88,6 +88,10 @@ public class CenterstageMecanumDrive extends MecanumDrive {
     private List<Integer> lastEncVels = new ArrayList<>();
 
     public CenterstageMecanumDrive(HardwareMap hardwareMap) {
+        this(hardwareMap, new Pose2d());
+    }
+
+    public CenterstageMecanumDrive(HardwareMap hardwareMap, Pose2d startPose) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
@@ -141,7 +145,7 @@ public class CenterstageMecanumDrive extends MecanumDrive {
 
         // TODO: if desired, use setLocalizer() to change the localization method
         //setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels));
-        setLocalizer(new TwoWheelTrackingLocalizer(hardwareMap, this));
+        setLocalizer(new TwoWheelTrackingLocalizer(hardwareMap, this, startPose));
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(
                 follower, HEADING_PID, batteryVoltageSensor,
@@ -149,15 +153,15 @@ public class CenterstageMecanumDrive extends MecanumDrive {
         );
     }
 
-    public void setStartPose(Pose2d startPose) {
-        getLocalizer().setPoseEstimate(startPose);
-    }
-
-    public Pose2d rotatePose(Pose2d pose) {
-        Vector2d vec = pose.vec();
-        Vector2d rotatedVec = vec.rotated(pose.getHeading());
-        return new Pose2d(rotatedVec.getX(), rotatedVec.getY(), pose.getHeading());
-    }
+//    public void setStartPose(Pose2d startPose) {
+//        getLocalizer().setPoseEstimate(startPose);
+//    }
+//
+//    public Pose2d rotatePose(Pose2d pose) {
+//        Vector2d vec = pose.vec();
+//        Vector2d rotatedVec = vec.rotated(pose.getHeading());
+//        return new Pose2d(rotatedVec.getX(), rotatedVec.getY(), pose.getHeading());
+//    }
 
     public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
         return new TrajectoryBuilder(startPose, VEL_CONSTRAINT, ACCEL_CONSTRAINT);

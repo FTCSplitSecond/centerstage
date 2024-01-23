@@ -39,7 +39,7 @@ class PixelStackTester : AnchorOpMode() {
         val driver = FTCGamepad(gamepad1)
         robot = Robot(hardwareMap, this.hardwareManager, telemetry)
         smec = robot.scoringMechanism
-        drive = robot.driveBase.dt()
+        drive = robot.driveBase.dt
         robot.elbow.isEnabled = true
         robot.init(this.world)
         val cameraMonitorViewId = hardwareMap.appContext.resources.getIdentifier(

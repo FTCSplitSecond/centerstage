@@ -42,7 +42,7 @@ class RedFarAuto : AnchorOpMode() {
         val driver = FTCGamepad(gamepad1)
         robot = Robot(hardwareMap, this.hardwareManager, telemetry)
         smec = robot.scoringMechanism
-        drive = robot.driveBase.dt()
+        drive = robot.driveBase.dt
         robot.elbow.isEnabled = true
         robot.init(this.world)
         val cameraMonitorViewId = hardwareMap.appContext.resources.getIdentifier(
@@ -117,7 +117,7 @@ class RedFarAuto : AnchorOpMode() {
                 .build()
 
             PropZone.RIGHT -> drive.trajectoryBuilder(startPose)
-                .lineToLinearHeading(Pose2d(-9.75, AutoConfig.FAR_LANE_START_Y, PI/2))
+                .lineToLinearHeading(Pose2d(-9.75, 0.0, PI/2))
                 .build()
 
             PropZone.LEFT -> drive.trajectoryBuilder(startPose)
@@ -147,7 +147,7 @@ class RedFarAuto : AnchorOpMode() {
                 .lineToLinearHeading(Pose2d(AutoConfig.RED_FAR_CENTER_X[2], AutoConfig.RED_FAR_CENTER_Y[2], -PI/2))// TODO: MOVE CLOSER TO BACKDROP (-y)
                 .build()
             PropZone.RIGHT -> drive.trajectoryBuilder(p2traj.end())
-                .strafeTo(Vector2d(AutoConfig.FAR_LANE_START_Y, -16.0))// TODO: MOVE CLOSER TO BACKDROP (-y)
+                .strafeTo(Vector2d(0.0, -16.0))// TODO: MOVE CLOSER TO BACKDROP (-y)
                 .build()
             PropZone.LEFT -> drive.trajectoryBuilder(p2traj.end())
                 .strafeTo(Vector2d(AutoConfig.RED_FAR_LEFT_X[2], AutoConfig.RED_FAR_LEFT_Y[2]))// TODO: MOVE CLOSER TO BACKDROP (-y)

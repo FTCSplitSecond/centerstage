@@ -8,6 +8,7 @@ import com.acmerobotics.roadrunner.localization.TwoTrackingWheelLocalizer;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.util.Encoder;
 
 import java.util.Arrays;
@@ -58,8 +59,9 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     private Encoder parallelEncoder, perpendicularEncoder;
 
     private CenterstageMecanumDrive drive;
+    private double correctionFromImuToFieldHeading = 0.0;
 
-    public TwoWheelTrackingLocalizer(HardwareMap hardwareMap, CenterstageMecanumDrive drive) {
+    public TwoWheelTrackingLocalizer(HardwareMap hardwareMap, CenterstageMecanumDrive drive, Pose2d startPose) {
         super(Arrays.asList(
             new Pose2d(PARALLEL_X, PARALLEL_Y, 0),
             new Pose2d(PERPENDICULAR_X, PERPENDICULAR_Y, Math.toRadians(90))
@@ -70,6 +72,8 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
         parallelEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "fL"));
         perpendicularEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "bL"));
 
+        correctionFromImuToFieldHeading = AngleUnit.normalizeRadians(startPose.getHeading() - drive.getRawExternalHeading());
+        setPoseEstimate(startPose);
     }
 
     public static double encoderTicksToInches(double ticks) {
@@ -78,7 +82,7 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 
     @Override
     public double getHeading() {
-        return drive.getRawExternalHeading();
+        return drive.getRawExternalHeading() + correctionFromImuToFieldHeading;
     }
 
     @Override

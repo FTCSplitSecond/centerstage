@@ -17,7 +17,7 @@ class IMUtesting : AnchorOpMode() {
     lateinit var drive : CenterstageMecanumDrive
     override fun prerun() {
         robot = Robot(hardwareMap, this.hardwareManager, telemetry)
-        drive = robot.driveBase.dt()
+        drive = robot.driveBase.dt
         robot.init(this.world)
         robot.scoringMechanism.state = ScoringMechanism.State.TRAVEL
     }
@@ -27,10 +27,9 @@ class IMUtesting : AnchorOpMode() {
         val startPose = Pose2d(IMUtestconfig.startX, IMUtestconfig.startY, IMUtestconfig.startHeading)
         val pose1 = Pose2d(IMUtestconfig.coords1[0], IMUtestconfig.coords1[1], IMUtestconfig.startHeading)
         val runner = drive.trajectorySequenceRunner
-        drive.setStartPose(startPose)
         val p1 = drive.trajectoryBuilder(startPose)
 //            .strafeTo(Vector2d(24.0, 60.0))
-            .lineToLinearHeading(drive.rotatePose(pose1))
+            .lineToLinearHeading(pose1)
             .build()
 
         val seq = drive.trajectorySequenceBuilder(startPose)

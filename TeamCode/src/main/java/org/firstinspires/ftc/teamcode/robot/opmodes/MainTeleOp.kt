@@ -116,7 +116,7 @@ class MainTeleOp : AnchorOpMode() {
 
 
         driver[Button.Key.DPAD_DOWN] onActivate instant {
-            dt.dt().IMU_OFFSET += dt.dt().rawExternalHeading
+            robot.awayFromDriverStationHeading = robot.driveBase.dt.poseEstimate.heading
         }
 
 

@@ -40,7 +40,7 @@ class BlueFarAuto : AnchorOpMode() {
         val driver = FTCGamepad(gamepad1)
         robot = Robot(hardwareMap, this.hardwareManager, telemetry)
         smec = robot.scoringMechanism
-        drive = robot.driveBase.dt()
+        drive = robot.driveBase.dt
         robot.elbow.isEnabled = true
         robot.init(this.world)
         val cameraMonitorViewId = hardwareMap.appContext.resources.getIdentifier(
@@ -97,7 +97,6 @@ class BlueFarAuto : AnchorOpMode() {
         zone = detector.zone
         val runner = drive.trajectorySequenceRunner
         val startPose = Pose2d(-32.0, 62.0, PI/2)
-        drive.setStartPose(startPose)
         // set testing zones
         zone = when (AutoConfig.MODE) {
             0 -> PropZone.CENTER

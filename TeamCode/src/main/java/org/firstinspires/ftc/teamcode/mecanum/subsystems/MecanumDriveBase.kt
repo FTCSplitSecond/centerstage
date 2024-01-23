@@ -2,17 +2,17 @@ package org.firstinspires.ftc.teamcode.mecanum.subsystems
 
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.arcrobotics.ftclib.util.MathUtils
-import com.qualcomm.robotcore.hardware.HardwareMap
 import dev.turtles.anchor.component.FinishReason
 import dev.turtles.anchor.entity.Subsystem
-import org.firstinspires.ftc.robotcore.external.Telemetry
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.teamcode.roadrunner.drive.CenterstageMecanumDrive
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 
-class MecanumDriveBase(hardwareMap: HardwareMap, val telemetry: Telemetry) : Subsystem() {
-    constructor(robot: Robot) : this(robot.hardwareMap, robot.telemetry)
+class MecanumDriveBase(val robot : Robot) : Subsystem() {
+    val hardwareMap = robot.hardwareMap
+    val telemetry = robot.telemetry
+    val dt = CenterstageMecanumDrive(hardwareMap, robot.startPose)
 
-    private val dt = CenterstageMecanumDrive(hardwareMap)
 
     fun driveFieldCentric(xVel: Double, yVel : Double, turnVel: Double) {
         val xVelocity = MathUtils.clamp(xVel, -1.0, 1.0)
@@ -20,12 +20,12 @@ class MecanumDriveBase(hardwareMap: HardwareMap, val telemetry: Telemetry) : Sub
         val turnVelocity = MathUtils.clamp(turnVel, -1.0, 1.0)
 
         var input = com.arcrobotics.ftclib.geometry.Vector2d(xVelocity, yVelocity)
-        input = input.rotateBy(Math.toDegrees(-dt.rawExternalHeading))
+        input = input.rotateBy(Math.toDegrees(robot.awayFromDriverStationHeading - dt.poseEstimate.heading))
         dt.setWeightedDrivePower(Pose2d(input.x, input.y, turnVelocity))
     }
 
     override fun end(reason: FinishReason) {
-
+        Robot.lastKnownAutoPose = dt.poseEstimate
     }
 
     override fun init() {
@@ -36,7 +36,6 @@ class MecanumDriveBase(hardwareMap: HardwareMap, val telemetry: Telemetry) : Sub
         dt.update()
     }
 
-    fun dt() = dt
 
     fun poseEstimate(): Pose2d {
        return dt.poseEstimate
