@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.roadrunner.TrajectoryFollower
 import org.firstinspires.ftc.teamcode.roadrunner.drive.CenterstageMecanumDrive
+import org.firstinspires.ftc.teamcode.robot.subsystems.Alliance
 import org.firstinspires.ftc.teamcode.robot.subsystems.AutoConfig
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMechanism
@@ -36,6 +37,7 @@ class BlueCloseAuto : AnchorOpMode() {
     var zone = PropZone.UNKNOWN
     override fun prerun() {
         val driver = FTCGamepad(gamepad1)
+        Robot.alliance = Alliance.BLUE
         robot = Robot(hardwareMap, this.hardwareManager, telemetry)
         smec = robot.scoringMechanism
         drive = robot.driveBase.dt

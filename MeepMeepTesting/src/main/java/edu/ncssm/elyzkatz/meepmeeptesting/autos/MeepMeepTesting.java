@@ -44,8 +44,9 @@ public class MeepMeepTesting {
                 .lineToLinearHeading(new Pose2d(-36.0, 62.0, -PI))
                 .lineTo(new Vector2d(-36.0, 8.0))
                 .lineTo(new Vector2d(24.0, 8.0))
-                .lineTo(new Vector2d(47.0, 24.0))
-                .lineTo(new Vector2d(47.0, 60.0))
+                .lineTo(new Vector2d(33.0, 24.0))
+                .lineTo(new Vector2d(42.0, 24.0))
+                .lineTo(new Vector2d(42.0, 6.0))
 
 //                .lineTo(new Vector2d(-32.0, 8.0))
 //                .lineTo(new Vector2d(24.0, 8.0))
