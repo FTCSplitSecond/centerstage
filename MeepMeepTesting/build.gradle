@@ -1,5 +1,7 @@
 plugins {
     id 'java-library'
+    id 'org.jetbrains.kotlin.jvm'  // Use the latest Kotlin version
+
 }
 
 java {
@@ -14,4 +16,5 @@ repositories {
 
 dependencies {
     implementation 'com.github.NoahBres:MeepMeep:2.0.3'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8" // Include Kotlin standard library
 }
