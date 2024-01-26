@@ -113,9 +113,6 @@ class BlueFarAuto : AnchorOpMode() {
             zone = PropZone.CENTER
         }
         // Treat unknown as if it is right
-//        lateinit var p1 : TrajectorySequence
-//        lateinit var p2 : TrajectorySequence
-//        lateinit var p3 : TrajectorySequence
         lateinit var t1 : Trajectory
         lateinit var t2 : Trajectory
         lateinit var t2_5 : Trajectory
@@ -220,6 +217,7 @@ class BlueFarAuto : AnchorOpMode() {
             instant {smec.leftClawState = ClawPositions.OPEN},
             parallel(
                 instant {smec.state = ScoringMechanism.State.TRAVEL},
+                // TODO: we want to follow only trajectory t3 UNLESS we are on the left path, in which case we have to follow t2_5 and t3
                 instant {
                     if (zone == PropZone.LEFT) {
                         t2_5follower
@@ -228,6 +226,8 @@ class BlueFarAuto : AnchorOpMode() {
                     }
                 }
             ),
+            // TODO: these are all of the steps for after we reach the backdrop side of the field
+            // TODO: should be more or less the same for each randomization
 //            parallel(
 //                instant {smec.state = ScoringMechanism.State.DEPOSIT},
 //                t4follower
