@@ -62,7 +62,6 @@ fun nearAuto(drive: DriveShim, alliance: Alliance, zone: PropZone): TrajectorySe
     val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(-36.0, transitLaneY), PI).adjustForAlliance(alliance)
     val transitLaneBackDropSide = Vector2d(nearBackDropLaneX, transitLaneY).adjustForAlliance(alliance)
     val transitLanePixelStackSide = Vector2d(-48.0, transitLaneY).adjustForAlliance(alliance)
-
     val backDropScoringClawOffset = 0.0 // offset to help pixels land better if needed
     val backDropZoneSpacing = 6.0
     val backDropCenterY = 36.0
@@ -76,6 +75,7 @@ fun nearAuto(drive: DriveShim, alliance: Alliance, zone: PropZone): TrajectorySe
     }
     val backDropScoringPosition = Vector2d(backDropScoreX, nearBackDropPosition.y)  // no need to adjust for alliance (already there)
     val parkPosition = Vector2d(48.0, transitLaneY).adjustForAlliance(alliance)
+
 
 
     val sb = drive.trajectorySequenceBuilder(startPose)
@@ -113,11 +113,11 @@ fun farAuto(drive: DriveShim, alliance: Alliance, zone: PropZone): TrajectorySeq
     // purple pixel is in the left claw, yellow is in the right
 
     // key points (key points are for the blue alliance)
-    val startHeading = getAllianceHeading(alliance)
     val spinOffset = when(alliance) {
         Alliance.RED -> 0.0001
         Alliance.BLUE -> -0.0001
     }
+    val startHeading = getAllianceHeading(alliance)
     val startPose = Pose2d(-32.0, 62.0, startHeading).adjustForAlliance(alliance)
     val awayFromWallPosition = Vector2d(-36.0, 60.0).adjustForAlliance(alliance)
 

@@ -20,11 +20,9 @@ import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.drone_launcher.Subsystems.DronePositions
 import org.firstinspires.ftc.teamcode.mecanum.commands.DriveMecanum
 import org.firstinspires.ftc.teamcode.robot.commands.UpdateTelemetry
-import org.firstinspires.ftc.teamcode.robot.subsystems.Alliance
 import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMechanism
-import kotlin.math.PI
 import kotlin.math.absoluteValue
 import kotlin.math.pow
 import kotlin.math.sign
@@ -175,7 +173,11 @@ class MainTeleOp : AnchorOpMode() {
         driverLeftTrigger onActivate
                 instant {
                     if (smec.state == ScoringMechanism.State.CLOSE_INTAKE)
-                        smec.state = ScoringMechanism.State.INTAKE
+                         {
+                            smec.state = ScoringMechanism.State.INTAKE
+                            smec.rightClawState = ClawPositions.OPEN
+                            smec.leftClawState = ClawPositions.OPEN
+                        }
                     else if (smec.state == ScoringMechanism.State.INTAKE)
                         smec.state = ScoringMechanism.State.CLOSE_INTAKE
                     else
@@ -195,25 +197,11 @@ class MainTeleOp : AnchorOpMode() {
                 smec.state = ScoringMechanism.State.TRAVEL
             else
                 smec.state = ScoringMechanism.State.CLOSE_INTAKE
-            smec.rightClawState = ClawPositions.OPEN
-            smec.leftClawState = ClawPositions.OPEN
+
 
 
         }
 
-
-
-        parallel(
-            instant {
-                smec.switch(ScoringMechanism.State.CLOSE_INTAKE)
-            },
-            instant {
-                smec.rightClawState = ClawPositions.OPEN
-                smec.leftClawState = ClawPositions.OPEN
-            }
-
-
-        )
 
 
 

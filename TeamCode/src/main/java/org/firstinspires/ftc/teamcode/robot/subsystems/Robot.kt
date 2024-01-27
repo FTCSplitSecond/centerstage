@@ -15,14 +15,12 @@ import org.firstinspires.ftc.teamcode.claw.subsystems.LeftClawSubsystem
 import org.firstinspires.ftc.teamcode.claw.subsystems.RightClawSubsystem
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowSubsystem
 import org.firstinspires.ftc.teamcode.mecanum.subsystems.MecanumDriveBase
+import org.firstinspires.ftc.teamcode.robot.opmodes.Alliance
 import org.firstinspires.ftc.teamcode.wrist.subsystems.WristSubsystem
 import kotlin.math.PI
 
 enum class OpModeType {
     TELEOP, AUTONOMOUS
-}
-enum class Alliance {
-    RED, BLUE
 }
 
 class Robot(val hardwareMap: HardwareMap, val hw: HardwareManager, t: Telemetry,
