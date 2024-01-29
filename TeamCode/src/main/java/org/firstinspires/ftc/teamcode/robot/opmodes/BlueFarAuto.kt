@@ -122,8 +122,8 @@ class BlueFarAuto : AnchorOpMode() {
         }
 
         val transitLaneY = 12.0
-        val nearBackDropLaneX = 34.0
-        val backDropScoreX = 40.0
+        val nearBackDropLaneX = 34.0 // 1/27 FIX: too far from backdrop when placing right
+        val backDropScoreX = 42.0
 
         val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(-36.0, transitLaneY), PI + spinOffset).adjustForAlliance(Robot.alliance)
         val transitLaneBackDropSide = Vector2d(nearBackDropLaneX, transitLaneY).adjustForAlliance(Robot.alliance)

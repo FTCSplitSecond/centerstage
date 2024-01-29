@@ -137,11 +137,11 @@ class BlueCloseAuto : AnchorOpMode() {
         val purplePixelPose = when (zoneDetected) {
             PropZone.LEFT -> if(alliance== Alliance.BLUE) purplePixelPoseBackdropSide else purplePixelPoseAwayFromBackdrop
             PropZone.CENTER, PropZone.UNKNOWN -> purplePixelPoseCenter
-            PropZone.RIGHT -> if(alliance== Alliance.BLUE) purplePixelPoseAwayFromBackdrop else purplePixelPoseBackdropSide
+            PropZone.RIGHT -> if(alliance== Alliance.BLUE) purplePixelPoseAwayFromBackdrop else purplePixelPoseBackdropSide // 1/27 FIX: robot running into truss when placing right
         }
         val transitLaneY = 60.0
         val nearBackDropLaneX = 34.0
-        val backDropScoreX = 40.0
+        val backDropScoreX = 42.0
 
         val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(-36.0, transitLaneY), PI).adjustForAlliance(alliance)
         val transitLaneBackDropSide = Vector2d(nearBackDropLaneX, transitLaneY).adjustForAlliance(alliance)

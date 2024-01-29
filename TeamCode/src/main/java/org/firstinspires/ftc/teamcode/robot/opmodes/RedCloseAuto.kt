@@ -129,10 +129,10 @@ class RedCloseAuto : AnchorOpMode() {
 
         // purple pixel is in the left claw, yellow is in the right
         val startHeading = getAllianceHeading(alliance)
-        val awayFromWallPosition = Vector2d(20.0, 56.0).adjustForAlliance(alliance)
+        val awayFromWallPosition = Vector2d(24.0, 36.0).adjustForAlliance(alliance)
         val purplePixelPoseBackdropSide = Pose2d(Vector2d(36.0, 30.0), PI).adjustForAlliance(alliance)
         val purplePixelPoseCenter = Pose2d(Vector2d(28.0, 25.5), PI).adjustForAlliance(alliance)
-        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(12.0, 32.0), PI).adjustForAlliance(alliance)
+        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(14.0, 32.0), PI).adjustForAlliance(alliance) // 1/27 CHANGED: changed x from 18 to 14
         // note here that zone right/left means different things for red and blue
         val purplePixelPose = when (zoneDetected) {
             PropZone.LEFT -> if(alliance== Alliance.BLUE) purplePixelPoseBackdropSide else purplePixelPoseAwayFromBackdrop
@@ -141,7 +141,7 @@ class RedCloseAuto : AnchorOpMode() {
         }
         val transitLaneY = 60.0
         val nearBackDropLaneX = 34.0
-        val backDropScoreX = 40.0
+        val backDropScoreX = 42.0 // 1/27 CHANGE: too far from backdrop in center randomization 40 -> 40.5
 
         val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(-36.0, transitLaneY), PI).adjustForAlliance(alliance)
         val transitLaneBackDropSide = Vector2d(nearBackDropLaneX, transitLaneY).adjustForAlliance(alliance)
