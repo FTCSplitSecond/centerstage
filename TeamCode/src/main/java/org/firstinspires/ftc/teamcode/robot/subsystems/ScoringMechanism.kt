@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot.subsystems
 
+import android.util.Log
 import dev.turtles.anchor.component.FinishReason
 import dev.turtles.anchor.entity.Subsystem
 import dev.turtles.anchor.util.Timer
@@ -34,7 +35,8 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
         TRAVEL,
         DEPOSIT,
         CLIMB,
-        DROP
+        DROP,
+        PREDEPOSIT
     }
 
     var state = State.TRAVEL
@@ -44,7 +46,7 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
     var rightClawState = ClawPositions.OPEN
 
     private var currentStateTimer = Timer()
-    var pixelHeight = 0.0;
+    var pixelHeight = 0.0
 
 
     fun switch(state: State) {
@@ -105,7 +107,13 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
             (-(actualElbow - 180) + WRIST_ANGLE)/2
         )
     }
+    fun movementShouldBeComplete() : Boolean {
+        Log.d("waitfor", "wrist-"+wrist.movementShouldBeComplete().toString())
+        Log.d("waitfor", "telescope-"+telescope.isAtTarget().toString())
+        Log.d("waitfor", "elbow-"+elbow.isAtTarget().toString())
 
+        return wrist.movementShouldBeComplete() && elbow.isAtTarget() && telescope.isAtTarget()
+    }
     override fun loop() {
 
         // This is a crude state machine.
@@ -131,6 +139,17 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
                 wrist.position = WristPosition.TRAVEL
                 elbow.position = ElbowPosition.TRAVEL
                 telescope.position = TelescopePosition.TRAVEL
+            }
+            State.PREDEPOSIT -> {
+                wrist.position = WristPosition.PREDEPOSIT
+                elbow.position = ElbowPosition.ADJUST
+                telescope.position = TelescopePosition.ADJUST
+
+                runKinematics()
+
+                wrist.depositAngle = ikResults.wristAngle
+                elbow.depositAngle = ikResults.elbowAngle
+                telescope.targetExtenstionInches = ikResults.telescopeExtension
             }
             State.DEPOSIT -> {
                 wrist.position = WristPosition.ADJUST

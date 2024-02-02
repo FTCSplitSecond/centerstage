@@ -10,7 +10,8 @@ enum class WristPosition {
     EXTENDED_INTAKE,
     CLOSE_INTAKE,
     ADJUST,
-    TRAVEL
+    TRAVEL,
+    PREDEPOSIT
 }
 class WristSubsystem(private val leftServo : Servo, private val rightServo : Servo, private val telemetry: Telemetry): Subsystem() {
     constructor(hw: HardwareManager, telemetry: Telemetry) :
@@ -19,7 +20,7 @@ class WristSubsystem(private val leftServo : Servo, private val rightServo : Ser
                 telemetry)
 
     var isTelemetryEnabled = false
-    private val degreesPerMicrosecond = 180.0/2000.0
+    private val degreesPerMicrosecond = -180.0/2000.0
     private var movementStartTime = System.currentTimeMillis()
     var angle = getAngleFromPosition(WristPosition.TRAVEL)
         private set;
@@ -66,6 +67,7 @@ class WristSubsystem(private val leftServo : Servo, private val rightServo : Ser
             WristPosition.CLOSE_INTAKE -> WristConfig.WRIST_CLOSE_INTAKE
             WristPosition.EXTENDED_INTAKE -> WristConfig.WRIST_EXTENDED_INTAKE
             WristPosition.ADJUST -> depositAngle
+            WristPosition.PREDEPOSIT -> WristConfig.WRIST_PREDEPOSIT
         }
     }
 
