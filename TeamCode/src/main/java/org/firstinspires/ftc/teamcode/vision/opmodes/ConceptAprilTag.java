@@ -91,6 +91,7 @@ public class ConceptAprilTag extends LinearOpMode {
 
         initAprilTag();
 
+
         // Wait for the DS start button to be touched.
         telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
         telemetry.addData(">", "Touch Play to start OpMode");
@@ -131,8 +132,9 @@ public class ConceptAprilTag extends LinearOpMode {
         aprilTag = new AprilTagProcessor.Builder()
 
             // The following default settings are available to un-comment and edit as needed.
-            .setDrawAxes(false)
-            .setDrawCubeProjection(false)
+            .setDrawAxes(true)
+            .setDrawCubeProjection(true)
+                .setDrawTagID(true)
             .setDrawTagOutline(true)
             .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
             .setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
@@ -161,7 +163,7 @@ public class ConceptAprilTag extends LinearOpMode {
 
         // Set the camera (webcam vs. built-in RC phone camera).
         if (USE_WEBCAM) {
-            builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
+            builder.setCamera(hardwareMap.get(WebcamName.class, "webcam1"));
         } else {
             builder.setCamera(BuiltinCameraDirection.BACK);
         }
@@ -191,7 +193,20 @@ public class ConceptAprilTag extends LinearOpMode {
 
     }   // end method initAprilTag()
 
+    private void aprilTagTest() {
+        aprilTag = new AprilTagProcessor.Builder()
+                .setDrawAxes(true)
+                .setDrawCubeProjection(true)
+                .setDrawTagID(true)
+                .setDrawTagOutline(true)
+                .build();
+        visionPortal = new VisionPortal.Builder()
+                .addProcessor(aprilTag)
+                .setCamera(hardwareMap.get(WebcamName.class, "webcam1"))
+                .setCameraResolution(new Size(640, 480))
+                .build();
 
+    }
     /**
      * Add telemetry about AprilTag detections.
      */

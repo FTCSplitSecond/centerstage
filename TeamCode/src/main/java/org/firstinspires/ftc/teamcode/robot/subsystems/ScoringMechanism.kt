@@ -30,6 +30,7 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
     enum class State {
         CLOSE_INTAKE,
         INTAKE,
+        STACK_INTAKE,
         IDLE,
         TRAVEL,
         DEPOSIT,
@@ -45,6 +46,9 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
 
     private var currentStateTimer = Timer()
     var pixelHeight = 0.0;
+
+    var stackPixelHeight  = 5.0;
+    var stackElbowAngle = 0.0;
 
 
     fun switch(state: State) {
@@ -106,6 +110,10 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
         )
     }
 
+    fun calcStackHeight() {
+
+    }
+
     override fun loop() {
 
         // This is a crude state machine.
@@ -122,6 +130,11 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
                 elbow.position = ElbowPosition.EXTENDED_INTAKE
                 telescope.position = TelescopePosition.EXTENDED_INTAKE
             }
+            State.STACK_INTAKE -> {
+                wrist.position = WristPosition.STACK_INTAKE
+                elbow.position = ElbowPosition.STACK_INTAKE
+                telescope.position = TelescopePosition.CLOSE_INTAKE
+        }
             State.IDLE -> {
                 wrist.position = WristPosition.TRAVEL
                 elbow.position = ElbowPosition.HOME

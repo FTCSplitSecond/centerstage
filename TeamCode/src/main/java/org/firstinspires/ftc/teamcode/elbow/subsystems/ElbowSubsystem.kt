@@ -22,10 +22,11 @@ import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
 enum class ElbowPosition{
     EXTENDED_INTAKE,
     CLOSE_INTAKE,
+    STACK_INTAKE,
     ADJUST,
     TRAVEL,
     HOME,
-    CLIMB
+    CLIMB,
 }
 class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager, val telescope: TelescopeSubsytem) : Subsystem() {
 
@@ -81,6 +82,7 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
             targetAngle = when(value) {
                 ElbowPosition.TRAVEL -> ElbowConfig.ELBOW_TRAVEL
                 ElbowPosition.CLOSE_INTAKE -> ElbowConfig.ELBOW_CLOSE_INTAKE
+                ElbowPosition.STACK_INTAKE -> ElbowConfig.ELBOW_STACK_INTAKE
                 ElbowPosition.ADJUST -> depositAngle
                 ElbowPosition.EXTENDED_INTAKE -> ElbowConfig.ELBOW_EXTENDED_INTAKE
                 ElbowPosition.HOME -> ElbowConfig.ELBOW_HOME

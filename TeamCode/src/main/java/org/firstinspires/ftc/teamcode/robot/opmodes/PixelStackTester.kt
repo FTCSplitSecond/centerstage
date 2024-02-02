@@ -52,18 +52,22 @@ class PixelStackTester : AnchorOpMode() {
                 WebcamName::class.java, "webcam1"
             ), cameraMonitorViewId
         )
-        webcam.openCameraDeviceAsync(object : OpenCvCamera.AsyncCameraOpenListener {
-            override fun onOpened() {
-                webcam.startStreaming(960, 720, OpenCvCameraRotation.UPRIGHT)
-            }
-
-            override fun onError(errorCode: Int) {}
-        })
-        webcam.setPipeline(detector)
+//        webcam.openCameraDeviceAsync(object : OpenCvCamera.AsyncCameraOpenListener {
+//            override fun onOpened() {
+//                webcam.startStreaming(960, 720, OpenCvCameraRotation.UPRIGHT)
+//            }
+//
+//            override fun onError(errorCode: Int) {}
+//        })
+//        webcam.setPipeline(detector)
         OpenBothClaw(robot.leftClaw, robot.rightClaw)
     }
 
     override fun run() {
-        webcam.stopStreaming()
+//        webcam.stopStreaming()
+
+        + series(
+            instant {smec.state = ScoringMechanism.State.STACK_INTAKE}
+        )
     }
 }
