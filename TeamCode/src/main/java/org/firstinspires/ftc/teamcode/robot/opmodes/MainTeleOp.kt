@@ -41,6 +41,7 @@ class MainTeleOp : AnchorOpMode() {
 
         robot.init(this.world)
         robot.elbow.isEnabled = true
+        robot.telescope.isTelemetryEnabled = true
         schedule(
         instant {
             robot.droneLauncher.position = DronePositions.HELD
@@ -215,8 +216,6 @@ class MainTeleOp : AnchorOpMode() {
                         }
                     else
                         series(
-                            instant { smec.state = ScoringMechanism.State.PREDEPOSIT },
-                            delay(0.5),
                             instant { smec.state = ScoringMechanism.State.DEPOSIT }
                         )
         }

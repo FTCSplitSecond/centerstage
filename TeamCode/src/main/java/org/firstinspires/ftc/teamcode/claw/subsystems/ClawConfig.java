@@ -5,9 +5,9 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public class ClawConfig {
 
-    public static double LEFT_SERVO_OPEN_MICROSECONDS = 1100;
-    public static double LEFT_SERVO_CLOSED_MICROSECONDS = 1700;
-     public static double LEFT_SERVO_DROP_MICROSECONDS = 1100;
+    public static double LEFT_SERVO_OPEN_MICROSECONDS = 1300;
+    public static double LEFT_SERVO_CLOSED_MICROSECONDS = 1900;
+     public static double LEFT_SERVO_DROP_MICROSECONDS = 1750;
     public static double RIGHT_SERVO_OPEN_MICROSECONDS = 1500.0;
     public static double RIGHT_SERVO_CLOSED_MICROSECONDS =  850.0;
     public static double RIGHT_SERVO_DROP_MICROSECONDS = 1650;
