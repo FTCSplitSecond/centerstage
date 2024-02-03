@@ -151,10 +151,7 @@ class MainTeleOp : AnchorOpMode() {
             if (smec.state == ScoringMechanism.State.DEPOSIT)
                 smec.setArmState(ScoringMechanism.State.TRAVEL)
             else
-                series(
-                    smec.setArmState(ScoringMechanism.State.PREDEPOSIT),
-                    smec.setArmState(ScoringMechanism.State.DEPOSIT)
-                )
+                smec.setArmState(ScoringMechanism.State.DEPOSIT)
         }
 
 

@@ -6,26 +6,6 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.openftc.easyopencv.OpenCvCameraFactory
 import org.openftc.easyopencv.OpenCvWebcam
 
-class AprilTags() : SubsystemBase() {
-//    private val cameraMonitorViewId = robot.hardwareMap.appContext.resources.getIdentifier(
-//        "cameraMonitorViewId",
-//        "id",
-//        robot.hardwareMap.appContext.packageName
-//    )
-//    private val cameraIds: IntArray = OpenCvCameraFactory.getInstance()
-//        .splitLayoutForMultipleViewports(
-//            cameraMonitorViewId,
-//            1,
-//            OpenCvCameraFactory.ViewportSplitMethod.VERTICALLY
-//        )
-//    private val webcam: OpenCvWebcam = OpenCvCameraFactory.getInstance()
-//        .createWebcam(robot.hardwareMap.get(WebcamName::class.java, "Webcam 1"), cameraIds[0])
-//    init {
-//        this.register()
-//    }
-//    override fun periodic() {
-//        //update()
-//    }
-
+class Vision : Subsystem {
 
 }
