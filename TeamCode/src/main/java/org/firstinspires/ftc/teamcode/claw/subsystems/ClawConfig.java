@@ -10,7 +10,7 @@ public class ClawConfig {
      public static double LEFT_SERVO_DROP_MICROSECONDS = 1750;
     public static double RIGHT_SERVO_OPEN_MICROSECONDS = 1500.0;
     public static double RIGHT_SERVO_CLOSED_MICROSECONDS =  850.0;
-    public static double RIGHT_SERVO_DROP_MICROSECONDS = 1650;
+    public static double RIGHT_SERVO_DROP_MICROSECONDS = 950;
 
     public static double estimatedTimeToComplete = 100; // 100 ms based on https://axon-robotics.com/products/micro
 
