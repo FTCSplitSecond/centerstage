@@ -15,29 +15,39 @@ import org.firstinspires.ftc.teamcode.claw.subsystems.LeftClawSubsystem
 import org.firstinspires.ftc.teamcode.claw.subsystems.RightClawSubsystem
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowSubsystem
 import org.firstinspires.ftc.teamcode.mecanum.subsystems.MecanumDriveBase
+import org.firstinspires.ftc.teamcode.robot.opmodes.Alliance
 import org.firstinspires.ftc.teamcode.wrist.subsystems.WristSubsystem
+import kotlin.math.PI
 
 enum class OpModeType {
     TELEOP, AUTONOMOUS
 }
-enum class Alliance {
-    RED, BLUE
-}
 
 class Robot(val hardwareMap: HardwareMap, val hw: HardwareManager, t: Telemetry,
             val opModeType: OpModeType = OpModeType.TELEOP,
-            val alliance: Alliance = Alliance.RED,
-            val startPose : Pose2d = lastKnownAutoPose
+            var startPose : Pose2d = lastKnownAutoPose
 ) {
 
     companion object {
         var lastKnownAutoPose = Pose2d(0.0, 0.0, 0.0)
+        var alliance = Alliance.RED
     }
     // this just uses the start pose assumption of the robot is facing the driver station
+
+//    var awayFromDriverStationHeading = when (opModeType) {
+//        OpModeType.TELEOP -> this.startPose.heading + PI
+//        OpModeType.AUTONOMOUS -> when (alliance) {
+//            Alliance.RED -> Math.PI / 2.0
+//            Alliance.BLUE -> -Math.PI / 2.0
+//        }
+//    }
+
     var awayFromDriverStationHeading = when (alliance) {
-        Alliance.RED -> Math.PI / 2.0
-        Alliance.BLUE -> -Math.PI / 2.0
+            Alliance.RED -> Math.PI / 2.0
+            Alliance.BLUE -> -Math.PI / 2.0
     }
+
+
 
     // add multiple telemetry here for dashboard here
     val telemetry = MultipleTelemetry(FtcDashboard.getInstance().telemetry, t)
@@ -45,7 +55,7 @@ class Robot(val hardwareMap: HardwareMap, val hw: HardwareManager, t: Telemetry,
     val entity = Entity()
 
     // add subsystems here
-    val driveBase = MecanumDriveBase(this)
+    var driveBase = MecanumDriveBase(this)
     val leftClaw = LeftClawSubsystem(hw, telemetry)
     val rightClaw = RightClawSubsystem(hw, telemetry)
     val wrist = WristSubsystem(hw, telemetry)
@@ -66,5 +76,4 @@ class Robot(val hardwareMap: HardwareMap, val hw: HardwareManager, t: Telemetry,
 
         world.add(entity)
     }
-
 }

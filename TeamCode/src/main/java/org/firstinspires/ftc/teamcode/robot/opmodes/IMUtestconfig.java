@@ -12,5 +12,5 @@ public class IMUtestconfig {
 
     public static double imuOffset = 0.0;
 
-    public static double[] coords1 = new double[]{0.0, 0.0};
+    public static double[] coords1 = new double[]{0.0, 0.0, 0.0};
 }

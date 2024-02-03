@@ -6,13 +6,14 @@ import dev.turtles.anchor.component.FinishReason
 import dev.turtles.anchor.entity.Subsystem
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.teamcode.roadrunner.drive.CenterstageMecanumDrive
+import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
+import kotlin.math.PI
 
 class MecanumDriveBase(val robot : Robot) : Subsystem() {
     val hardwareMap = robot.hardwareMap
     val telemetry = robot.telemetry
-    val dt = CenterstageMecanumDrive(hardwareMap, robot.startPose)
-
+    var dt = CenterstageMecanumDrive(hardwareMap, robot.startPose)
 
     fun driveFieldCentric(xVel: Double, yVel : Double, turnVel: Double) {
         val xVelocity = MathUtils.clamp(xVel, -1.0, 1.0)

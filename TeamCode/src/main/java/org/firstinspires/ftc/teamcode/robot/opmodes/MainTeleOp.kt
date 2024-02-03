@@ -19,9 +19,6 @@ import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.drone_launcher.Subsystems.DronePositions
 import org.firstinspires.ftc.teamcode.mecanum.commands.DriveMecanum
 import org.firstinspires.ftc.teamcode.robot.commands.UpdateTelemetry
-
-import org.firstinspires.ftc.teamcode.robot.commands.WaitFor
-import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMechanism
 import kotlin.math.PI
@@ -41,11 +38,10 @@ class MainTeleOp : AnchorOpMode() {
 
         robot.init(this.world)
         robot.elbow.isEnabled = true
-        robot.telescope.isTelemetryEnabled = true
         schedule(
-            instant {
-                robot.droneLauncher.position = DronePositions.HELD
-            }
+        instant {
+            robot.droneLauncher.position = DronePositions.HELD
+        }
         )
 
         val command = DriveMecanum(robot.driveBase,
@@ -73,10 +69,50 @@ class MainTeleOp : AnchorOpMode() {
         val driverLeftTrigger = EventTrigger { driver[Button.Trigger.LEFT] > triggerThreshold }
 
 
+//        driverLeftTrigger onActivate (MoveToExtendedIntake(robot)) onDeactivate series(
+//                    CloseBothClaw(robot.leftclaw, robot.rightClaw),
+//                    delay(0.25),
+//                    MoveToTravel(robot))
+//        driver[Button.Key.CIRCLE] onActivate MoveToCloseIntake(robot)
+//
+//        driverRightTrigger onActivate MoveToDeposit(robot)
+//
+//        driver[Button.Key.CROSS] onActivate (
+//            series(
+//                OpenBothClaw(robot.leftclaw, robot.rightClaw),
+//                MoveToPlace(robot),
+//                parallel(
+//                    CloseBothClaw(robot.leftclaw, robot.rightClaw),
+//                    MoveToTravel(robot)
+//                )
+//            )
+//        )
+//
+//        driver[Button.Key.LEFT_BUMPER] onActivate ToggleLeftClaw(robot.leftclaw)
+//        driver[Button.Key.RIGHT_BUMPER] onActivate ToggleRightClaw(robot.rightClaw)
+//
+//        driver[Button.Key.TRIANGLE] onActivate MoveToTravel(robot)
+//        driver[Button.Key.DPAD_UP] onActivate IncreasePixelLevel(robot)
+//        driver[Button.Key.DPAD_DOWN] onActivate DecreasePixelLevel(robot)
+//        driver[Button.Key.DPAD_LEFT] onActivate LaunchDrone(robot.droneLauncher)
 
         val routine = RoutineModule { true }
         driver.apply(routine)
 
+
+//        routine.make {
+//            name = "Claw Routine"
+//            activation = driver[Button.Key.LEFT_BUMPER]
+//            concurrent = false
+//
+//            action =
+//                if (smec.state == ScoringMechanism.State.INAKE)
+//                    instant {
+//
+//                    } else instant {
+//                        println("balls")
+//                    }
+//        }
 
 
         driver[Button.Key.DPAD_DOWN] onActivate instant {
@@ -90,11 +126,10 @@ class MainTeleOp : AnchorOpMode() {
                 ClawPositions.CLOSED -> {
                     if (smec.state == ScoringMechanism.State.INTAKE)
                         ClawPositions.OPEN
-                    else if (smec.state == ScoringMechanism.State.CLOSE_INTAKE)
+                    else if (smec.state == ScoringMechanism.State.CLOSE_INTAKE )
                         ClawPositions.OPEN
                     else ClawPositions.DROP
                 }
-
                 ClawPositions.DROP -> ClawPositions.CLOSED
             }
 
@@ -107,9 +142,9 @@ class MainTeleOp : AnchorOpMode() {
                 ClawPositions.DROP -> ClawPositions.CLOSED
 
                 ClawPositions.CLOSED -> {
-                    if (smec.state == ScoringMechanism.State.INTAKE)
+                    if (smec.state == ScoringMechanism.State.INTAKE )
                         ClawPositions.OPEN
-                    else if (smec.state == ScoringMechanism.State.CLOSE_INTAKE)
+                    else if (smec.state == ScoringMechanism.State.CLOSE_INTAKE )
                         ClawPositions.OPEN
                     else ClawPositions.DROP;
                 }
@@ -122,6 +157,7 @@ class MainTeleOp : AnchorOpMode() {
                 instant {
                     if (smec.state == ScoringMechanism.State.CLOSE_INTAKE)
                         smec.state = ScoringMechanism.State.INTAKE
+
                     else if (smec.state == ScoringMechanism.State.INTAKE)
                         smec.state = ScoringMechanism.State.CLOSE_INTAKE
                     else
@@ -129,11 +165,11 @@ class MainTeleOp : AnchorOpMode() {
                 }
 
         driverRightTrigger onActivate instant {
-            smec.pixelHeight += 1.0
-        }
+                        smec.pixelHeight += 1.0
+                    }
 
         driver[Button.Key.LEFT_JOSTICK_PRESS] onActivate instant {
-            if (smec.state == ScoringMechanism.State.DEPOSIT)
+            if  (smec.state == ScoringMechanism.State.DEPOSIT)
                 smec.state = ScoringMechanism.State.TRAVEL
             else if (smec.state == ScoringMechanism.State.INTAKE)
                 smec.state = ScoringMechanism.State.TRAVEL
@@ -141,15 +177,15 @@ class MainTeleOp : AnchorOpMode() {
                 smec.state = ScoringMechanism.State.TRAVEL
             else
                 smec.state = ScoringMechanism.State.CLOSE_INTAKE
-            smec.rightClawState = ClawPositions.OPEN
-            smec.leftClawState = ClawPositions.OPEN
+                smec.rightClawState = ClawPositions.OPEN
+                smec.leftClawState = ClawPositions.OPEN
 
 
         }
 
 
 
-        parallel(
+                parallel(
             instant {
                 smec.switch(ScoringMechanism.State.CLOSE_INTAKE)
             },
@@ -159,69 +195,51 @@ class MainTeleOp : AnchorOpMode() {
             }
 
 
+
+
+
         )
 
 
 
         driver[Button.Key.RIGHT_JOYSTICK_PRESS] onActivate instant {
-            if (smec.state == ScoringMechanism.State.DEPOSIT)
+            if  (smec.state == ScoringMechanism.State.DEPOSIT)
                 smec.state = ScoringMechanism.State.TRAVEL
-            driver[Button.Key.RIGHT_JOYSTICK_PRESS] onActivate
-                    if (smec.state == ScoringMechanism.State.DEPOSIT)
-                        instant {
-                            smec.state = ScoringMechanism.State.TRAVEL
-                        }
-                    else
-                        series(
-                            instant { smec.state = ScoringMechanism.State.DEPOSIT }
-                        )
+            else
+                smec.state = ScoringMechanism.State.DEPOSIT
         }
 
         driver[Button.Key.SQUARE] onActivate
-                series(
-                    instant {
-                        smec.rightClawState = ClawPositions.CLOSED
-                        smec.leftClawState = ClawPositions.CLOSED
-                    },
-                    delay(0.1),
-                    instant {
-                        smec.switch(ScoringMechanism.State.TRAVEL)
-                    }
-                )
+            series(
+                instant {
+                    smec.rightClawState = ClawPositions.CLOSED
+                    smec.leftClawState = ClawPositions.CLOSED
+                },
+                delay(0.1),
+                instant {
+                    smec.switch(ScoringMechanism.State.TRAVEL)
+                }
+            )
 
 
         driver[Button.Key.CROSS] onActivate
-                series(
-                    instant {
-                        smec.rightClawState = ClawPositions.DROP
-                        smec.leftClawState = ClawPositions.DROP
-                    },
-                    delay(0.25),
-                    instant {
-                        smec.switch(ScoringMechanism.State.DROP)
-                    },
-                    instant {
-                        smec.switch(ScoringMechanism.State.TRAVEL)
-                    }
-                )
-        series(
-            instant {
-                smec.rightClawState = ClawPositions.DROP
-                smec.leftClawState = ClawPositions.DROP
-            },
-            delay(0.25),
-            instant {
-                smec.switch(ScoringMechanism.State.DROP)
-            },
-            delay(0.75),
-            instant {
-                smec.switch(ScoringMechanism.State.TRAVEL)
-            }
-        )
+            series(
+                instant {
+                    smec.rightClawState = ClawPositions.DROP
+                    smec.leftClawState = ClawPositions.DROP
+                },
+                delay(0.25),
+                instant {
+                    smec.switch(ScoringMechanism.State.DROP)
+                },
+                instant {
+                    smec.switch(ScoringMechanism.State.TRAVEL)
+                }
+            )
 
         driver[Button.Key.START] onActivate instant {
             if (smec.state == ScoringMechanism.State.CLIMB)
-                +parallel(
+                + parallel(
                     instant {
                         smec.switch(ScoringMechanism.State.DROP)
                     },
@@ -239,6 +257,17 @@ class MainTeleOp : AnchorOpMode() {
         }
 
         driver[Button.Key.DPAD_UP] onActivate LaunchDrone(robot.droneLauncher)
+
+
+//        driver[Button.Key.SHARE] onActivate instant {
+//            LaunchDrone(robot.droneLauncher)
+//        }
+
+//        +forever { _, _ ->
+//            smec.elbowTesting = driver[Button.Trigger.RIGHT] - driver[Button.Trigger.LEFT]
+//        }
+//
+
 
         +UpdateTelemetry(robot) {
             robot.telemetry.addData("X", robot.driveBase.poseEstimate().x)
