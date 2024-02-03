@@ -8,9 +8,8 @@ import dev.turtles.anchor.entity.Entity
 import dev.turtles.anchor.world.World
 import dev.turtles.electriceel.wrapper.HardwareManager
 import org.firstinspires.ftc.robotcore.external.Telemetry
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.teamcode.drone_launcher.Subsystems.DroneSubsystem
-import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
+import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsystem
 import org.firstinspires.ftc.teamcode.claw.subsystems.LeftClawSubsystem
 import org.firstinspires.ftc.teamcode.claw.subsystems.RightClawSubsystem
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowSubsystem
@@ -49,7 +48,7 @@ class Robot(val hardwareMap: HardwareMap, val hw: HardwareManager, t: Telemetry,
     val leftClaw = LeftClawSubsystem(hw, telemetry)
     val rightClaw = RightClawSubsystem(hw, telemetry)
     val wrist = WristSubsystem(hw, telemetry)
-    val telescope = TelescopeSubsytem(hw, this)
+    val telescope = TelescopeSubsystem(hw, this)
     val elbow = ElbowSubsystem(this, hw, telescope)
     val droneLauncher = DroneSubsystem(hw, telemetry)
     val scoringMechanism = ScoringMechanism(leftClaw, rightClaw, wrist, telescope, elbow);

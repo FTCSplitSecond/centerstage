@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.swerve.utils.clamp
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeConfig.TELESCOPE_MAX
-import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
+import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsystem
 
 
 enum class ElbowPosition{
@@ -27,7 +27,7 @@ enum class ElbowPosition{
     HOME,
     CLIMB
 }
-class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager, val telescope: TelescopeSubsytem) : Subsystem() {
+class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager, val telescope: TelescopeSubsystem) : Subsystem() {
 
     var isEnabled = false
     var isTelemetryEnabled = true

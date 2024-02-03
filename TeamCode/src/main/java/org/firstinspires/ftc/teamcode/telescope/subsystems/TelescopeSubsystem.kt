@@ -12,14 +12,14 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.swerve.utils.clamp
 
 
-enum class  TelescopePosition {
+enum class  TelescopeState {
     EXTENDED_INTAKE,
     CLOSE_INTAKE,
     ADJUST,
     TRAVEL
 }
 
-class TelescopeSubsytem(private val hardwareManager: HardwareManager, private val robot: Robot) : Subsystem() {
+class TelescopeSubsystem(private val hardwareManager: HardwareManager, private val robot: Robot) : Subsystem() {
 
     var isTelemetryEnabled = false
 
@@ -48,29 +48,17 @@ class TelescopeSubsytem(private val hardwareManager: HardwareManager, private va
         get() {
             return getExtensionInchesFromEncoderTicks(motor.encoder.getCounts())
         }
-    var targetExtenstionInches : Double = 0.0
+    var position : Double = 0.0
 
     /**
-     * Angle when the current state is [TelescopePosition.ADJUST]
+     * Angle when the current state is [TelescopeState.ADJUST]
      */
     var depositDistance = 0.0
-
-    var position : TelescopePosition = TelescopePosition.TRAVEL
-        set(value) {
-            targetExtenstionInches = when(value) {
-                TelescopePosition.TRAVEL -> TELESCOPE_TRAVEL
-                TelescopePosition.CLOSE_INTAKE -> TELESCOPE_CLOSE_INTAKE
-                TelescopePosition.ADJUST -> depositDistance
-                TelescopePosition.EXTENDED_INTAKE -> TELESCOPE_EXTENDED_INTAKE
-            }
-            field = value
-        }
-
 
     private val controller = PIDController(TELESCOPE_KP, TELESCOPE_KI, TELESCOPE_KD)
 
     fun isAtTarget() : Boolean {
-        return Math.abs(targetExtenstionInches-currentExtensionInches)<PIDTolerance
+        return Math.abs(position-currentExtensionInches)<PIDTolerance
     }
 
     override fun init() {
@@ -78,12 +66,12 @@ class TelescopeSubsytem(private val hardwareManager: HardwareManager, private va
     }
 
     override fun loop() {
-        val clampedTarget = targetExtenstionInches.clamp(TELESCOPE_MIN, TELESCOPE_MAX)
+        val clampedTarget = position.clamp(TELESCOPE_MIN, TELESCOPE_MAX)
         motor power controller.calculate(currentExtensionInches, clampedTarget)
 
         if(isTelemetryEnabled) {
             robot.telemetry.addLine("Telescope: Telemetry Enabled")
-            robot.telemetry.addData("Target Extension Inches:", targetExtenstionInches)
+            robot.telemetry.addData("Target Extension Inches:", position)
             robot.telemetry.addData("Current Extension Inches", currentExtensionInches)
             robot.telemetry.addData("motor.getCurrrent (mA)", motor.getCurrent() * 1000.0)
             robot.telemetry.addData("motor.position", motor.encoder.getCounts())

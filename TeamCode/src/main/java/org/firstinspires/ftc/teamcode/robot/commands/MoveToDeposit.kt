@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.elbow.commands.SetElbowPosition
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowPosition
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.telescope.commands.SetTelescopePosition
-import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopePosition
+import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeState
 import org.firstinspires.ftc.teamcode.wrist.commands.SetWristPosition
 import org.firstinspires.ftc.teamcode.wrist.subsystems.WristPosition
 
@@ -18,7 +18,7 @@ class MoveToDeposit(val robot : Robot) : SequentialParent(mutableListOf(
                 SetElbowPosition(robot.elbow, ElbowPosition.ADJUST),
                 series(
                     delay(0.5),
-                    SetTelescopePosition(robot.telescope, TelescopePosition.ADJUST)
+                    SetTelescopePosition(robot.telescope, TelescopeState.ADJUST)
                 )
             )
 ))

@@ -1,21 +1,7 @@
 package org.firstinspires.ftc.teamcode.elbow.opmodes
 
-import com.acmerobotics.dashboard.FtcDashboard
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry
 import com.arcrobotics.ftclib.command.CommandOpMode
-import com.arcrobotics.ftclib.command.button.Trigger
-import com.arcrobotics.ftclib.gamepad.GamepadEx
-import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import com.qualcomm.robotcore.hardware.DcMotorEx
-import org.firstinspires.ftc.teamcode.elbow.commands.SetElbowPosition
-import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowPosition
-import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowSubsystem
-import org.firstinspires.ftc.teamcode.robot.commands.MoveToDeposit
-import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
-import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
-import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
 
 @Autonomous
 class ElbowTest() : CommandOpMode() {

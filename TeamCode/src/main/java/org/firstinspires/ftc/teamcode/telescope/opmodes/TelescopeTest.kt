@@ -1,17 +1,7 @@
 package org.firstinspires.ftc.teamcode.telescope.opmodes
 
-import com.acmerobotics.dashboard.FtcDashboard
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry
 import com.arcrobotics.ftclib.command.CommandOpMode
-import com.arcrobotics.ftclib.gamepad.GamepadEx
-import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import com.qualcomm.robotcore.hardware.DcMotorEx
-import org.firstinspires.ftc.teamcode.telescope.commands.SetTelescopePosition
-import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopePosition
-import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
-import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
-import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 
 @TeleOp
 class TelescopeTest() : CommandOpMode() {
