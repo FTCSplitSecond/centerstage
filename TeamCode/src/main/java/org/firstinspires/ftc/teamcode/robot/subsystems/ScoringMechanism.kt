@@ -38,6 +38,7 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
         DROP,
         PREDEPOSIT,
         STACK_INTAKE,
+        STACK_INTAKE_CLOSE,
     }
 
     var state = State.TRAVEL
@@ -153,6 +154,7 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
                 elbow.depositAngle = ikResults.elbowAngle
                 telescope.targetExtenstionInches = ikResults.telescopeExtension
             }
+
             State.DEPOSIT -> {
                 wrist.position = WristPosition.ADJUST
                 elbow.position = ElbowPosition.ADJUST
@@ -180,6 +182,12 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
                 telescope.position = TelescopePosition.CLOSE_INTAKE
                 elbow.position = ElbowPosition.STACK_INTAKE
                 wrist.position = WristPosition.CLOSE_INTAKE
+            }
+
+            State.STACK_INTAKE_CLOSE -> {
+                telescope.position = TelescopePosition.EXTENDED_INTAKE
+                elbow.position = ElbowPosition.STACK_INTAKE_CLOSE
+                wrist.position = WristPosition.EXTENDED_INTAKE
             }
         }
 
