@@ -28,8 +28,8 @@ import org.joml.Vector2d
  * Overarching scoring mechanism subsystem.
  * Handles the claw, wrist, telescope, and elbow integration.
  */
-class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
-                       private val rightClaw: RightClawSubsystem,
+class ScoringMechanism(val leftClaw: LeftClawSubsystem,
+                       val rightClaw: RightClawSubsystem,
                        private val wrist: WristSubsystem,
                        private val telescope: TelescopeSubsystem,
                        private val elbow: ElbowSubsystem) : Subsystem() {

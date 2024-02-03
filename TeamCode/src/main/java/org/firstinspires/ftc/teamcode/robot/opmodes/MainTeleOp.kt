@@ -2,19 +2,17 @@ package org.firstinspires.ftc.teamcode.robot.opmodes
 
 import LaunchDrone
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import dev.turtles.anchor.component.stock.SequentialParent
 import dev.turtles.anchor.component.stock.delay
-import dev.turtles.anchor.component.stock.forever
 import dev.turtles.anchor.component.stock.instant
 import dev.turtles.anchor.component.stock.parallel
 import dev.turtles.anchor.component.stock.series
 import dev.turtles.electriceel.opmode.AnchorOpMode
-import dev.turtles.electriceel.util.AngleUnit
-import dev.turtles.electriceel.util.epsilonEquals
 import dev.turtles.lilypad.Button
 import dev.turtles.lilypad.EventTrigger
 import dev.turtles.lilypad.impl.FTCGamepad
 import dev.turtles.lilypad.module.RoutineModule
+import org.firstinspires.ftc.teamcode.claw.commands.SetLeftClawState
+import org.firstinspires.ftc.teamcode.claw.commands.SetRightClawState
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.drone_launcher.Subsystems.DronePositions
 import org.firstinspires.ftc.teamcode.mecanum.commands.DriveMecanum
@@ -80,8 +78,8 @@ class MainTeleOp : AnchorOpMode() {
         }
 
 
-        driver[Button.Key.LEFT_BUMPER] onActivate instant {
-            smec.leftClawState = when (smec.leftClawState) {
+        driver[Button.Key.LEFT_BUMPER] onActivate run {
+            val leftClawState = when (smec.leftClawState) {
                 ClawPositions.OPEN -> ClawPositions.CLOSED
                 ClawPositions.CLOSED -> {
                     if (smec.state == ScoringMechanism.State.INTAKE)
@@ -93,24 +91,26 @@ class MainTeleOp : AnchorOpMode() {
 
                 ClawPositions.DROP -> ClawPositions.CLOSED
             }
-
-
+            SetLeftClawState(smec, leftClawState)
         }
 
-        driver[Button.Key.RIGHT_BUMPER] onActivate instant {
-            smec.rightClawState = when (smec.rightClawState) {
-                ClawPositions.OPEN -> ClawPositions.CLOSED
-                ClawPositions.DROP -> ClawPositions.CLOSED
 
+        driver[Button.Key.RIGHT_BUMPER] onActivate run {
+            val rightClawState = when (smec.rightClawState) {
+                ClawPositions.OPEN -> ClawPositions.CLOSED
                 ClawPositions.CLOSED -> {
                     if (smec.state == ScoringMechanism.State.INTAKE)
                         ClawPositions.OPEN
                     else if (smec.state == ScoringMechanism.State.CLOSE_INTAKE)
                         ClawPositions.OPEN
-                    else ClawPositions.DROP;
+                    else ClawPositions.DROP
                 }
+
+                ClawPositions.DROP -> ClawPositions.CLOSED
             }
+            SetRightClawState(smec, rightClawState)
         }
+
 
 
 
