@@ -87,12 +87,17 @@ public class CenterstageMecanumDrive extends MecanumDrive {
     private List<Integer> lastEncPositions = new ArrayList<>();
     private List<Integer> lastEncVels = new ArrayList<>();
 
+    private HardwareMap hardwareMap;
+
+
     public CenterstageMecanumDrive(HardwareMap hardwareMap) {
         this(hardwareMap, new Pose2d());
     }
 
     public CenterstageMecanumDrive(HardwareMap hardwareMap, Pose2d startPose) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
+
+        this.hardwareMap = hardwareMap;
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
                 new Pose2d(0.25, 0.25, Math.toRadians(1.0)), 1.0);
@@ -152,6 +157,10 @@ public class CenterstageMecanumDrive extends MecanumDrive {
                 lastEncPositions, lastEncVels, lastTrackingEncPositions, lastTrackingEncVels
         );
     }
+
+//    public void setStartPose(Pose2d startPose) {
+//        setLocalizer(new TwoWheelTrackingLocalizer(hardwareMap, this, startPose));
+//    }
 
 //    public void setStartPose(Pose2d startPose) {
 //        getLocalizer().setPoseEstimate(startPose);
