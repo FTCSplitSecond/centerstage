@@ -14,6 +14,8 @@ import dev.turtles.lilypad.Button
 import dev.turtles.lilypad.impl.FTCGamepad
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
+import org.firstinspires.ftc.teamcode.claw.commands.SetLeftClawState
+import org.firstinspires.ftc.teamcode.claw.commands.SetRightClawState
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.roadrunner.TrajectoryFollower
 import org.firstinspires.ftc.teamcode.roadrunner.drive.CenterstageMecanumDrive
@@ -62,32 +64,34 @@ class BlueCloseAuto : AnchorOpMode() {
         OpenBothClaw(robot.leftClaw, robot.rightClaw)
 
         driver[Button.Key.DPAD_LEFT] onActivate instant {
-            smec.leftClawState = when (smec.leftClawState) {
+            val leftClawState = when (smec.leftClaw.position) {
                 ClawPositions.OPEN -> ClawPositions.CLOSED
                 ClawPositions.CLOSED -> {
-                if (smec.state == ScoringMechanism.State.INTAKE)
+                if (smec.armState == ScoringMechanism.State.INTAKE)
                     ClawPositions.OPEN
-                else if (smec.state == ScoringMechanism.State.CLOSE_INTAKE )
+                else if (smec.armState == ScoringMechanism.State.CLOSE_INTAKE )
                     ClawPositions.OPEN
                 else ClawPositions.DROP
             }
                 ClawPositions.DROP -> ClawPositions.CLOSED
             }
+            SetLeftClawState(smec.leftClaw, leftClawState)
         }
 
-        driver[Button.Key.DPAD_RIGHT] onActivate instant {
-            smec.rightClawState = when (smec.rightClawState) {
+        driver[Button.Key.DPAD_RIGHT] onActivate run {
+            val rightClawState = when (smec.rightClaw.position) {
                 ClawPositions.OPEN -> ClawPositions.CLOSED
                 ClawPositions.DROP -> ClawPositions.CLOSED
 
                 ClawPositions.CLOSED -> {
-                    if (smec.state == ScoringMechanism.State.INTAKE )
+                    if (smec.armState == ScoringMechanism.State.INTAKE )
                         ClawPositions.OPEN
-                    else if (smec.state == ScoringMechanism.State.CLOSE_INTAKE )
+                    else if (smec.armState == ScoringMechanism.State.CLOSE_INTAKE )
                         ClawPositions.OPEN
                     else ClawPositions.DROP;
                 }
             }
+            SetRightClawState(smec.rightClaw, rightClawState)
         }
     }
 
@@ -161,7 +165,7 @@ class BlueCloseAuto : AnchorOpMode() {
             p1follower,
             parallel (
                 instant {
-                    smec.state = ScoringMechanism.State.CLOSE_INTAKE
+                    smec.armState = ScoringMechanism.State.CLOSE_INTAKE
                 },
                 p2follower,
             ),
@@ -170,13 +174,13 @@ class BlueCloseAuto : AnchorOpMode() {
             },
             parallel (
                 instant {
-                    smec.state = ScoringMechanism.State.TRAVEL
+                    smec.armState = ScoringMechanism.State.TRAVEL
                 },
                 p3follower
             ),
             instant {
                 smec.pixelHeight = 0.0
-                smec.state = ScoringMechanism.State.DEPOSIT
+                smec.armState = ScoringMechanism.State.DEPOSIT
             },
             delay(2.0),
             instant {
@@ -184,11 +188,11 @@ class BlueCloseAuto : AnchorOpMode() {
             },
             delay(0.5),
             instant {
-                smec.state = ScoringMechanism.State.DROP
+                smec.armState = ScoringMechanism.State.DROP
             },
             delay(0.5),
             instant {
-                smec.state = ScoringMechanism.State.TRAVEL
+                smec.armState = ScoringMechanism.State.TRAVEL
             }
         )
 

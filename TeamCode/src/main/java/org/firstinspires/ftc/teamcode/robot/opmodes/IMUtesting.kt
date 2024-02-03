@@ -1,15 +1,11 @@
 package org.firstinspires.ftc.teamcode.robot.opmodes
 
 import com.acmerobotics.roadrunner.geometry.Pose2d
-import com.acmerobotics.roadrunner.geometry.Vector2d
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import dev.turtles.electriceel.opmode.AnchorOpMode
-import org.firstinspires.ftc.teamcode.roadrunner.TrajectoryFollower
 import org.firstinspires.ftc.teamcode.roadrunner.drive.CenterstageMecanumDrive
-import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceRunner
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMechanism
-import kotlin.math.PI
 
 @Autonomous
 class IMUtesting : AnchorOpMode() {
@@ -19,7 +15,7 @@ class IMUtesting : AnchorOpMode() {
         robot = Robot(hardwareMap, this.hardwareManager, telemetry)
         drive = robot.driveBase.dt
         robot.init(this.world)
-        robot.scoringMechanism.state = ScoringMechanism.State.TRAVEL
+        robot.scoringMechanism.armState = ScoringMechanism.State.TRAVEL
     }
 
     override fun run() {

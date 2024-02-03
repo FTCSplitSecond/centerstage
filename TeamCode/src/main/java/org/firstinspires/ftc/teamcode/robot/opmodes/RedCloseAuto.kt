@@ -4,7 +4,6 @@ import PropDetector
 import PropZone
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
-import com.fasterxml.jackson.databind.annotation.JsonAppend.Prop
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import dev.turtles.anchor.component.stock.delay
 import dev.turtles.anchor.component.stock.instant
@@ -66,9 +65,9 @@ class RedCloseAuto : AnchorOpMode() {
             smec.leftClawState = when (smec.leftClawState) {
                 ClawPositions.OPEN -> ClawPositions.CLOSED
                 ClawPositions.CLOSED -> {
-                    if (smec.state == ScoringMechanism.State.INTAKE)
+                    if (smec.armState == ScoringMechanism.State.INTAKE)
                         ClawPositions.OPEN
-                    else if (smec.state == ScoringMechanism.State.CLOSE_INTAKE )
+                    else if (smec.armState == ScoringMechanism.State.CLOSE_INTAKE )
                         ClawPositions.OPEN
                     else ClawPositions.DROP
                 }
@@ -82,9 +81,9 @@ class RedCloseAuto : AnchorOpMode() {
                 ClawPositions.DROP -> ClawPositions.CLOSED
 
                 ClawPositions.CLOSED -> {
-                    if (smec.state == ScoringMechanism.State.INTAKE )
+                    if (smec.armState == ScoringMechanism.State.INTAKE )
                         ClawPositions.OPEN
-                    else if (smec.state == ScoringMechanism.State.CLOSE_INTAKE )
+                    else if (smec.armState == ScoringMechanism.State.CLOSE_INTAKE )
                         ClawPositions.OPEN
                     else ClawPositions.DROP;
                 }
@@ -167,7 +166,7 @@ class RedCloseAuto : AnchorOpMode() {
             p1follower,
             parallel (
                 instant {
-                    smec.state = ScoringMechanism.State.CLOSE_INTAKE
+                    smec.armState = ScoringMechanism.State.CLOSE_INTAKE
                 },
                 p2follower,
             ),
@@ -176,13 +175,13 @@ class RedCloseAuto : AnchorOpMode() {
             },
             parallel (
                 instant {
-                    smec.state = ScoringMechanism.State.TRAVEL
+                    smec.armState = ScoringMechanism.State.TRAVEL
                 },
                 p3follower
             ),
             instant {
                 smec.pixelHeight = 0.0
-                smec.state = ScoringMechanism.State.DEPOSIT
+                smec.armState = ScoringMechanism.State.DEPOSIT
             },
             delay(2.0),
             instant {
@@ -190,11 +189,11 @@ class RedCloseAuto : AnchorOpMode() {
             },
             delay(0.5),
             instant {
-                smec.state = ScoringMechanism.State.DROP
+                smec.armState = ScoringMechanism.State.DROP
             },
             delay(0.5),
             instant {
-                smec.state = ScoringMechanism.State.TRAVEL
+                smec.armState = ScoringMechanism.State.TRAVEL
             }
         )
 

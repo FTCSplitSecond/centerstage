@@ -6,7 +6,6 @@ import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
 import com.acmerobotics.roadrunner.trajectory.Trajectory
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
-import dev.turtles.anchor.component.stock.delay
 import dev.turtles.anchor.component.stock.instant
 import dev.turtles.anchor.component.stock.parallel
 import dev.turtles.anchor.component.stock.series
@@ -18,7 +17,6 @@ import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.roadrunner.TrajectoryFollower
 import org.firstinspires.ftc.teamcode.roadrunner.drive.CenterstageMecanumDrive
-import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence
 import org.firstinspires.ftc.teamcode.robot.subsystems.AutoConfig
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMechanism
@@ -67,9 +65,9 @@ class BlueFarAuto : AnchorOpMode() {
             smec.leftClawState = when (smec.leftClawState) {
                 ClawPositions.OPEN -> ClawPositions.CLOSED
                 ClawPositions.CLOSED -> {
-                    if (smec.state == ScoringMechanism.State.INTAKE)
+                    if (smec.armState == ScoringMechanism.State.INTAKE)
                         ClawPositions.OPEN
-                    else if (smec.state == ScoringMechanism.State.INTAKE )
+                    else if (smec.armState == ScoringMechanism.State.INTAKE )
                         ClawPositions.OPEN
                     else ClawPositions.DROP
                 }
@@ -82,9 +80,9 @@ class BlueFarAuto : AnchorOpMode() {
                 ClawPositions.DROP -> ClawPositions.CLOSED
 
                 ClawPositions.CLOSED -> {
-                    if (smec.state == ScoringMechanism.State.INTAKE )
+                    if (smec.armState == ScoringMechanism.State.INTAKE )
                         ClawPositions.OPEN
-                    else if (smec.state == ScoringMechanism.State.CLOSE_INTAKE )
+                    else if (smec.armState == ScoringMechanism.State.CLOSE_INTAKE )
                         ClawPositions.OPEN
                     else ClawPositions.DROP;
                 }
@@ -218,12 +216,12 @@ class BlueFarAuto : AnchorOpMode() {
 
             t1follower,
             parallel(
-                instant {smec.state = ScoringMechanism.State.CLOSE_INTAKE},
+                instant {smec.armState = ScoringMechanism.State.CLOSE_INTAKE},
                 t2follower,
             ),
             instant {smec.leftClawState = ClawPositions.OPEN},
             parallel(
-                instant {smec.state = ScoringMechanism.State.TRAVEL},
+                instant {smec.armState = ScoringMechanism.State.TRAVEL},
                 t3follower
             )
 //            p1follower,
