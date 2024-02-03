@@ -36,7 +36,8 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
         DEPOSIT,
         CLIMB,
         DROP,
-        PREDEPOSIT
+        PREDEPOSIT,
+        STACK_INTAKE,
     }
 
     var state = State.TRAVEL
@@ -47,6 +48,7 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
 
     private var currentStateTimer = Timer()
     var pixelHeight = 0.0
+    var stackHeight = 5.0
 
 
     fun switch(state: State) {
@@ -172,6 +174,12 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
 
             State.DROP -> {
                 telescope.position = TelescopePosition.TRAVEL
+            }
+
+            State.STACK_INTAKE -> {
+                telescope.position = TelescopePosition.CLOSE_INTAKE
+                elbow.position = ElbowPosition.STACK_INTAKE
+                wrist.position = WristPosition.CLOSE_INTAKE
             }
         }
 
