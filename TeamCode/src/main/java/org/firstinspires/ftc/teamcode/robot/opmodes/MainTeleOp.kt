@@ -78,20 +78,20 @@ class MainTeleOp : AnchorOpMode() {
 
 
         driver[Button.Key.LEFT_BUMPER] onActivate run {
-            val leftClawState = when (smec.leftClaw.position) {
-                ClawPositions.OPEN -> ClawPositions.CLOSED
-                ClawPositions.CLOSED -> {
-                    if (smec.armState == ScoringMechanism.State.INTAKE)
-                        ClawPositions.OPEN
-                    else if (smec.armState == ScoringMechanism.State.CLOSE_INTAKE)
-                        ClawPositions.OPEN
-                    else ClawPositions.DROP
-                }
-
-                ClawPositions.DROP -> ClawPositions.CLOSED
-            }
-            Log.d("claw", leftClawState.toString())
-            SetLeftClawState(smec.leftClaw, leftClawState)
+//            val leftClawState = when (smec.leftClaw.position) {
+//                ClawPositions.OPEN -> ClawPositions.CLOSED
+//                ClawPositions.CLOSED -> {
+//                    if (smec.armState == ScoringMechanism.State.INTAKE)
+//                        ClawPositions.OPEN
+//                    else if (smec.armState == ScoringMechanism.State.CLOSE_INTAKE)
+//                        ClawPositions.OPEN
+//                    else ClawPositions.DROP
+//                }
+//
+//                ClawPositions.DROP -> ClawPositions.CLOSED
+//            }
+//            val leftClawState = ClawPositions.OPEN
+            SetLeftClawState(smec.leftClaw, ClawPositions.OPEN)
         }
 
         driver[Button.Key.RIGHT_BUMPER] onActivate run {
@@ -137,33 +137,6 @@ class MainTeleOp : AnchorOpMode() {
                 OpenBothClaw(smec.leftClaw, smec.rightClaw)
             )
         }
-
-
-//        parallel(
-//            instant {
-//                smec.switch(ScoringMechanism.State.CLOSE_INTAKE)
-//            },
-//            instant {
-//                smec.rightClawState = ClawPositions.OPEN
-//                smec.leftClawState = ClawPositions.OPEN
-//            }
-//        )
-
-        driver[Button.Key.RIGHT_JOYSTICK_PRESS] onActivate run {
-            if (smec.armState == ScoringMechanism.State.DEPOSIT)
-                smec.setArmState(ScoringMechanism.State.TRAVEL)
-            else
-                smec.setArmState(ScoringMechanism.State.DEPOSIT)
-        }
-
-
-        driver[Button.Key.SQUARE] onActivate
-                series(
-                    CloseBothClaw(smec.leftClaw, smec.rightClaw),
-                    delay(0.1),
-                    smec.setArmState(ScoringMechanism.State.TRAVEL)
-                )
-
 
         driver[Button.Key.CROSS] onActivate
                 series(
