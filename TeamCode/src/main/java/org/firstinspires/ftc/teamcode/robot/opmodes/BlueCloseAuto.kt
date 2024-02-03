@@ -139,13 +139,16 @@ class BlueCloseAuto : AnchorOpMode() {
             PropZone.CENTER, PropZone.UNKNOWN -> purplePixelPoseCenter
             PropZone.RIGHT -> if(alliance== Alliance.BLUE) purplePixelPoseAwayFromBackdrop else purplePixelPoseBackdropSide // 1/27 FIX: robot running into truss when placing right
         }
-        val transitLaneY = 60.0
+
+        val transitLaneY = 12.0
         val nearBackDropLaneX = 34.0
         val backDropScoreX = 42.0
+        val pixelFromLaneOffset = 2.0
 
-        val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(-36.0, transitLaneY), PI).adjustForAlliance(alliance)
+        val transitLanePoseAfterYellowPixel = Pose2d(Vector2d(-36.0, transitLaneY), PI).adjustForAlliance(alliance)
         val transitLaneBackDropSide = Vector2d(nearBackDropLaneX, transitLaneY).adjustForAlliance(alliance)
-        val transitLanePixelStackSide = Vector2d(-48.0, transitLaneY).adjustForAlliance(alliance)
+        val transitLanePixelStackSide = Vector2d(-32.0, transitLaneY + pixelFromLaneOffset).adjustForAlliance(alliance)
+        val stackLocation = Vector2d(-41.0, transitLaneY + pixelFromLaneOffset).adjustForAlliance(alliance)
         val backDropScoringClawOffset = 0.0 // offset to help pixels land better if needed
         val backDropZoneSpacing = 6.0
         val backDropCenterY = 36.0
@@ -158,7 +161,7 @@ class BlueCloseAuto : AnchorOpMode() {
             PropZone.RIGHT -> nearBackDropRight
         }
         val backDropScoringPosition = Vector2d(backDropScoreX, nearBackDropPosition.y)  // no need to adjust for alliance (already there)
-        val parkPosition = Vector2d(48.0, transitLaneY).adjustForAlliance(alliance)
+        val parkPosition = Vector2d(backDropScoreX, 60.0).adjustForAlliance(alliance)
 
 
 
@@ -182,15 +185,20 @@ class BlueCloseAuto : AnchorOpMode() {
                 .lineTo(nearBackDropPosition) // front is facing away from BB, possibly add a velocity/acceleration constraint here as we might ram the BB
                 .build()
 
-//        val moveToTransitLaneToPixelStacksTrajectory = drive.trajectoryBuilder(backAwayFromBackDropTrajectory.end())
-//                .lineTo(transitLaneBackDropSide)
-//                .lineTo(transitLanePixelStackSide)
-//                .build()
-//        val moveToTransitLaneFromPixelStacksTrajectory = drive.trajectoryBuilder(moveToTransitLaneToPixelStacksTrajectory.end())
-//                .lineTo(transitLaneBackDropSide)
-//                .build()
+        val moveToTransitLaneTrajectory = drive.trajectoryBuilder(backAwayFromBackDropTrajectory.end())
+                .lineTo(transitLaneBackDropSide)
+                .build()
 
-        val parkRightSideTrajectory = drive.trajectoryBuilder(backAwayFromBackDropTrajectory.end())
+        val moveToPixelStacksTrajectory = drive.trajectoryBuilder(moveToTransitLaneTrajectory.end())
+            .lineTo(transitLanePixelStackSide)
+            .build()
+        val pickUpPixelsTrajectory = drive.trajectoryBuilder(moveToPixelStacksTrajectory.end())
+            .lineTo(stackLocation)
+            .build()
+        val moveToTransitLaneFromPixelStacksTrajectory = drive.trajectoryBuilder(moveToPixelStacksTrajectory.end())
+                .lineTo(transitLaneBackDropSide)
+                .build()
+        val parkLeftSideTrajectory = drive.trajectoryBuilder(backAwayFromBackDropTrajectory.end())
                 .lineTo(parkPosition)
                 .build()
 
@@ -203,7 +211,7 @@ class BlueCloseAuto : AnchorOpMode() {
 //        val moveToBackDropLane = TrajectoryFollower(drive, moveToBackDropLaneTrajectory)
         val moveToNearBackdrop = TrajectoryFollower(drive, moveToNearBackdropTrajectory)
         val moveToDeposit = instant {
-            smec.pixelHeight = -0.5
+            smec.pixelHeight = -1.0
             smec.state = ScoringMechanism.State.DEPOSIT
         }
         val moveToScoreBackDrop = TrajectoryFollower(drive, moveToScoreBackDropTrajectory)
@@ -217,14 +225,34 @@ class BlueCloseAuto : AnchorOpMode() {
             TrajectoryFollower(drive, backAwayFromBackDropTrajectory),
             series(
                 delay(0.5),  // delay here is to not pull the pixel with us
-                moveToTravel))
+                moveToTravel
+            )
+        )
+
+        val moveToTransitLane = TrajectoryFollower(drive, moveToTransitLaneTrajectory)
+        val moveToPixelStacks = parallel(
+                TrajectoryFollower(drive, moveToPixelStacksTrajectory),
+                instant {smec.state = ScoringMechanism.State.INTAKE}
+            )
+
+        val pickUpPixelStacks = series(
+            TrajectoryFollower(drive, pickUpPixelsTrajectory),
+            parallel(
+                instant {smec.rightClawState = ClawPositions.CLOSED},
+                instant {smec.leftClawState = ClawPositions.CLOSED}
+            )
+        )
+
+        val moveToTransitLaneFromPixelStacks = TrajectoryFollower(drive, moveToTransitLaneFromPixelStacksTrajectory)
+
+        val backAwayAfterScoringWhitePixel = TrajectoryFollower(drive, drive.trajectoryBuilder(moveToScoreBackDropTrajectory.end()).forward(12.0).build())
 
         // used for extra cycles
 //        val moveToTransitLaneToPixelStacks = TrajectoryFollower(drive, moveToTransitLaneToPixelStacksTrajectory)
 //        val intakePixelsFromStack = instant {  } // add pixel intake here returns to transit lane when done
 //        val moveToTransitLaneFromPixelStacks = TrajectoryFollower(drive, moveToTransitLaneFromPixelStacksTrajectory)
 
-        val parkRightSide = TrajectoryFollower(drive, parkRightSideTrajectory)
+        val parkLeftSide = TrajectoryFollower(drive, parkLeftSideTrajectory)
         val relocalizeFromAprilTags = instant {  } // add april tag relocalization here
 
         // Now we schedule the commands
@@ -235,7 +263,10 @@ class BlueCloseAuto : AnchorOpMode() {
 
             scorePurplePixel,
 
-            parallel(moveToDeposit, moveToNearBackdrop,instant { smec.leftClawState = ClawPositions.CLOSED}), //may need delay on moveToTravel
+            parallel(
+                moveToDeposit,
+                moveToNearBackdrop,
+            ),
 
             relocalizeFromAprilTags,
 
@@ -249,6 +280,40 @@ class BlueCloseAuto : AnchorOpMode() {
 
             moveToTravel,
 
+            moveToTransitLane,
+
+            moveToPixelStacks,
+
+            pickUpPixelStacks,
+
+            parallel(
+                moveToTransitLaneFromPixelStacks,
+                moveToTravel
+            ),
+
+            parallel(
+                moveToNearBackdrop,
+                series(
+                    moveToDeposit,
+                    instant {smec.pixelHeight += 2.0}
+                )
+            ),
+
+
+            moveToScoreBackDrop,
+
+            scoreBackDrop,
+
+//            backAwayFromBackDrop,
+
+
+            backAwayAfterScoringWhitePixel,
+
+            moveToTravel,
+
+            parkLeftSide
+
+
             // add extra cycles here to the pixel stack
 //            moveToTransitLaneToPixelStacks,
 //            intakePixelsFromStack,
@@ -261,7 +326,7 @@ class BlueCloseAuto : AnchorOpMode() {
 //            scoreBackDrop,
 //            backAwayFromBackDrop,
 
-            parkRightSide
+//            parkLeftSide
             )
 
 
