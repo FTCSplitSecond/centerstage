@@ -13,10 +13,9 @@ enum class WristPosition {
     TRAVEL,
     PREDEPOSIT
 }
-class WristSubsystem(private val leftServo : Servo, private val rightServo : Servo, private val telemetry: Telemetry): Subsystem() {
+class WristSubsystem(private val wristServo : Servo, private val telemetry: Telemetry): Subsystem() {
     constructor(hw: HardwareManager, telemetry: Telemetry) :
-            this(hw.servo("leftWristServo"),
-                hw.servo("rightWristServo"),
+            this(hw.servo("wristServo"),
                 telemetry)
 
     var isTelemetryEnabled = false
@@ -35,9 +34,7 @@ class WristSubsystem(private val leftServo : Servo, private val rightServo : Ser
     }
 
     override fun init() {
-        leftServo.axonPwmRange()
-        rightServo.axonPwmRange()
-        rightServo.mapRange(min = 1.0, max = 0.0)
+        wristServo.axonPwmRange()
     }
     var position: WristPosition = WristPosition.TRAVEL
     set(value) {
@@ -49,11 +46,9 @@ class WristSubsystem(private val leftServo : Servo, private val rightServo : Ser
         }
     }
     fun updateServoFromAngle(angle: Double) {
-        val leftServoPulseWidth = getServoPulseWidthFromAngle(angle, WristConfig.LEFT_SERVO_ZERO_POSITION)
-        val rightServoPulseWidth = getServoPulseWidthFromAngle(angle, WristConfig.RIGHT_SERVO_ZERO_POSITION)
+        val wristServoPulseWidth = getServoPulseWidthFromAngle(angle, WristConfig.LEFT_SERVO_ZERO_POSITION)
 
-        leftServo goto getServoPositionFromPulseWidth(leftServoPulseWidth, leftServo)
-        rightServo goto getServoPositionFromPulseWidth(rightServoPulseWidth, rightServo)
+        wristServo goto getServoPositionFromPulseWidth(wristServoPulseWidth, wristServo)
     }
     fun getServoPositionFromPulseWidth(pulseWidth : Double, servo : Servo) : Double {
         return (pulseWidth - servo.pwmRange().usPulseLower) / (servo.pwmRange().usPulseUpper - servo.pwmRange().usPulseLower)
@@ -79,8 +74,7 @@ class WristSubsystem(private val leftServo : Servo, private val rightServo : Ser
         if(isTelemetryEnabled) {
             telemetry.addLine("Wrist: Telemetry Enabled")
             telemetry.addData("Position:", position)
-            //telemetry.addData("Left Servo Position:", leftServo.position)
-            //telemetry.addData("Right Servo Position:", rightServo.position)
+            //telemetry.addData("Left Servo Position:", wristServo.position)
             telemetry.update()
         }
 
