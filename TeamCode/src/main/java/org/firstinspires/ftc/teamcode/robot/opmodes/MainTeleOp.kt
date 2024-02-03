@@ -11,6 +11,7 @@ import dev.turtles.lilypad.Button
 import dev.turtles.lilypad.EventTrigger
 import dev.turtles.lilypad.impl.FTCGamepad
 import dev.turtles.lilypad.module.RoutineModule
+import org.firstinspires.ftc.teamcode.claw.commands.CloseBothClaw
 import org.firstinspires.ftc.teamcode.claw.commands.SetLeftClawState
 import org.firstinspires.ftc.teamcode.claw.commands.SetRightClawState
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
@@ -172,30 +173,21 @@ class MainTeleOp : AnchorOpMode() {
 
             driver[Button.Key.SQUARE] onActivate
                     series(
-                        instant {
-                            smec.rightClawState = ClawPositions.CLOSED
-                            smec.leftClawState = ClawPositions.CLOSED
-                        },
+                        CloseBothClaw(smec.leftClaw, smec.rightClaw),
                         delay(0.1),
-                        instant {
-                            smec.switch(ScoringMechanism.State.TRAVEL)
-                        }
+                        smec.setArmState(ScoringMechanism.State.TRAVEL)
                     )
 
 
             driver[Button.Key.CROSS] onActivate
                     series(
-                        instant {
-                            smec.rightClawState = ClawPositions.DROP
-                            smec.leftClawState = ClawPositions.DROP
-                        },
+                        parallel(
+                            SetRightClawState(smec, ClawPositions.DROP),
+                            SetLeftClawState(smec, ClawPositions.DROP)
+                        ),
                         delay(0.25),
-                        instant {
-                            smec.switch(ScoringMechanism.State.DROP)
-                        },
-                        instant {
-                            smec.switch(ScoringMechanism.State.TRAVEL)
-                        }
+                        smec.setArmState(ScoringMechanism.State.DROP),
+                        smec.setArmState(ScoringMechanism.State.TRAVEL)
                     )
 
             driver[Button.Key.START] onActivate instant {
