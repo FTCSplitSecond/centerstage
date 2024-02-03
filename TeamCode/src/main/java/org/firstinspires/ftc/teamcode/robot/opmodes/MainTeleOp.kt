@@ -77,29 +77,8 @@ class MainTeleOp : AnchorOpMode() {
         }
 
 
-//        driver[Button.Key.LEFT_BUMPER] onActivate run {
-//            val leftClawState = when (smec.leftClawState) {
-//                ClawPositions.OPEN -> ClawPositions.CLOSED
-//                ClawPositions.CLOSED -> {
-//                    if (smec.state == ScoringMechanism.State.INTAKE)
-//                        ClawPositions.OPEN
-//                    else if (smec.state == ScoringMechanism.State.CLOSE_INTAKE)
-//                        ClawPositions.OPEN
-//                    else ClawPositions.DROP
-//                }
-//
-//                ClawPositions.DROP -> ClawPositions.CLOSED
-//            }
-//            SetLeftClawState(smec, leftClawState)
-//        }
-
-        driver[Button.Key.LEFT_BUMPER] onActivate instant {
-            smec.leftClawState = ClawPositions.CLOSED
-        }
-
-
-        driver[Button.Key.RIGHT_BUMPER] onActivate run {
-            val rightClawState = when (smec.rightClawState) {
+        driver[Button.Key.LEFT_BUMPER] onActivate run {
+            val leftClawState = when (smec.leftClawState) {
                 ClawPositions.OPEN -> ClawPositions.CLOSED
                 ClawPositions.CLOSED -> {
                     if (smec.state == ScoringMechanism.State.INTAKE)
@@ -108,10 +87,30 @@ class MainTeleOp : AnchorOpMode() {
                         ClawPositions.OPEN
                     else ClawPositions.DROP
                 }
+                ClawPositions.DROP -> ClawPositions.CLOSED
+                ClawPositions.OPEN -> ClawPositions.CLOSED
+            }
+            smec.leftClawState = leftClawState
+            SetLeftClawState(smec.leftClaw, leftClawState)
+        }
 
+//        driver[Button.Key.LEFT_BUMPER] onActivate instant {
+//            smec.leftClawState = ClawPositions.CLOSED
+//        }
+
+        driver[Button.Key.RIGHT_BUMPER] onActivate run {
+            val rightClawState = when (smec.rightClaw.position) {
+                ClawPositions.OPEN -> ClawPositions.CLOSED
+                ClawPositions.CLOSED -> {
+                    if (smec.state == ScoringMechanism.State.INTAKE)
+                        ClawPositions.OPEN
+                    else if (smec.state == ScoringMechanism.State.CLOSE_INTAKE)
+                        ClawPositions.OPEN
+                    else ClawPositions.DROP
+                }
                 ClawPositions.DROP -> ClawPositions.CLOSED
             }
-            SetRightClawState(smec, rightClawState)
+            SetRightClawState(smec.rightClaw, rightClawState)
         }
 
         driverLeftTrigger onActivate run {
@@ -141,15 +140,15 @@ class MainTeleOp : AnchorOpMode() {
 
 
 
-        parallel(
-            instant {
-                smec.switch(ScoringMechanism.State.CLOSE_INTAKE)
-            },
-            instant {
-                smec.rightClawState = ClawPositions.OPEN
-                smec.leftClawState = ClawPositions.OPEN
-            }
-        )
+//        parallel(
+//            instant {
+//                smec.switch(ScoringMechanism.State.CLOSE_INTAKE)
+//            },
+//            instant {
+//                smec.rightClawState = ClawPositions.OPEN
+//                smec.leftClawState = ClawPositions.OPEN
+//            }
+//        )
 
         driver[Button.Key.RIGHT_JOYSTICK_PRESS] onActivate run {
             if (smec.state == ScoringMechanism.State.DEPOSIT)
@@ -170,8 +169,8 @@ class MainTeleOp : AnchorOpMode() {
             driver[Button.Key.CROSS] onActivate
                     series(
                         parallel(
-                            SetRightClawState(smec, ClawPositions.DROP),
-                            SetLeftClawState(smec, ClawPositions.DROP)
+                            SetRightClawState(smec.rightClaw, ClawPositions.DROP),
+                            SetLeftClawState(smec.leftClaw, ClawPositions.DROP)
                         ),
                         delay(0.25),
                         smec.setArmState(ScoringMechanism.State.DROP),

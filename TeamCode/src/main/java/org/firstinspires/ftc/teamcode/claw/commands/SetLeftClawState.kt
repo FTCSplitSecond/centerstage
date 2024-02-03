@@ -7,11 +7,11 @@ import org.firstinspires.ftc.teamcode.claw.subsystems.LeftClawSubsystem
 import org.firstinspires.ftc.teamcode.claw.subsystems.RightClawSubsystem
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMechanism
 
-class SetLeftClawState(private val smec : ScoringMechanism, val position : ClawPositions) : SplitSecondComponent(){
+class SetLeftClawState(private val leftClaw : LeftClawSubsystem, val position : ClawPositions) : SplitSecondComponent(){
     override fun start() {
-        smec.leftClawState = position
+        leftClaw.position = position
     }
     override fun isComplete() : Boolean {
-        return smec.leftClaw.movementShouldBeComplete()
+        return leftClaw.movementShouldBeComplete()
     }
 }
