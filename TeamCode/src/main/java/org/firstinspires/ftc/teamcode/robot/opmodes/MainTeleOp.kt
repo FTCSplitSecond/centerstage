@@ -180,7 +180,6 @@ class MainTeleOp : AnchorOpMode() {
                 smec.rightClawState = ClawPositions.OPEN
                 smec.leftClawState = ClawPositions.OPEN
 
-
         }
 
 
@@ -205,6 +204,8 @@ class MainTeleOp : AnchorOpMode() {
         driver[Button.Key.RIGHT_JOYSTICK_PRESS] onActivate instant {
             if  (smec.state == ScoringMechanism.State.DEPOSIT)
                 smec.state = ScoringMechanism.State.TRAVEL
+            else if (smec.state == ScoringMechanism.State.MOVEDEPOSIT)
+                smec.state = ScoringMechanism.State.TRAVEL
             else
                 smec.state = ScoringMechanism.State.DEPOSIT
         }
@@ -221,6 +222,13 @@ class MainTeleOp : AnchorOpMode() {
                 }
             )
 
+        driver[Button.Key.DPAD_RIGHT] onActivate
+                instant {
+                    if  (smec.state == ScoringMechanism.State.MOVEDEPOSIT)
+                        smec.state = ScoringMechanism.State.TRAVEL
+                    else
+                        smec.switch(ScoringMechanism.State.MOVEDEPOSIT)
+                }
 
         driver[Button.Key.CROSS] onActivate
             series(

@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowSubsystem
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeConfig
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopePosition
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
+import org.firstinspires.ftc.teamcode.wrist.subsystems.WristConfig.WRIST_MOVE_OFFSET
 import org.firstinspires.ftc.teamcode.wrist.subsystems.WristPosition
 import org.firstinspires.ftc.teamcode.wrist.subsystems.WristSubsystem
 import org.joml.Vector2d
@@ -27,7 +28,7 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
                        private val wrist: WristSubsystem,
                        private val telescope: TelescopeSubsytem,
                        private val elbow: ElbowSubsystem) : Subsystem() {
-    data class KinematicResults(val elbowAngle : Double, val telescopeExtension : Double, val wristAngle : Double)
+    data class KinematicResults(val elbowAngle : Double, val telescopeExtension : Double, val wristAngle : Double, val moveWristAngle : Double)
     enum class State {
         CLOSE_INTAKE,
         INTAKE,
@@ -36,11 +37,11 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
         DEPOSIT,
         CLIMB,
         DROP,
-        PREDEPOSIT
+        MOVEDEPOSIT
     }
 
     var state = State.TRAVEL
-    private var ikResults = KinematicResults(0.0, 0.0, 0.0)
+    private var ikResults = KinematicResults(0.0, 0.0, 0.0, 0.0)
 
     var leftClawState = ClawPositions.OPEN
     var rightClawState = ClawPositions.OPEN
@@ -104,7 +105,8 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
         ikResults = KinematicResults(
                 180.0 - elbow,
                 telescopeLength - retractedTelescopeLength,
-            (-(actualElbow - 180) + WRIST_ANGLE)/2
+            (-(actualElbow - 180) + WRIST_ANGLE)/2,
+            wristAngle - WRIST_MOVE_OFFSET
         )
     }
     fun movementShouldBeComplete() : Boolean {
@@ -140,14 +142,14 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
                 elbow.position = ElbowPosition.TRAVEL
                 telescope.position = TelescopePosition.TRAVEL
             }
-            State.PREDEPOSIT -> {
-                wrist.position = WristPosition.PREDEPOSIT
+            State.MOVEDEPOSIT -> {
+                wrist.position = WristPosition.ADJUST
                 elbow.position = ElbowPosition.ADJUST
                 telescope.position = TelescopePosition.ADJUST
 
                 runKinematics()
 
-                wrist.depositAngle = ikResults.wristAngle
+                wrist.depositAngle = ikResults.moveWristAngle
                 elbow.depositAngle = ikResults.elbowAngle
                 telescope.targetExtenstionInches = ikResults.telescopeExtension
             }
