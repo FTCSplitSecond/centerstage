@@ -19,11 +19,9 @@ import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.drone_launcher.Subsystems.DronePositions
 import org.firstinspires.ftc.teamcode.mecanum.commands.DriveMecanum
 import org.firstinspires.ftc.teamcode.robot.commands.UpdateTelemetry
-<<<<<<< Updated upstream
-=======
+
 import org.firstinspires.ftc.teamcode.robot.commands.WaitFor
 import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
->>>>>>> Stashed changes
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMechanism
 import kotlin.math.PI
@@ -207,24 +205,21 @@ class MainTeleOp : AnchorOpMode() {
 
 
 
-<<<<<<< Updated upstream
         driver[Button.Key.RIGHT_JOYSTICK_PRESS] onActivate instant {
-            if  (smec.state == ScoringMechanism.State.DEPOSIT)
-                smec.state = ScoringMechanism.State.TRAVEL
-=======
-        driver[Button.Key.RIGHT_JOYSTICK_PRESS] onActivate
             if (smec.state == ScoringMechanism.State.DEPOSIT)
-                instant {
-                    smec.state = ScoringMechanism.State.TRAVEL
-                }
->>>>>>> Stashed changes
-            else
-                series(
-                    instant {smec.state = ScoringMechanism.State.PREDEPOSIT},
-                    WaitFor {smec.movementShouldBeComplete()},
-                    instant {smec.state = ScoringMechanism.State.DEPOSIT}
-                )
-
+                smec.state = ScoringMechanism.State.TRAVEL
+            driver[Button.Key.RIGHT_JOYSTICK_PRESS] onActivate
+                    if (smec.state == ScoringMechanism.State.DEPOSIT)
+                        instant {
+                            smec.state = ScoringMechanism.State.TRAVEL
+                        }
+                    else
+                        series(
+                            instant { smec.state = ScoringMechanism.State.PREDEPOSIT },
+                            delay(0.5),
+                            instant { smec.state = ScoringMechanism.State.DEPOSIT }
+                        )
+        }
 
         driver[Button.Key.SQUARE] onActivate
             series(
@@ -240,7 +235,6 @@ class MainTeleOp : AnchorOpMode() {
 
 
         driver[Button.Key.CROSS] onActivate
-<<<<<<< Updated upstream
             series(
                 instant {
                     smec.rightClawState = ClawPositions.DROP
@@ -254,7 +248,6 @@ class MainTeleOp : AnchorOpMode() {
                     smec.switch(ScoringMechanism.State.TRAVEL)
                 }
             )
-=======
                 series(
                     instant {
                         smec.rightClawState = ClawPositions.DROP
@@ -264,14 +257,11 @@ class MainTeleOp : AnchorOpMode() {
                     instant {
                         smec.switch(ScoringMechanism.State.DROP)
                     },
-                    WaitFor {
-                        smec.movementShouldBeComplete()
-                    },
+                    delay(0.75),
                     instant {
                         smec.switch(ScoringMechanism.State.TRAVEL)
                     }
                 )
->>>>>>> Stashed changes
 
         driver[Button.Key.START] onActivate instant {
             if (smec.state == ScoringMechanism.State.CLIMB)
