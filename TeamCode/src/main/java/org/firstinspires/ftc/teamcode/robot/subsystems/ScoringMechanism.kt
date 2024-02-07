@@ -55,9 +55,6 @@ class ScoringMechanism(
     var armState = State.TRAVEL
     private var ikResults = KinematicResults(0.0, 0.0, 0.0)
 
-    var leftClawState = ClawPositions.OPEN
-    var rightClawState = ClawPositions.OPEN
-
     private var currentStateTimer = Timer()
     var pixelHeight = 0.0
 
