@@ -15,6 +15,7 @@ import dev.turtles.lilypad.Button
 import dev.turtles.lilypad.EventTrigger
 import dev.turtles.lilypad.impl.FTCGamepad
 import dev.turtles.lilypad.module.RoutineModule
+import org.firstinspires.ftc.teamcode.claw.subsystems.ClawConfig
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.drone_launcher.Subsystems.DronePositions
 import org.firstinspires.ftc.teamcode.mecanum.commands.DriveMecanum
@@ -28,9 +29,27 @@ import kotlin.math.sign
 
 @TeleOp
 class MainTeleOp : AnchorOpMode() {
+    lateinit var driver : FTCGamepad
     override fun prerun() {
-        val driver = FTCGamepad(gamepad1)
+        driver = FTCGamepad(gamepad1)
+        ClawConfig.LEFT_SERVO_CLOSED_MICROSECONDS = 1900.0
+        ClawConfig.RIGHT_SERVO_CLOSED_MICROSECONDS = 850.0
 
+        driver[Button.Key.DPAD_RIGHT] onActivate instant {
+            Robot.alliance = Alliance.RED
+            telemetry.addData("ALLIANCE", Robot.alliance)
+            telemetry.update()
+        }
+        driver[Button.Key.DPAD_LEFT] onActivate instant {
+            Robot.alliance = Alliance.BLUE
+            telemetry.addData("ALLIANCE", Robot.alliance)
+            telemetry.update()
+        }
+        telemetry.addData("ALLIANCE", Robot.alliance)
+        telemetry.update()
+    }
+
+    override fun run() {
         val robot = Robot(hardwareMap, this.hardwareManager, telemetry)
         val smec = robot.scoringMechanism
 
@@ -265,7 +284,8 @@ class MainTeleOp : AnchorOpMode() {
         }
     }
 
-    override fun run() {
-
+    override fun end() {
+        ClawConfig.LEFT_SERVO_CLOSED_MICROSECONDS = 2000.0
+        ClawConfig.RIGHT_SERVO_CLOSED_MICROSECONDS = 550.0
     }
 }

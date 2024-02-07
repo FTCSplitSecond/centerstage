@@ -10,5 +10,5 @@ public class InverseKinematicsConfig {
     public static double TELESCOPE_OFFSET = 1.5; // [in]
     public static double MINIMUM_EXTENSION = 8.0; // [in]
     public static double BACKBOARD_OFFSET = 4.0; // [in]
-    public static  double WRIST_ANGLE = -67.5; // [in]
+    public static  double WRIST_ANGLE = -57.5; // [in]
 }

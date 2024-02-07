@@ -15,9 +15,9 @@ public class ElbowConfig {
     public static double ELBOW_CLOSE_INTAKE = -9.0; //   degrees
     public static double ELBOW_TRAVEL = 0.0; //  degrees
 
-    public static double ELBOW_STACK_INTAKE = 0.0;
+    public static double ELBOW_STACK_INTAKE = -2.0;
 
-    public static double ELBOW_STACK_INTAKE_CLOSE = -2.0;
+    public static double ELBOW_STACK_INTAKE_CLOSE = -2.5;
     public static double KG = 0.2;
     public static double ELBOW_MAX_ANGULAR_VELOCITY = 800.0;
     public static double ELBOW_MAX_ANGULAR_ACCELERATION = 400.0; // (REMEMBER TO CHANGE THIS TO 600!!!!!)

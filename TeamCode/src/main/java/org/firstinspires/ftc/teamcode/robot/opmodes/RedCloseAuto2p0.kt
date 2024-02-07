@@ -24,11 +24,10 @@ import org.openftc.easyopencv.OpenCvCameraFactory
 import org.openftc.easyopencv.OpenCvCameraRotation
 import org.openftc.easyopencv.OpenCvWebcam
 import kotlin.math.PI
-import org.firstinspires.ftc.teamcode.robot.opmodes.Alliance
 
 
 @Autonomous
-class RedCloseAuto : AnchorOpMode() {
+class RedCloseAuto2p0 : AnchorOpMode() {
     lateinit var robot: Robot
     lateinit var smec: ScoringMechanism
     lateinit var drive: CenterstageMecanumDrive
@@ -40,6 +39,7 @@ class RedCloseAuto : AnchorOpMode() {
     override fun prerun() {
         val driver = FTCGamepad(gamepad1)
         robot = Robot(hardwareMap, this.hardwareManager, telemetry, startPose = startPose)
+        Robot.alliance = alliance
         smec = robot.scoringMechanism
         drive = robot.driveBase.dt
         robot.elbow.isEnabled = true
@@ -132,7 +132,7 @@ class RedCloseAuto : AnchorOpMode() {
         val awayFromWallPosition = Vector2d(24.0, 36.0).adjustForAlliance(alliance)
         val purplePixelPoseBackdropSide = Pose2d(Vector2d(36.0, 30.0), PI).adjustForAlliance(alliance)
         val purplePixelPoseCenter = Pose2d(Vector2d(28.0, 25.5), PI).adjustForAlliance(alliance)
-        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(14.0, 32.0), PI).adjustForAlliance(alliance) // 1/27 CHANGED: changed x from 18 to 14
+        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(14.0, 32.0), PI).adjustForAlliance(alliance)
         // note here that zone right/left means different things for red and blue
         val purplePixelPose = when (zoneDetected) {
             PropZone.LEFT -> if(alliance== Alliance.BLUE) purplePixelPoseBackdropSide else purplePixelPoseAwayFromBackdrop
@@ -141,7 +141,7 @@ class RedCloseAuto : AnchorOpMode() {
         }
         val transitLaneY = 60.0
         val nearBackDropLaneX = 34.0
-        val backDropScoreX = 42.0 // 1/27 CHANGE: too far from backdrop in center randomization 40 -> 40.5
+        val backDropScoreX = 42.0
 
         val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(-36.0, transitLaneY), PI).adjustForAlliance(alliance)
         val transitLaneBackDropSide = Vector2d(nearBackDropLaneX, transitLaneY).adjustForAlliance(alliance)

@@ -37,7 +37,9 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
         DEPOSIT,
         CLIMB,
         DROP,
-        MOVEDEPOSIT
+        MOVEDEPOSIT,
+        STACK_INTAKE,
+        STACK_INTAKE_CLOSE
     }
 
     var state = State.TRAVEL
@@ -106,7 +108,7 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
                 180.0 - elbow,
                 telescopeLength - retractedTelescopeLength,
             (-(actualElbow - 180) + WRIST_ANGLE)/2,
-            wristAngle - WRIST_MOVE_OFFSET
+            (-(actualElbow - 180) + WRIST_ANGLE)/2 - WRIST_MOVE_OFFSET
         )
     }
     fun movementShouldBeComplete() : Boolean {
@@ -174,6 +176,17 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
 
             State.DROP -> {
                 telescope.position = TelescopePosition.TRAVEL
+            }
+            State.STACK_INTAKE -> {
+                telescope.position = TelescopePosition.CLOSE_INTAKE
+                elbow.position = ElbowPosition.STACK_INTAKE
+                wrist.position = WristPosition.CLOSE_INTAKE
+            }
+
+            State.STACK_INTAKE_CLOSE -> {
+                telescope.position = TelescopePosition.EXTENDED_INTAKE
+                elbow.position = ElbowPosition.STACK_INTAKE_CLOSE
+                wrist.position = WristPosition.EXTENDED_INTAKE
             }
         }
 

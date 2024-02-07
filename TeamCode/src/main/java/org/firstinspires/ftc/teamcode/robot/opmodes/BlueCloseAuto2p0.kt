@@ -24,7 +24,6 @@ import org.openftc.easyopencv.OpenCvCameraFactory
 import org.openftc.easyopencv.OpenCvCameraRotation
 import org.openftc.easyopencv.OpenCvWebcam
 import kotlin.math.PI
-import org.firstinspires.ftc.teamcode.robot.opmodes.Alliance
 
 
 @Autonomous
@@ -40,6 +39,7 @@ class BlueCloseAuto2p0 : AnchorOpMode() {
     override fun prerun() {
         val driver = FTCGamepad(gamepad1)
         robot = Robot(hardwareMap, this.hardwareManager, telemetry, startPose = startPose)
+        Robot.alliance = alliance
         smec = robot.scoringMechanism
         drive = robot.driveBase.dt
         robot.elbow.isEnabled = true
@@ -137,7 +137,7 @@ class BlueCloseAuto2p0 : AnchorOpMode() {
         val purplePixelPose = when (zoneDetected) {
             PropZone.LEFT -> if(alliance== Alliance.BLUE) purplePixelPoseBackdropSide else purplePixelPoseAwayFromBackdrop
             PropZone.CENTER, PropZone.UNKNOWN -> purplePixelPoseCenter
-            PropZone.RIGHT -> if(alliance== Alliance.BLUE) purplePixelPoseAwayFromBackdrop else purplePixelPoseBackdropSide // 1/27 FIX: robot running into truss when placing right
+            PropZone.RIGHT -> if(alliance== Alliance.BLUE) purplePixelPoseAwayFromBackdrop else purplePixelPoseBackdropSide
         }
         val transitLaneY = 60.0
         val nearBackDropLaneX = 34.0
@@ -158,8 +158,8 @@ class BlueCloseAuto2p0 : AnchorOpMode() {
             PropZone.RIGHT -> nearBackDropRight
         }
         val backDropScoringPosition = Vector2d(backDropScoreX, nearBackDropPosition.y)  // no need to adjust for alliance (already there)
-        val parkPosition = Vector2d(48.0, transitLaneY).adjustForAlliance(alliance)
-
+        val parkInsidePosition = Vector2d(48.0, transitLaneY).adjustForAlliance(alliance)
+        val parkOutsidePosition = Vector2d(backDropScoreX, 60.0).adjustForAlliance(alliance)
 
 
         // trajectories
@@ -190,8 +190,12 @@ class BlueCloseAuto2p0 : AnchorOpMode() {
 //                .lineTo(transitLaneBackDropSide)
 //                .build()
 
-        val parkRightSideTrajectory = drive.trajectoryBuilder(backAwayFromBackDropTrajectory.end())
-            .lineTo(parkPosition)
+        val parkInsideTrajectory = drive.trajectoryBuilder(backAwayFromBackDropTrajectory.end())
+            .lineTo(parkInsidePosition)
+            .build()
+
+        val parkOutsideTrajectory = drive.trajectoryBuilder(backAwayFromBackDropTrajectory.end())
+            .lineTo(parkOutsidePosition)
             .build()
 
         // commands
@@ -224,7 +228,8 @@ class BlueCloseAuto2p0 : AnchorOpMode() {
 //        val intakePixelsFromStack = instant {  } // add pixel intake here returns to transit lane when done
 //        val moveToTransitLaneFromPixelStacks = TrajectoryFollower(drive, moveToTransitLaneFromPixelStacksTrajectory)
 
-        val parkRightSide = TrajectoryFollower(drive, parkRightSideTrajectory)
+        val parkInside = TrajectoryFollower(drive, parkInsideTrajectory)
+        val parkOutside = TrajectoryFollower(drive, parkOutsideTrajectory)
         val relocalizeFromAprilTags = instant {  } // add april tag relocalization here
 
         // Now we schedule the commands
@@ -261,7 +266,7 @@ class BlueCloseAuto2p0 : AnchorOpMode() {
 //            scoreBackDrop,
 //            backAwayFromBackDrop,
 
-            parkRightSide
+            parkInside
         )
 
 
