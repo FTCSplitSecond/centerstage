@@ -28,7 +28,7 @@ open class SetTelescopePosition(val telescope: TelescopeSubsystem, private val p
     override fun loop() {}
 
     override fun start() {
-        telescope.position = position
+        telescope.targetExtensionInches = position
     }
 }
 

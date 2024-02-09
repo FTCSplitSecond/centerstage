@@ -25,7 +25,9 @@ enum class ElbowPosition{
     ADJUST,
     TRAVEL,
     HOME,
-    CLIMB
+    CLIMB,
+    STACK_INTAKE,
+    STACK_INTAKE_CLOSE
 }
 class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager, val telescope: TelescopeSubsystem) : Subsystem() {
 
@@ -85,6 +87,8 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
                 ElbowPosition.EXTENDED_INTAKE -> ElbowConfig.ELBOW_EXTENDED_INTAKE
                 ElbowPosition.HOME -> ElbowConfig.ELBOW_HOME
                 ElbowPosition.CLIMB -> ElbowConfig.ELBOW_CLIMB
+                ElbowPosition.STACK_INTAKE -> ElbowConfig.ELBOW_STACK_INTAKE
+                ElbowPosition.STACK_INTAKE_CLOSE -> ElbowConfig.ELBOW_STACK_INTAKE_CLOSE
             }
             field = value
         }

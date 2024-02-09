@@ -4,6 +4,7 @@ import PropDetector
 import PropZone
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
+import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import dev.turtles.anchor.component.stock.delay
 import dev.turtles.anchor.component.stock.instant
@@ -42,28 +43,45 @@ class PixelStackTester : AnchorOpMode() {
         drive = robot.driveBase.dt
         robot.elbow.isEnabled = true
         robot.init(this.world)
-        val cameraMonitorViewId = hardwareMap.appContext.resources.getIdentifier(
-            "cameraMonitorViewId",
-            "id",
-            hardwareMap.appContext.packageName
-        )
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(
-            hardwareMap.get(
-                WebcamName::class.java, "webcam1"
-            ), cameraMonitorViewId
-        )
-        webcam.openCameraDeviceAsync(object : OpenCvCamera.AsyncCameraOpenListener {
-            override fun onOpened() {
-                webcam.startStreaming(960, 720, OpenCvCameraRotation.UPRIGHT)
-            }
-
-            override fun onError(errorCode: Int) {}
-        })
-        webcam.setPipeline(detector)
         OpenBothClaw(robot.leftClaw, robot.rightClaw)
+//        val cameraMonitorViewId = hardwareMap.appContext.resources.getIdentifier(
+//            "cameraMonitorViewId",
+//            "id",
+//            hardwareMap.appContext.packageName
+//        )
+//        webcam = OpenCvCameraFactory.getInstance().createWebcam(
+//            hardwareMap.get(
+//                WebcamName::class.java, "webcam1"
+//            ), cameraMonitorViewId
+//        )
+//        webcam.openCameraDeviceAsync(object : OpenCvCamera.AsyncCameraOpenListener {
+//            override fun onOpened() {
+//                webcam.startStreaming(960, 720, OpenCvCameraRotation.UPRIGHT)
+//            }
+//
+//            override fun onError(errorCode: Int) {}
+//        })
+//        webcam.setPipeline(detector)
+//        OpenBothClaw(robot.leftClaw, robot.rightClaw)
     }
 
     override fun run() {
-        webcam.stopStreaming()
+//        webcam.stopStreaming()
+        val traj = drive.trajectoryBuilder(Pose2d())
+            .forward(2.0)
+            .build()
+        val follower = TrajectoryFollower(drive, traj)
+        + series (
+            instant {
+                smec.state = ScoringMechanism.State.STACK_INTAKE
+            },
+            follower,
+            instant {
+                smec.leftClawState = ClawPositions.CLOSED
+            },
+            instant {
+                smec.state = ScoringMechanism.State.TRAVEL
+            }
+        )
     }
 }

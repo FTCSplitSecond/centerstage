@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.swerve.utils.clamp
 
 
-enum class  TelescopeState {
+enum class TelescopeState {
     EXTENDED_INTAKE,
     CLOSE_INTAKE,
     ADJUST,
@@ -48,7 +48,18 @@ class TelescopeSubsystem(private val hardwareManager: HardwareManager, private v
         get() {
             return getExtensionInchesFromEncoderTicks(motor.encoder.getCounts())
         }
-    var position : Double = 0.0
+    var targetExtensionInches : Double = 0.0
+
+    var position : TelescopeState = TelescopeState.TRAVEL
+        set(value) {
+            targetExtensionInches = when(value) {
+                TelescopeState.TRAVEL -> TELESCOPE_TRAVEL
+                TelescopeState.CLOSE_INTAKE -> TELESCOPE_CLOSE_INTAKE
+                TelescopeState.ADJUST -> depositDistance
+                TelescopeState.EXTENDED_INTAKE -> TELESCOPE_EXTENDED_INTAKE
+            }
+            field = value
+        }
 
     /**
      * Angle when the current state is [TelescopeState.ADJUST]
@@ -58,7 +69,7 @@ class TelescopeSubsystem(private val hardwareManager: HardwareManager, private v
     private val controller = PIDController(TELESCOPE_KP, TELESCOPE_KI, TELESCOPE_KD)
 
     fun isAtTarget() : Boolean {
-        return Math.abs(position-currentExtensionInches)<PIDTolerance
+        return Math.abs(targetExtensionInches-currentExtensionInches)<PIDTolerance
     }
 
     override fun init() {
@@ -66,7 +77,7 @@ class TelescopeSubsystem(private val hardwareManager: HardwareManager, private v
     }
 
     override fun loop() {
-        val clampedTarget = position.clamp(TELESCOPE_MIN, TELESCOPE_MAX)
+        val clampedTarget = targetExtensionInches.clamp(TELESCOPE_MIN, TELESCOPE_MAX)
         motor power controller.calculate(currentExtensionInches, clampedTarget)
 
         if(isTelemetryEnabled) {

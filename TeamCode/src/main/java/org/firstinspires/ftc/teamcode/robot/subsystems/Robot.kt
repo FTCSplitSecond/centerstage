@@ -42,8 +42,8 @@ class Robot(val hardwareMap: HardwareMap, val hw: HardwareManager, t: Telemetry,
 //    }
 
     var awayFromDriverStationHeading = when (alliance) {
-            Alliance.RED -> Math.PI / 2.0
-            Alliance.BLUE -> -Math.PI / 2.0
+            Alliance.RED -> -Math.PI / 2.0
+            Alliance.BLUE -> Math.PI / 2.0
     }
 
 

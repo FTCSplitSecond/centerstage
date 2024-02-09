@@ -61,8 +61,6 @@ public class CenterstageMecanumDrive extends MecanumDrive {
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(8.0, 0, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(8.0, 0, 0);
     public double IMU_OFFSET = 0.0;
-    public double X_OFFSET = 0.0;
-    public double Y_OFFSET = 0.0;
     public Pose2d startPose = new Pose2d();
 
     public static double LATERAL_MULTIPLIER = 1;
@@ -100,7 +98,7 @@ public class CenterstageMecanumDrive extends MecanumDrive {
         this.hardwareMap = hardwareMap;
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
-                new Pose2d(0.25, 0.25, Math.toRadians(1.0)), 1.0);
+                new Pose2d(DriveConstants.PID_TOLERANCE, DriveConstants.PID_TOLERANCE, Math.toRadians(1.0)), 1.0);
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
