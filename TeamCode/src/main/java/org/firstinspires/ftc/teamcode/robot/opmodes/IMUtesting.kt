@@ -15,7 +15,7 @@ class IMUtesting : AnchorOpMode() {
         robot = Robot(hardwareMap, this.hardwareManager, telemetry)
         drive = robot.driveBase.dt
         robot.init(this.world)
-        robot.scoringMechanism.armState = ScoringMechanism.State.TRAVEL
+        robot.scoringMechanism.state = ScoringMechanism.State.TRAVEL
     }
 
     override fun run() {
