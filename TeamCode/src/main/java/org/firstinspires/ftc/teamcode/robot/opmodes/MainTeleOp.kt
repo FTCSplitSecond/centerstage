@@ -52,6 +52,8 @@ class MainTeleOp : AnchorOpMode() {
     override fun run() {
         val robot = Robot(hardwareMap, this.hardwareManager, telemetry)
         val smec = robot.scoringMechanism
+        val leftClaw = robot.leftClaw
+        val rightClaw = robot.rightClaw
 
         val dt = robot.driveBase
 
@@ -144,22 +146,20 @@ class MainTeleOp : AnchorOpMode() {
         }
 
 
-        driver[Button.Key.LEFT_BUMPER] onActivate instant {
-            smec.leftClawState = when (smec.leftClawState) {
-                ClawPositions.OPEN -> ClawPositions.CLOSED
-                ClawPositions.CLOSED -> {
-                    if (smec.state == ScoringMechanism.State.INTAKE)
-                        ClawPositions.OPEN
-                    else if (smec.state == ScoringMechanism.State.CLOSE_INTAKE)
-                        ClawPositions.OPEN
-                    else ClawPositions.DROP
-                }
-
-                ClawPositions.DROP -> ClawPositions.CLOSED
-            }
-
-
-        }
+//        driver[Button.Key.LEFT_BUMPER] onActivate instant {
+//            smec.leftClawState = when (smec.leftClawState) {
+//                ClawPositions.OPEN -> ClawPositions.CLOSED
+//                ClawPositions.CLOSED -> {
+//                    if (smec.state == ScoringMechanism.State.INTAKE)
+//                        ClawPositions.OPEN
+//                    else if (smec.state == ScoringMechanism.State.CLOSE_INTAKE)
+//                        ClawPositions.OPEN
+//                    else ClawPositions.DROP
+//                }
+//
+//                ClawPositions.DROP -> ClawPositions.CLOSED
+//            }
+//        }
 
         driver[Button.Key.RIGHT_BUMPER] onActivate instant {
             smec.rightClawState = when (smec.rightClawState) {
