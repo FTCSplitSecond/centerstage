@@ -78,8 +78,8 @@ class MainTeleOp : AnchorOpMode() {
                 val rightX = -driver[Button.Joystick.RIGHT].x
                 if (smec.state == ScoringMechanism.State.INTAKE || smec.state == ScoringMechanism.State.DROP) {
                     rightX * 0.5
-                }
-                rightX
+                } else
+                    rightX
             })
 
         schedule(command)
