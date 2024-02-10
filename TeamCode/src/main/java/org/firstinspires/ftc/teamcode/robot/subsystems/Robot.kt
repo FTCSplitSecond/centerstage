@@ -19,9 +19,6 @@ import org.firstinspires.ftc.teamcode.robot.opmodes.Alliance
 import org.firstinspires.ftc.teamcode.wrist.subsystems.WristSubsystem
 import kotlin.math.PI
 
-enum class OpModeType {
-    TELEOP, AUTONOMOUS
-}
 
 class Robot(val hardwareMap: HardwareMap, val hw: HardwareManager, t: Telemetry,
             val opModeType: OpModeType = OpModeType.TELEOP,
@@ -47,8 +44,6 @@ class Robot(val hardwareMap: HardwareMap, val hw: HardwareManager, t: Telemetry,
             Alliance.BLUE -> Math.PI / 2.0
     }
 
-
-
     // add multiple telemetry here for dashboard here
     val telemetry = MultipleTelemetry(FtcDashboard.getInstance().telemetry, t)
 
@@ -73,7 +68,6 @@ class Robot(val hardwareMap: HardwareMap, val hw: HardwareManager, t: Telemetry,
         entity.add(elbow)
         entity.add(droneLauncher)
         entity.add(scoringMechanism)
-
         world.add(entity)
     }
 }

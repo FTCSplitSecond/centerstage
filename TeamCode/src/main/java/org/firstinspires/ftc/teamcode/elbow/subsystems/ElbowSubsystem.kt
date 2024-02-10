@@ -31,8 +31,8 @@ enum class ElbowPosition{
 }
 class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager, val telescope: TelescopeSubsytem) : Subsystem() {
 
-    var isEnabled = false
-    var isTelemetryEnabled = true
+    var isEnabled = true
+    var isTelemetryEnabled = false
     private val motor = hw.motor("elbow")
 
 

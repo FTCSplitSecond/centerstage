@@ -4,7 +4,6 @@ import PropDetector
 import PropZone
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
-import com.fasterxml.jackson.databind.annotation.JsonAppend.Prop
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import dev.turtles.anchor.component.stock.delay
 import dev.turtles.anchor.component.stock.instant
@@ -25,7 +24,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory
 import org.openftc.easyopencv.OpenCvCameraRotation
 import org.openftc.easyopencv.OpenCvWebcam
 import kotlin.math.PI
-import org.firstinspires.ftc.teamcode.robot.opmodes.Alliance
+import org.firstinspires.ftc.teamcode.robot.util.adjustForAlliance
 
 
 @Autonomous

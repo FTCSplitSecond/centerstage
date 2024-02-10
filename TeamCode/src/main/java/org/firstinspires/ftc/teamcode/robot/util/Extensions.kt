@@ -1,7 +1,8 @@
-package org.firstinspires.ftc.teamcode.robot.opmodes
+package org.firstinspires.ftc.teamcode.robot.util
 
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
+import org.firstinspires.ftc.teamcode.robot.opmodes.Alliance
 
 
 fun Vector2d.adjustForAlliance(alliance: Alliance): Vector2d {

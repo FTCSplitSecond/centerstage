@@ -20,6 +20,7 @@ import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.drone_launcher.Subsystems.DronePositions
 import org.firstinspires.ftc.teamcode.mecanum.commands.DriveMecanum
 import org.firstinspires.ftc.teamcode.robot.commands.UpdateTelemetry
+import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMechanism
 import kotlin.math.PI
@@ -29,36 +30,23 @@ import kotlin.math.sign
 
 @TeleOp
 class MainTeleOp : AnchorOpMode() {
-    lateinit var driver : FTCGamepad
+    val driver = FTCGamepad(gamepad1)
+    val robot = Robot(hardwareMap, this.hardwareManager, telemetry, OpModeType.TELEOP)
+
     override fun prerun() {
-        driver = FTCGamepad(gamepad1)
+        // TODO: Investigate a better way to do this.
         ClawConfig.LEFT_SERVO_CLOSED_MICROSECONDS = 1900.0
         ClawConfig.RIGHT_SERVO_CLOSED_MICROSECONDS = 850.0
-
-        driver[Button.Key.DPAD_RIGHT] onActivate instant {
-            Robot.alliance = Alliance.RED
-            telemetry.addData("ALLIANCE", Robot.alliance)
-            telemetry.update()
-        }
-        driver[Button.Key.DPAD_LEFT] onActivate instant {
-            Robot.alliance = Alliance.BLUE
-            telemetry.addData("ALLIANCE", Robot.alliance)
-            telemetry.update()
-        }
-        telemetry.addData("ALLIANCE", Robot.alliance)
-        telemetry.update()
     }
 
     override fun run() {
-        val robot = Robot(hardwareMap, this.hardwareManager, telemetry)
         val smec = robot.scoringMechanism
         val leftClaw = robot.leftClaw
         val rightClaw = robot.rightClaw
-
         val dt = robot.driveBase
 
         robot.init(this.world)
-        robot.elbow.isEnabled = true
+
         schedule(
             instant {
                 robot.droneLauncher.position = DronePositions.HELD
@@ -81,7 +69,6 @@ class MainTeleOp : AnchorOpMode() {
                 } else
                     rightX
             })
-
         schedule(command)
 
         val triggerThreshold = 0.2
@@ -140,11 +127,9 @@ class MainTeleOp : AnchorOpMode() {
 //                    }
 //        }
 
-
         driver[Button.Key.DPAD_DOWN] onActivate instant {
             robot.awayFromDriverStationHeading = robot.driveBase.dt.poseEstimate.heading
         }
-
 
 //        driver[Button.Key.LEFT_BUMPER] onActivate instant {
 //            smec.leftClawState = when (smec.leftClawState) {
@@ -175,8 +160,6 @@ class MainTeleOp : AnchorOpMode() {
                 }
             }
         }
-
-
 
         driverLeftTrigger onActivate
                 instant {

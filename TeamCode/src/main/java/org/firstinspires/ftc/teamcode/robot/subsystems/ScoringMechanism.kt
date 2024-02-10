@@ -112,9 +112,9 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
         )
     }
     fun movementShouldBeComplete() : Boolean {
-        Log.d("waitfor", "wrist-"+wrist.movementShouldBeComplete().toString())
-        Log.d("waitfor", "telescope-"+telescope.isAtTarget().toString())
-        Log.d("waitfor", "elbow-"+elbow.isAtTarget().toString())
+        Log.d("waitfor", "wrist-" + wrist.movementShouldBeComplete().toString())
+        Log.d("waitfor", "telescope-" + telescope.isAtTarget().toString())
+        Log.d("waitfor", "elbow-" + elbow.isAtTarget().toString())
 
         return wrist.movementShouldBeComplete() && elbow.isAtTarget() && telescope.isAtTarget()
     }

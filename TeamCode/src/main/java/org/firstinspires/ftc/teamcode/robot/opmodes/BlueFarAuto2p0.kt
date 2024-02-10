@@ -24,7 +24,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory
 import org.openftc.easyopencv.OpenCvCameraRotation
 import org.openftc.easyopencv.OpenCvWebcam
 import kotlin.math.PI
-import org.firstinspires.ftc.teamcode.robot.opmodes.Alliance
+import org.firstinspires.ftc.teamcode.robot.util.adjustForAlliance
 
 
 @Autonomous
