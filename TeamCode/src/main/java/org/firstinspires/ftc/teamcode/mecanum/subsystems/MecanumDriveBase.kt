@@ -4,11 +4,8 @@ import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.arcrobotics.ftclib.util.MathUtils
 import dev.turtles.anchor.component.FinishReason
 import dev.turtles.anchor.entity.Subsystem
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.teamcode.roadrunner.drive.CenterstageMecanumDrive
-import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
-import kotlin.math.PI
 
 class MecanumDriveBase(val robot : Robot) : Subsystem() {
     val hardwareMap = robot.hardwareMap

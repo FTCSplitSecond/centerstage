@@ -12,7 +12,7 @@ import dev.turtles.electriceel.wrapper.HardwareManager
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_HOME
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_MAX_ANGULAR_ACCELERATION
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_MAX_ANGULAR_VELOCITY
-import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
+import org.firstinspires.ftc.teamcode.robot.util.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.swerve.utils.clamp
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeConfig.TELESCOPE_MAX
@@ -104,7 +104,7 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
             val minExtension = 13.5
             val maxTotalExtension = minExtension + TELESCOPE_MAX
             val currentTotalExtension = minExtension + telescope.currentExtensionInches
-            val gravityAdjustment = Math.cos(Math.toRadians(currentAngle)) * currentTotalExtension/maxTotalExtension * ElbowConfig.KG
+            val gravityAdjustment = Math.cos(Math.toRadians(currentAngle)) * ElbowConfig.KG
             motor power controller.calculate(currentAngle, motionProfile[motionProfileTimer.seconds()].x) + gravityAdjustment
         } else motor power 0.0
 

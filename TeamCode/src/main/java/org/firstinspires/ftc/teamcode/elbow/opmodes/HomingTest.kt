@@ -1,18 +1,7 @@
 package org.firstinspires.ftc.teamcode.elbow.opmodes
 
-import com.acmerobotics.dashboard.FtcDashboard
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry
 import com.arcrobotics.ftclib.command.CommandOpMode
-import com.arcrobotics.ftclib.command.InstantCommand
-import com.arcrobotics.ftclib.gamepad.GamepadEx
-import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import com.qualcomm.robotcore.hardware.DcMotorEx
-import org.firstinspires.ftc.teamcode.elbow.commands.SetElbowPosition
-import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig
-import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowPosition
-import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowSubsystem
-import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
 
 @TeleOp
 class HomingTest() : CommandOpMode() {

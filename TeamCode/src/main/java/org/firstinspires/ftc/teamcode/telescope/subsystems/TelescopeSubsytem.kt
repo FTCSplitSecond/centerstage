@@ -7,7 +7,7 @@ import dev.turtles.anchor.entity.Subsystem
 import dev.turtles.electriceel.wrapper.HardwareManager
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeConfig.*
-import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
+import org.firstinspires.ftc.teamcode.robot.util.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.swerve.utils.clamp
 

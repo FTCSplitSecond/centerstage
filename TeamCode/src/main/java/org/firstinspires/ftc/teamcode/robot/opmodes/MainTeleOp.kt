@@ -4,7 +4,6 @@ import LaunchDrone
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.turtles.anchor.component.stock.delay
 import dev.turtles.anchor.component.stock.instant
-import dev.turtles.anchor.component.stock.parallel
 import dev.turtles.anchor.component.stock.series
 import dev.turtles.electriceel.opmode.AnchorOpMode
 import dev.turtles.lilypad.Button
@@ -18,10 +17,9 @@ import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.drone_launcher.Subsystems.DronePositions
 import org.firstinspires.ftc.teamcode.mecanum.commands.DriveMecanum
 import org.firstinspires.ftc.teamcode.robot.commands.UpdateTelemetry
-import org.firstinspires.ftc.teamcode.robot.subsystems.OpModeType
+import org.firstinspires.ftc.teamcode.robot.util.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMechanism
-import org.firstinspires.ftc.teamcode.wrist.subsystems.WristPosition
 import kotlin.math.absoluteValue
 import kotlin.math.pow
 import kotlin.math.sign
@@ -233,8 +231,6 @@ class MainTeleOp : AnchorOpMode() {
             robot.telemetry.addData("Telescope Ext", robot.telescope.currentExtensionInches)
             robot.telemetry.addData("left claw", robot.leftClaw.position)
             robot.telemetry.addData("right claw", robot.rightClaw.position)
-
-            robot.telemetry.update()
         }
     }
 
