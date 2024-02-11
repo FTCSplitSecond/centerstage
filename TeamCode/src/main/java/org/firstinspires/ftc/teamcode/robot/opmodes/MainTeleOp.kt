@@ -130,11 +130,11 @@ class MainTeleOp : AnchorOpMode() {
             robot.leftClaw.position = when (robot.leftClaw.position) {
                 ClawPositions.OPEN -> ClawPositions.CLOSED
                 ClawPositions.CLOSED -> {
-                    if (smec.armState == ScoringMechanism.State.EXTENDED_INTAKE)
-                        ClawPositions.OPEN
-                    else if (smec.armState == ScoringMechanism.State.CLOSE_INTAKE)
-                        ClawPositions.OPEN
-                    else ClawPositions.DROP
+                    when (smec.armState) {
+                        ScoringMechanism.State.EXTENDED_INTAKE -> ClawPositions.OPEN
+                        ScoringMechanism.State.CLOSE_INTAKE -> ClawPositions.OPEN
+                        else -> ClawPositions.DROP
+                    }
                 }
 
                 ClawPositions.DROP -> ClawPositions.CLOSED
@@ -147,46 +147,39 @@ class MainTeleOp : AnchorOpMode() {
                 ClawPositions.DROP -> ClawPositions.CLOSED
 
                 ClawPositions.CLOSED -> {
-                    if (smec.armState == ScoringMechanism.State.EXTENDED_INTAKE)
-                        ClawPositions.OPEN
-                    else if (smec.armState == ScoringMechanism.State.CLOSE_INTAKE)
-                        ClawPositions.OPEN
-                    else ClawPositions.DROP;
+                    when (smec.armState) {
+                        ScoringMechanism.State.EXTENDED_INTAKE -> ClawPositions.OPEN
+                        ScoringMechanism.State.CLOSE_INTAKE -> ClawPositions.OPEN
+                        else -> ClawPositions.DROP
+                    };
                 }
             }
         }
 
         driverLeftTrigger onActivate
-                    if (smec.armState == ScoringMechanism.State.CLOSE_INTAKE)
-                        smec.setArmState(ScoringMechanism.State.EXTENDED_INTAKE)
-                    else if (smec.armState == ScoringMechanism.State.EXTENDED_INTAKE)
-                        smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
-                    else
-                        instant {
-                            smec.pixelHeight -= 1.0
-                        }
+                when (smec.armState) {
+                    ScoringMechanism.State.CLOSE_INTAKE -> smec.setArmState(ScoringMechanism.State.EXTENDED_INTAKE)
+                    ScoringMechanism.State.EXTENDED_INTAKE -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
+                    else -> instant {
+                        smec.pixelHeight -= 1.0
+                    }
+                }
 
         driverRightTrigger onActivate instant {
             smec.pixelHeight += 1.0
         }
 
         driver[Button.Key.LEFT_JOSTICK_PRESS] onActivate
-            if (smec.armState == ScoringMechanism.State.DEPOSIT)
-                smec.setArmState(ScoringMechanism.State.TRAVEL)
-            else if (smec.armState == ScoringMechanism.State.EXTENDED_INTAKE)
-                smec.setArmState(ScoringMechanism.State.TRAVEL)
-            else if (smec.armState == ScoringMechanism.State.CLOSE_INTAKE)
-                smec.setArmState(ScoringMechanism.State.TRAVEL)
-            else
-                smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
+            when (smec.armState) {
+                ScoringMechanism.State.DEPOSIT, ScoringMechanism.State.EXTENDED_INTAKE, ScoringMechanism.State.CLOSE_INTAKE -> smec.setArmState(ScoringMechanism.State.TRAVEL)
+                else -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
+            }
 
-
-        driver[Button.Key.RIGHT_JOYSTICK_PRESS] onActivate instant {
-            if (smec.armState == ScoringMechanism.State.DEPOSIT)
-                smec.setArmState(ScoringMechanism.State.TRAVEL)
-            else
-                smec.setArmState(ScoringMechanism.State.DEPOSIT)
-        }
+        driver[Button.Key.RIGHT_JOYSTICK_PRESS] onActivate
+                when (smec.armState) {
+                    ScoringMechanism.State.DEPOSIT -> smec.setArmState(ScoringMechanism.State.TRAVEL)
+                    else -> smec.setArmState(ScoringMechanism.State.DEPOSIT)
+                }
 
         driver[Button.Key.SQUARE] onActivate
                 series(
@@ -203,10 +196,10 @@ class MainTeleOp : AnchorOpMode() {
                 )
 
         driver[Button.Key.START] onActivate
-            if (smec.armState == ScoringMechanism.State.CLIMB)
-                smec.setArmState(ScoringMechanism.State.TRAVEL)
-            else
-                smec.setArmState(ScoringMechanism.State.CLIMB)
+                when (smec.armState) {
+                    ScoringMechanism.State.CLIMB -> smec.setArmState(ScoringMechanism.State.TRAVEL)
+                    else -> smec.setArmState(ScoringMechanism.State.CLIMB)
+                }
 
 
 
