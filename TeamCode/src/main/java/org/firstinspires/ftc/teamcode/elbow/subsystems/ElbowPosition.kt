@@ -9,7 +9,4 @@ sealed class ElbowPosition(val angle : Double) {
     object StackIntake : ElbowPosition(ElbowConfig.ELBOW_STACK_INTAKE)
     object StackIntakeClose : ElbowPosition(ElbowConfig.ELBOW_STACK_INTAKE_CLOSE)
     class Adjust(angle : Double) : ElbowPosition(angle)
-
-
-
 }

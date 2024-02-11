@@ -5,14 +5,16 @@ import dev.turtles.anchor.entity.Subsystem
 import dev.turtles.electriceel.wrapper.HardwareManager
 import dev.turtles.electriceel.wrapper.interfaces.Servo
 import org.firstinspires.ftc.robotcore.external.Telemetry
+import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
+import org.firstinspires.ftc.teamcode.robot.util.OpModeType
 
 enum class ClawPositions{
     OPEN,
     CLOSED,
     DROP
 }
-class RightClawSubsystem(private val rightServo : Servo, private val telemetry: Telemetry) : Subsystem() {
-    constructor(hw: HardwareManager, telemetry: Telemetry) : this(hw.servo("rightClawServo"), telemetry)
+class RightClawSubsystem(private val robot : Robot, private val rightServo : Servo, private val telemetry: Telemetry) : Subsystem() {
+    constructor(robot : Robot, hw: HardwareManager, telemetry: Telemetry) : this(robot, hw.servo("rightClawServo"), telemetry)
 
     private var movementStartTime = System.currentTimeMillis()
     private var lastPos = 0.0
@@ -26,7 +28,10 @@ class RightClawSubsystem(private val rightServo : Servo, private val telemetry: 
         set(value) {
             lastPos = getServoPositionFromPulseWidth(when(value){
                 ClawPositions.OPEN -> ClawConfig.RIGHT_SERVO_OPEN_MICROSECONDS
-                ClawPositions.CLOSED -> ClawConfig.RIGHT_SERVO_CLOSED_MICROSECONDS
+                ClawPositions.CLOSED -> when (robot.opModeType) {
+                    OpModeType.TELEOP -> ClawConfig.RIGHT_SERVO_CLOSED_TELEOP_MICROSECONDS
+                    OpModeType.AUTONOMOUS -> ClawConfig.RIGHT_SERVO_CLOSED_AUTO_MICROSECONDS
+                }
                 ClawPositions.DROP -> ClawConfig.RIGHT_SERVO_DROP_MICROSECONDS
             }, rightServo)
 

@@ -26,13 +26,13 @@ import kotlin.math.sign
 
 @TeleOp
 class MainTeleOp : AnchorOpMode() {
-    val driver = FTCGamepad(gamepad1)
-    val robot = Robot(hardwareMap, this.hardwareManager, telemetry, OpModeType.TELEOP)
+    lateinit var driver : FTCGamepad
+    lateinit var robot : Robot
 
     override fun prerun() {
         // TODO: Investigate a better way to do this.
-        ClawConfig.LEFT_SERVO_CLOSED_MICROSECONDS = 1900.0
-        ClawConfig.RIGHT_SERVO_CLOSED_MICROSECONDS = 850.0
+        robot = Robot(hardwareMap, this.hardwareManager, telemetry, OpModeType.TELEOP)
+        driver = FTCGamepad(gamepad1)
     }
 
     override fun run() {
@@ -235,7 +235,5 @@ class MainTeleOp : AnchorOpMode() {
     }
 
     override fun end() {
-        ClawConfig.LEFT_SERVO_CLOSED_MICROSECONDS = 2000.0
-        ClawConfig.RIGHT_SERVO_CLOSED_MICROSECONDS = 550.0
     }
 }

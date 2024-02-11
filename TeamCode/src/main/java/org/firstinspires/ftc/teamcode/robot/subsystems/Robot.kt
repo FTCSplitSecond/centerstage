@@ -29,15 +29,6 @@ class Robot(val hardwareMap: HardwareMap, val hw: HardwareManager, t: Telemetry,
         var lastKnownAutoPose = Pose2d(0.0, 0.0, 0.0)
         var alliance = Alliance.RED
     }
-    // this just uses the start pose assumption of the robot is facing the driver station
-
-//    var awayFromDriverStationHeading = when (opModeType) {
-//        OpModeType.TELEOP -> this.startPose.heading + PI
-//        OpModeType.AUTONOMOUS -> when (alliance) {
-//            Alliance.RED -> Math.PI / 2.0
-//            Alliance.BLUE -> -Math.PI / 2.0
-//        }
-//    }
 
     var awayFromDriverStationHeading = when (alliance) {
             Alliance.RED -> -Math.PI / 2.0
