@@ -69,9 +69,9 @@ class RedFarAuto : AnchorOpMode() {
             robot.leftClaw.position = when (robot.leftClaw.position) {
                 ClawPositions.OPEN -> ClawPositions.CLOSED
                 ClawPositions.CLOSED -> {
-                    if (smec.armState == ScoringMechanism.State.INTAKE)
+                    if (smec.armState == ScoringMechanism.State.EXTENDED_INTAKE)
                         ClawPositions.OPEN
-                    else if (smec.armState == ScoringMechanism.State.INTAKE)
+                    else if (smec.armState == ScoringMechanism.State.EXTENDED_INTAKE)
                         ClawPositions.OPEN
                     else ClawPositions.DROP
                 }
@@ -85,7 +85,7 @@ class RedFarAuto : AnchorOpMode() {
                 ClawPositions.DROP -> ClawPositions.CLOSED
 
                 ClawPositions.CLOSED -> {
-                    if (smec.armState == ScoringMechanism.State.INTAKE)
+                    if (smec.armState == ScoringMechanism.State.EXTENDED_INTAKE)
                         ClawPositions.OPEN
                     else if (smec.armState == ScoringMechanism.State.CLOSE_INTAKE)
                         ClawPositions.OPEN

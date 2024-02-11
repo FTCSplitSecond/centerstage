@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.robot.subsystems
 
-import android.util.Log
 import dev.turtles.anchor.component.Component
 import dev.turtles.anchor.component.stock.delay
 import dev.turtles.anchor.component.stock.instant
@@ -33,8 +32,7 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
     data class KinematicResults(val elbowAngle : Double, val telescopeExtension : Double, val wristAngle : Double)
     enum class State {
         CLOSE_INTAKE,
-        INTAKE,
-        IDLE,
+        EXTENDED_INTAKE,
         TRAVEL,
         DEPOSIT,
         CLIMB,
@@ -45,8 +43,6 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
     var armState = State.TRAVEL
         private set;
     var pixelHeight = 0.0
-
-
 
     /**
      * Does inverse kinematics to derive:
@@ -109,15 +105,11 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
                 updateState
             )
 
-            State.INTAKE -> parallel(
+            State.EXTENDED_INTAKE -> parallel(
                 SetWristPosition(wrist, WristPosition.ExtendedIntake),
                 SetElbowPosition(elbow, ElbowPosition.ExtendedIntake),
                 SetTelescopePosition(telescope, TelescopePosition.ExtendedIntake),
                 updateState
-            )
-
-            State.IDLE -> series(
-                //TODO figure out what this does
             )
 
             State.TRAVEL -> when(armState) {
@@ -159,7 +151,6 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
                         SetWristPosition(wrist, WristPosition.Adjust(ikResults.wristAngle))
                     ),
                     updateState
-
                 )
             }
 
@@ -189,9 +180,6 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
                 ),
                 updateState
             )
-
-
         }
     }
-
 }
