@@ -60,7 +60,7 @@ class MainTeleOp : AnchorOpMode() {
             },
             {
                 val rightX = -driver[Button.Joystick.RIGHT].x
-                if (smec.armState == ScoringMechanism.State.INTAKE || smec.armState == ScoringMechanism.State.DEPOSIT) {
+                if (smec.armState == ScoringMechanism.State.EXTENDED_INTAKE || smec.armState == ScoringMechanism.State.DEPOSIT) {
                     rightX * 0.5
                 } else
                     rightX
@@ -130,7 +130,7 @@ class MainTeleOp : AnchorOpMode() {
             robot.leftClaw.position = when (robot.leftClaw.position) {
                 ClawPositions.OPEN -> ClawPositions.CLOSED
                 ClawPositions.CLOSED -> {
-                    if (smec.armState == ScoringMechanism.State.INTAKE)
+                    if (smec.armState == ScoringMechanism.State.EXTENDED_INTAKE)
                         ClawPositions.OPEN
                     else if (smec.armState == ScoringMechanism.State.CLOSE_INTAKE)
                         ClawPositions.OPEN
@@ -147,7 +147,7 @@ class MainTeleOp : AnchorOpMode() {
                 ClawPositions.DROP -> ClawPositions.CLOSED
 
                 ClawPositions.CLOSED -> {
-                    if (smec.armState == ScoringMechanism.State.INTAKE)
+                    if (smec.armState == ScoringMechanism.State.EXTENDED_INTAKE)
                         ClawPositions.OPEN
                     else if (smec.armState == ScoringMechanism.State.CLOSE_INTAKE)
                         ClawPositions.OPEN
@@ -158,8 +158,8 @@ class MainTeleOp : AnchorOpMode() {
 
         driverLeftTrigger onActivate
                     if (smec.armState == ScoringMechanism.State.CLOSE_INTAKE)
-                        smec.setArmState(ScoringMechanism.State.INTAKE)
-                    else if (smec.armState == ScoringMechanism.State.INTAKE)
+                        smec.setArmState(ScoringMechanism.State.EXTENDED_INTAKE)
+                    else if (smec.armState == ScoringMechanism.State.EXTENDED_INTAKE)
                         smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
                     else
                         instant {
@@ -173,7 +173,7 @@ class MainTeleOp : AnchorOpMode() {
         driver[Button.Key.LEFT_JOSTICK_PRESS] onActivate
             if (smec.armState == ScoringMechanism.State.DEPOSIT)
                 smec.setArmState(ScoringMechanism.State.TRAVEL)
-            else if (smec.armState == ScoringMechanism.State.INTAKE)
+            else if (smec.armState == ScoringMechanism.State.EXTENDED_INTAKE)
                 smec.setArmState(ScoringMechanism.State.TRAVEL)
             else if (smec.armState == ScoringMechanism.State.CLOSE_INTAKE)
                 smec.setArmState(ScoringMechanism.State.TRAVEL)
