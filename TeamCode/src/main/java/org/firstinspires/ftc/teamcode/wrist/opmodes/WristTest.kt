@@ -7,28 +7,35 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.ServoImplEx
+import dev.turtles.anchor.component.stock.delay
+import dev.turtles.anchor.component.stock.instant
+import dev.turtles.anchor.component.stock.parallel
+import dev.turtles.anchor.component.stock.series
+import dev.turtles.electriceel.opmode.AnchorOpMode
+import org.firstinspires.ftc.teamcode.robot.commands.UpdateTelemetry
+import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.wrist.commands.SetWristPosition
 import org.firstinspires.ftc.teamcode.wrist.subsystems.WristPosition
 import org.firstinspires.ftc.teamcode.wrist.subsystems.WristSubsystem
 
 @TeleOp
-class WristTest(): CommandOpMode() {
-    override fun initialize() {
-//        val leftWristServo = hardwareMap.get(ServoImplEx::class.java, "leftWristServo")
-//        val rightWristServo = hardwareMap.get(ServoImplEx::class.java, "rightWristServo")
-//        val telemetry = MultipleTelemetry(FtcDashboard.getInstance().telemetry, telemetry)
-//        val wrist = WristSubsystem(leftWristServo, rightWristServo, telemetry)
-//        wrist.isTelemetryEnabled = true
-//        val driver = GamepadEx(gamepad1)
-//
-//        val gamePadA = driver.getGamepadButton(GamepadKeys.Button.A)
-//        val gamePadB = driver.getGamepadButton(GamepadKeys.Button.B)
-//        val gamePadX = driver.getGamepadButton(GamepadKeys.Button.X)
-//        val gamePadY = driver.getGamepadButton(GamepadKeys.Button.Y)
-//
-//        gamePadA.whenPressed(SetWristPosition(wrist, WristPosition.TRAVEL))
-//        gamePadB.whenPressed(SetWristPosition(wrist, WristPosition.DEPOSIT))
-//        gamePadX.whenPressed(SetWristPosition(wrist, WristPosition.CLOSE_INTAKE))
-//        gamePadY.whenPressed(SetWristPosition(wrist, WristPosition.EXTENDED_INTAKE))
+class WristTest : AnchorOpMode() {
+    lateinit var robot : Robot
+    override fun prerun() {
+        robot = Robot(hardwareMap, this.hardwareManager, telemetry)
+        robot.init(this.world)
+        robot.elbow.isTelemetryEnabled = true
+        robot.wrist.isTelemetryEnabled = true
+//        + UpdateTelemetry(robot) {
+//        }
+    }
+
+    override fun run() {
+        + series(
+            SetWristPosition(robot.wrist, WristPosition.CloseIntake),
+            delay(1.0),
+            SetWristPosition(robot.wrist, WristPosition.Travel),
+        )
+        + UpdateTelemetry(robot) {}
     }
 }
