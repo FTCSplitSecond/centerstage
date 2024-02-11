@@ -48,7 +48,7 @@ class Robot(val hardwareMap: HardwareMap, val hw: HardwareManager, t: Telemetry,
     val telescope = TelescopeSubsytem(hw, this)
     val elbow = ElbowSubsystem(this, hw, telescope)
     val droneLauncher = DroneSubsystem(hw, telemetry)
-    val scoringMechanism = ScoringMechanism(leftClaw, rightClaw, wrist, telescope, elbow);
+    val scoringMechanism = ScoringMechanism(leftClaw, rightClaw, wrist, telescope, elbow, telemetry);
 
     fun init(world: World) {
         entity.add(driveBase)

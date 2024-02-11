@@ -27,8 +27,8 @@ import kotlin.math.sign
 
 @TeleOp
 class MainTeleOp : AnchorOpMode() {
-    lateinit var driver : FTCGamepad
-    lateinit var robot : Robot
+    lateinit var driver: FTCGamepad
+    lateinit var robot: Robot
 
     override fun prerun() {
         // TODO: Investigate a better way to do this.
@@ -40,7 +40,6 @@ class MainTeleOp : AnchorOpMode() {
         val smec = robot.scoringMechanism
 
         robot.init(this.world)
-        robot.wrist.isTelemetryEnabled = true
 
         schedule(
             instant {
@@ -156,32 +155,36 @@ class MainTeleOp : AnchorOpMode() {
         }
 
         driverLeftTrigger onActivate
-                when (smec.armState) {
-                    ScoringMechanism.State.CLOSE_INTAKE -> smec.setArmState(ScoringMechanism.State.EXTENDED_INTAKE)
-                    ScoringMechanism.State.EXTENDED_INTAKE -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
-                    else -> instant {
-                        smec.pixelHeight -= 1.0
+                instant {
+                    + when (smec.armState) {
+                        ScoringMechanism.State.CLOSE_INTAKE -> smec.setArmState(ScoringMechanism.State.EXTENDED_INTAKE)
+                        ScoringMechanism.State.EXTENDED_INTAKE -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
+                        else -> instant {
+                            smec.pixelHeight -= 1.0
                     }
                 }
+            }
 
         driverRightTrigger onActivate instant {
             smec.pixelHeight += 1.0
         }
 
         driver[Button.Key.LEFT_JOSTICK_PRESS] onActivate
-            when (smec.armState) {
-                ScoringMechanism.State.DEPOSIT, ScoringMechanism.State.EXTENDED_INTAKE, ScoringMechanism.State.CLOSE_INTAKE -> {
-                    Log.d("ARM", "Button pressed")
-                    smec.setArmState(ScoringMechanism.State.TRAVEL)
-                }
-                else -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
-            }
+                instant {
+                    +when (smec.armState) {
+                        ScoringMechanism.State.DEPOSIT, ScoringMechanism.State.EXTENDED_INTAKE, ScoringMechanism.State.CLOSE_INTAKE -> {
+                            smec.setArmState(ScoringMechanism.State.TRAVEL)
+                        }
 
-        driver[Button.Key.RIGHT_JOYSTICK_PRESS] onActivate
-                when (smec.armState) {
+                        else -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
+                    }
+                }
+
+        driver[Button.Key.RIGHT_JOYSTICK_PRESS] onActivate instant {
+                +when (smec.armState) {
                     ScoringMechanism.State.DEPOSIT -> smec.setArmState(ScoringMechanism.State.TRAVEL)
                     else -> smec.setArmState(ScoringMechanism.State.DEPOSIT)
-                }
+                }}
 
         driver[Button.Key.SQUARE] onActivate
                 series(
@@ -197,11 +200,12 @@ class MainTeleOp : AnchorOpMode() {
                     smec.setArmState(ScoringMechanism.State.TRAVEL)
                 )
 
-        driver[Button.Key.START] onActivate
-                when (smec.armState) {
-                    ScoringMechanism.State.CLIMB -> smec.setArmState(ScoringMechanism.State.TRAVEL)
-                    else -> smec.setArmState(ScoringMechanism.State.CLIMB)
-                }
+        driver[Button.Key.START] onActivate instant {
+            +when (smec.armState) {
+                ScoringMechanism.State.CLIMB -> smec.setArmState(ScoringMechanism.State.TRAVEL)
+                else -> smec.setArmState(ScoringMechanism.State.CLIMB)
+            }
+        }
 
 
 
