@@ -224,6 +224,7 @@ class MainTeleOp : AnchorOpMode() {
             robot.telemetry.addData("Telescope Ext", robot.telescope.currentExtensionInches)
             robot.telemetry.addData("left claw", robot.leftClaw.position)
             robot.telemetry.addData("right claw", robot.rightClaw.position)
+            robot.telemetry.addData("arm state", smec.armState)
         }
     }
 

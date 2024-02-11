@@ -36,7 +36,7 @@ class WristSubsystem(private val wristServo: Servo, private val telemetry: Telem
         }
     }
     fun updateServoFromAngle(angle: Double) {
-        val wristServoPulseWidth = getServoPulseWidthFromAngle(angle, WristConfig.LEFT_SERVO_ZERO_POSITION)
+        val wristServoPulseWidth = getServoPulseWidthFromAngle(angle, WristConfig.WRIST_SERVO_ZERO_POSITION)
 
         wristServo goto getServoPositionFromPulseWidth(wristServoPulseWidth, wristServo)
     }
