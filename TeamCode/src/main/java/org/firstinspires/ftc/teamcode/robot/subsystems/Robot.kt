@@ -42,8 +42,8 @@ class Robot(val hardwareMap: HardwareMap, val hw: HardwareManager, t: Telemetry,
 
     // add subsystems here
     var driveBase = MecanumDriveBase(this)
-    val leftClaw = LeftClawSubsystem(hw, telemetry)
-    val rightClaw = RightClawSubsystem(hw, telemetry)
+    val leftClaw = LeftClawSubsystem(this, hw, telemetry)
+    val rightClaw = RightClawSubsystem(this, hw, telemetry)
     val wrist = WristSubsystem(hw, telemetry)
     val telescope = TelescopeSubsytem(hw, this)
     val elbow = ElbowSubsystem(this, hw, telescope)
