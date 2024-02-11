@@ -12,12 +12,7 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.swerve.utils.clamp
 
 
-enum class  TelescopePosition {
-    EXTENDED_INTAKE,
-    CLOSE_INTAKE,
-    ADJUST,
-    TRAVEL
-}
+
 
 class TelescopeSubsytem(private val hardwareManager: HardwareManager, private val robot: Robot) : Subsystem() {
 
@@ -51,18 +46,13 @@ class TelescopeSubsytem(private val hardwareManager: HardwareManager, private va
     var targetExtenstionInches : Double = 0.0
 
     /**
-     * Angle when the current state is [TelescopePosition.ADJUST]
+     * Angle when the current armState is [TelescopePosition.ADJUST]
      */
     var depositDistance = 0.0
 
-    var position : TelescopePosition = TelescopePosition.TRAVEL
+    var position : TelescopePosition = TelescopePosition.Travel
         set(value) {
-            targetExtenstionInches = when(value) {
-                TelescopePosition.TRAVEL -> TELESCOPE_TRAVEL
-                TelescopePosition.CLOSE_INTAKE -> TELESCOPE_CLOSE_INTAKE
-                TelescopePosition.ADJUST -> depositDistance
-                TelescopePosition.EXTENDED_INTAKE -> TELESCOPE_EXTENDED_INTAKE
-            }
+            targetExtenstionInches = value.extension
             field = value
         }
 

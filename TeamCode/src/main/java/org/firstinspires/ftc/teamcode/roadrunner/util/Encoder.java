@@ -71,7 +71,7 @@ public class Encoder {
     }
 
     /**
-     * Allows you to set the direction of the counts and velocity without modifying the motor's direction state
+     * Allows you to set the direction of the counts and velocity without modifying the motor's direction armState
      * @param direction either reverse or forward depending on if encoder counts should be negated
      */
     public void setDirection(Direction direction) {

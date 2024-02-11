@@ -13,6 +13,7 @@ import dev.turtles.electriceel.opmode.AnchorOpMode
 import dev.turtles.lilypad.Button
 import dev.turtles.lilypad.impl.FTCGamepad
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
+import org.firstinspires.ftc.teamcode.claw.commands.DropBothClaw
 import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.roadrunner.TrajectoryFollower
@@ -29,18 +30,17 @@ import kotlin.math.PI
 
 @Autonomous
 class RedFarAuto : AnchorOpMode() {
-    lateinit var robot: Robot
     lateinit var smec: ScoringMechanism
     lateinit var drive: CenterstageMecanumDrive
     lateinit var webcam: OpenCvWebcam
     var detector = PropDetector(telemetry)
     val startPose = Pose2d(-40.0, -62.0, PI / 2)
     val alliance = Alliance.RED
+    val robot = Robot(hardwareMap, this.hardwareManager, telemetry, startPose = startPose)
 
     override fun prerun() {
         val driver = FTCGamepad(gamepad1)
         Robot.alliance = alliance
-        robot = Robot(hardwareMap, this.hardwareManager, telemetry, startPose = startPose)
         smec = robot.scoringMechanism
         drive = robot.driveBase.dt
         robot.elbow.isEnabled = true
@@ -66,12 +66,12 @@ class RedFarAuto : AnchorOpMode() {
         OpenBothClaw(robot.leftClaw, robot.rightClaw)
 
         driver[Button.Key.DPAD_LEFT] onActivate instant {
-            smec.leftClawState = when (smec.leftClawState) {
+            robot.leftClaw.position = when (robot.leftClaw.position) {
                 ClawPositions.OPEN -> ClawPositions.CLOSED
                 ClawPositions.CLOSED -> {
-                    if (smec.state == ScoringMechanism.State.INTAKE)
+                    if (smec.armState == ScoringMechanism.State.INTAKE)
                         ClawPositions.OPEN
-                    else if (smec.state == ScoringMechanism.State.INTAKE)
+                    else if (smec.armState == ScoringMechanism.State.INTAKE)
                         ClawPositions.OPEN
                     else ClawPositions.DROP
                 }
@@ -80,14 +80,14 @@ class RedFarAuto : AnchorOpMode() {
             }
         }
         driver[Button.Key.DPAD_RIGHT] onActivate instant {
-            smec.rightClawState = when (smec.rightClawState) {
+            robot.rightClaw.position = when (robot.rightClaw.position) {
                 ClawPositions.OPEN -> ClawPositions.CLOSED
                 ClawPositions.DROP -> ClawPositions.CLOSED
 
                 ClawPositions.CLOSED -> {
-                    if (smec.state == ScoringMechanism.State.INTAKE)
+                    if (smec.armState == ScoringMechanism.State.INTAKE)
                         ClawPositions.OPEN
-                    else if (smec.state == ScoringMechanism.State.CLOSE_INTAKE)
+                    else if (smec.armState == ScoringMechanism.State.CLOSE_INTAKE)
                         ClawPositions.OPEN
                     else ClawPositions.DROP;
                 }
@@ -220,27 +220,21 @@ class RedFarAuto : AnchorOpMode() {
 
         // commands
         val moveAwayFromWall = TrajectoryFollower(drive, moveAwayFromWallTrajectory)
-        val moveToCloseIntake = instant { smec.state = ScoringMechanism.State.CLOSE_INTAKE }
+        val moveToCloseIntake = smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
         val alignWithStack = TrajectoryFollower(drive, moveToAlignWithStackTrajectory)
         val moveToStack = TrajectoryFollower(drive, moveToStackTrajectory)
         val moveToScorePurplePixel = TrajectoryFollower(drive, moveToScorePurplePixelTrajectory)
-        val scorePurplePixel = instant { smec.leftClawState = ClawPositions.OPEN }
-        val moveToTravel = instant { smec.state = ScoringMechanism.State.TRAVEL }
+        val scorePurplePixel = instant { robot.leftClaw.position = ClawPositions.OPEN }
+        val moveToTravel = smec.setArmState(ScoringMechanism.State.TRAVEL)
         val moveToFarTransitLane = TrajectoryFollower(drive, moveToFarTransitLaneTrajectory)
         val moveToBackDropLane = TrajectoryFollower(drive, moveToBackDropLaneTrajectory)
         val moveToNearBackdrop = TrajectoryFollower(drive, moveToNearBackdropTrajectory)
-        val moveToDeposit = instant {
-            smec.pixelHeight = -1.0
-            smec.state = ScoringMechanism.State.DEPOSIT
-        }
+        val moveToDeposit = parallel(
+            instant { smec.pixelHeight = -0.5},
+            smec.setArmState(ScoringMechanism.State.DEPOSIT)
+        )
         val moveToScoreBackDrop = TrajectoryFollower(drive, moveToScoreBackDropTrajectory)
-        val scoreBackDrop = series(
-            instant {
-                smec.rightClawState = ClawPositions.DROP
-                smec.leftClawState = ClawPositions.DROP
-            },
-
-            )
+        val scoreBackDrop =DropBothClaw(robot.leftClaw, robot.rightClaw)
         val backAwayFromBackDrop = parallel(
             TrajectoryFollower(drive, backAwayFromBackDropTrajectory),
             series(
@@ -272,7 +266,7 @@ class RedFarAuto : AnchorOpMode() {
             delay(10.0),
 
             parallel(
-                instant {smec.state = ScoringMechanism.State.STACK_INTAKE},
+                smec.setArmState(ScoringMechanism.State.STACK_INTAKE),
                 series(
                     delay(0.5),
                     alignWithStack,
@@ -281,7 +275,7 @@ class RedFarAuto : AnchorOpMode() {
 
             moveToStack,
 
-            instant {smec.leftClawState = ClawPositions.CLOSED},
+            instant {robot.leftClaw.position = ClawPositions.CLOSED},
 
 //            delay(10.0),
 
@@ -513,13 +507,13 @@ class RedFarAuto : AnchorOpMode() {
 //            parallel(
 //                series(
 //                    delay(1.0),
-//                    instant { smec.state = ScoringMechanism.State.CLOSE_INTAKE },
+//                    instant { smec.armState = ScoringMechanism.State.CLOSE_INTAKE },
 //                ),
 //                t2follower,
 //            ),
 //            instant { smec.leftClawState = ClawPositions.OPEN },
 //            parallel(
-//                instant { smec.state = ScoringMechanism.State.TRAVEL },
+//                instant { smec.armState = ScoringMechanism.State.TRAVEL },
 //                // We want to follow only trajectory t3 UNLESS we are on the left path, in which case we have to follow t2_5 and t3
 //                if(zone == PropZone.LEFT)
 //                    series(t2_5follower, t3follower)
@@ -530,13 +524,13 @@ class RedFarAuto : AnchorOpMode() {
 //            // TODO: these are all of the steps for after we reach the backdrop side of the field
 //            // TODO: should be more or less the same for each randomization
 ////            parallel(
-////                instant {smec.state = ScoringMechanism.State.DEPOSIT},
+////                instant {smec.armState = ScoringMechanism.State.DEPOSIT},
 ////                t4follower
 ////            ),
 ////            t5follower,
 ////            instant {smec.rightClawState = ClawPositions.OPEN},
 ////            t6follower,
-////            instant {smec.state = ScoringMechanism.State.TRAVEL},
+////            instant {smec.armState = ScoringMechanism.State.TRAVEL},
 ////            t7follower
 //        )
 

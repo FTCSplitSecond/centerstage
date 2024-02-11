@@ -1,20 +1,22 @@
 package org.firstinspires.ftc.teamcode.robot.subsystems
 
 import android.util.Log
-import dev.turtles.anchor.component.FinishReason
-import dev.turtles.anchor.entity.Subsystem
-import dev.turtles.anchor.util.Timer
+import dev.turtles.anchor.component.Component
+import dev.turtles.anchor.component.stock.delay
+import dev.turtles.anchor.component.stock.instant
+import dev.turtles.anchor.component.stock.parallel
+import dev.turtles.anchor.component.stock.series
 import org.firstinspires.ftc.teamcode.util.InverseKinematicsConfig
 import org.firstinspires.ftc.teamcode.util.InverseKinematicsConfig.WRIST_ANGLE
-import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.claw.subsystems.LeftClawSubsystem
 import org.firstinspires.ftc.teamcode.claw.subsystems.RightClawSubsystem
+import org.firstinspires.ftc.teamcode.elbow.commands.SetElbowPosition
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowPosition
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowSubsystem
-import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeConfig
+import org.firstinspires.ftc.teamcode.telescope.commands.SetTelescopePosition
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopePosition
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
-import org.firstinspires.ftc.teamcode.wrist.subsystems.WristConfig.WRIST_MOVE_OFFSET
+import org.firstinspires.ftc.teamcode.wrist.commands.SetWristPosition
 import org.firstinspires.ftc.teamcode.wrist.subsystems.WristPosition
 import org.firstinspires.ftc.teamcode.wrist.subsystems.WristSubsystem
 import org.joml.Vector2d
@@ -27,8 +29,8 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
                        private val rightClaw: RightClawSubsystem,
                        private val wrist: WristSubsystem,
                        private val telescope: TelescopeSubsytem,
-                       private val elbow: ElbowSubsystem) : Subsystem() {
-    data class KinematicResults(val elbowAngle : Double, val telescopeExtension : Double, val wristAngle : Double, val moveWristAngle : Double)
+                       private val elbow: ElbowSubsystem) {
+    data class KinematicResults(val elbowAngle : Double, val telescopeExtension : Double, val wristAngle : Double)
     enum class State {
         CLOSE_INTAKE,
         INTAKE,
@@ -36,30 +38,15 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
         TRAVEL,
         DEPOSIT,
         CLIMB,
-        DROP,
-        MOVEDEPOSIT,
         STACK_INTAKE,
         STACK_INTAKE_CLOSE
     }
 
-    var state = State.TRAVEL
-    private var ikResults = KinematicResults(0.0, 0.0, 0.0, 0.0)
-
-    var leftClawState = ClawPositions.OPEN
-    var rightClawState = ClawPositions.OPEN
-
-    private var currentStateTimer = Timer()
+    var armState = State.TRAVEL
+        private set;
     var pixelHeight = 0.0
 
 
-    fun switch(state: State) {
-        this.currentStateTimer.reset()
-        this.state = state
-    }
-
-    override fun init() {
-
-    }
 
     /**
      * Does inverse kinematics to derive:
@@ -69,7 +56,8 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
      *     <li>Wrist angle</li>
      * </ul>
      */
-    fun runKinematics() {
+    private fun runKinematics(pixelHeight : Double) : KinematicResults {
+
         val retractedTelescopeLength = InverseKinematicsConfig.MINIMUM_EXTENSION
 
         val goalTrans = pixelHeight * 3.0 + 8.25 // distance along the backdrop from the bottom
@@ -100,102 +88,110 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
 
         // it's really that shrimple
         val elbow = Math.toDegrees(finalAngle)
-        val actualElbow = this.elbow.currentAngle
 
 
         // it's really that shrimple
-        ikResults = KinematicResults(
+        return KinematicResults(
                 180.0 - elbow,
                 telescopeLength - retractedTelescopeLength,
-            (-(actualElbow - 180) + WRIST_ANGLE)/2,
-            (-(actualElbow - 180) + WRIST_ANGLE)/2 - WRIST_MOVE_OFFSET
+            (elbow + WRIST_ANGLE)/2
         )
     }
-    fun movementShouldBeComplete() : Boolean {
-        Log.d("waitfor", "wrist-" + wrist.movementShouldBeComplete().toString())
-        Log.d("waitfor", "telescope-" + telescope.isAtTarget().toString())
-        Log.d("waitfor", "elbow-" + elbow.isAtTarget().toString())
 
-        return wrist.movementShouldBeComplete() && elbow.isAtTarget() && telescope.isAtTarget()
-    }
-    override fun loop() {
+    fun setArmState(newState : State) : Component {
+        val updateState = instant { armState = newState}
+        return when(newState){
+            State.CLOSE_INTAKE -> parallel(
+                //TODO redo series
+                SetWristPosition(wrist, WristPosition.CloseIntake),
+                SetElbowPosition(elbow, ElbowPosition.CloseIntake),
+                SetTelescopePosition(telescope, TelescopePosition.CloseIntake),
+                updateState
+            )
 
-        // This is a crude state machine.
-        // A state machine library, such as the WIP one in Nautilus could be used
-        when (state) {
+            State.INTAKE -> parallel(
+                SetWristPosition(wrist, WristPosition.ExtendedIntake),
+                SetElbowPosition(elbow, ElbowPosition.ExtendedIntake),
+                SetTelescopePosition(telescope, TelescopePosition.ExtendedIntake),
+                updateState
+            )
 
-            State.CLOSE_INTAKE -> {
-                wrist.position = WristPosition.CLOSE_INTAKE
-                elbow.position = ElbowPosition.CLOSE_INTAKE
-                telescope.position = TelescopePosition.CLOSE_INTAKE
-            }
-            State.INTAKE -> {
-                wrist.position = WristPosition.EXTENDED_INTAKE
-                elbow.position = ElbowPosition.EXTENDED_INTAKE
-                telescope.position = TelescopePosition.EXTENDED_INTAKE
-            }
-            State.IDLE -> {
-                wrist.position = WristPosition.TRAVEL
-                elbow.position = ElbowPosition.HOME
-                telescope.position = TelescopePosition.TRAVEL
-            }
-            State.TRAVEL -> {
-                wrist.position = WristPosition.TRAVEL
-                elbow.position = ElbowPosition.TRAVEL
-                telescope.position = TelescopePosition.TRAVEL
-            }
-            State.MOVEDEPOSIT -> {
-                wrist.position = WristPosition.ADJUST
-                elbow.position = ElbowPosition.ADJUST
-                telescope.position = TelescopePosition.ADJUST
+            State.IDLE -> series(
+                //TODO figure out what this does
+            )
 
-                runKinematics()
+            State.TRAVEL -> when(armState) {
+                State.DEPOSIT ->
+                    series(
+                        SetTelescopePosition(telescope, TelescopePosition.Travel),
+                        parallel(
+                            SetElbowPosition(elbow, ElbowPosition.Travel),
+                            SetWristPosition(wrist, WristPosition.Travel)
+                        ),
+                        updateState
 
-                wrist.depositAngle = ikResults.moveWristAngle
-                elbow.depositAngle = ikResults.elbowAngle
-                telescope.targetExtenstionInches = ikResults.telescopeExtension
-            }
+                    )
+                State.CLIMB ->
+                    parallel(
+                        SetTelescopePosition(telescope, TelescopePosition.Travel),
+                        series(
+                            delay(0.25),
+                            SetElbowPosition(elbow, ElbowPosition.Travel),
+                            SetWristPosition(wrist, WristPosition.Travel)
+                        ),
+                        updateState
+                    )
+                else ->
+                    parallel(
+                        SetWristPosition(wrist, WristPosition.Travel),
+                        SetElbowPosition(elbow, ElbowPosition.Travel),
+                        SetTelescopePosition(telescope, TelescopePosition.Travel),
+                        updateState
+                    )
+                }
+
             State.DEPOSIT -> {
-                wrist.position = WristPosition.ADJUST
-                elbow.position = ElbowPosition.ADJUST
-                telescope.position = TelescopePosition.ADJUST
+                val ikResults = runKinematics(pixelHeight)
+                series(
+                    SetElbowPosition(elbow, ElbowPosition.Adjust(ikResults.elbowAngle)),
+                    parallel(
+                        SetTelescopePosition(telescope, TelescopePosition.Adjust(ikResults.telescopeExtension)),
+                        SetWristPosition(wrist, WristPosition.Adjust(ikResults.wristAngle))
+                    ),
+                    updateState
 
-                runKinematics()
-
-                wrist.depositAngle = ikResults.wristAngle
-                elbow.depositAngle = ikResults.elbowAngle
-                telescope.targetExtenstionInches = ikResults.telescopeExtension
+                )
             }
 
-            State.CLIMB -> {
-                wrist.position = WristPosition.EXTENDED_INTAKE
-                elbow.position = ElbowPosition.CLIMB
-                telescope.position = TelescopePosition.ADJUST
-                telescope.targetExtenstionInches = TelescopeConfig.TELESCOPE_CLIMB
-            }
+            State.STACK_INTAKE -> series(
+                SetElbowPosition(elbow, ElbowPosition.Travel),
+                parallel(
+                    SetTelescopePosition(telescope, TelescopePosition.Travel),
+                    SetWristPosition(wrist, WristPosition.Travel)
+                ),
+                updateState
+            )
 
-            State.DROP -> {
-                telescope.position = TelescopePosition.TRAVEL
-            }
-            State.STACK_INTAKE -> {
-                telescope.position = TelescopePosition.CLOSE_INTAKE
-                elbow.position = ElbowPosition.STACK_INTAKE
-                wrist.position = WristPosition.CLOSE_INTAKE
-            }
+            State.STACK_INTAKE_CLOSE -> series(
+                SetElbowPosition(elbow, ElbowPosition.Travel),
+                parallel(
+                    SetTelescopePosition(telescope, TelescopePosition.Travel),
+                    SetWristPosition(wrist, WristPosition.Travel)
+                ),
+                updateState
+            )
 
-            State.STACK_INTAKE_CLOSE -> {
-                telescope.position = TelescopePosition.EXTENDED_INTAKE
-                elbow.position = ElbowPosition.STACK_INTAKE_CLOSE
-                wrist.position = WristPosition.EXTENDED_INTAKE
-            }
+            State.CLIMB -> series(
+                SetElbowPosition(elbow, ElbowPosition.Travel),
+                parallel(
+                    SetTelescopePosition(telescope, TelescopePosition.Travel),
+                    SetWristPosition(wrist, WristPosition.Travel)
+                ),
+                updateState
+            )
+
+
         }
-
-        leftClaw.position = leftClawState
-        rightClaw.position = rightClawState
-    }
-
-    override fun end(reason: FinishReason) {
-
     }
 
 }

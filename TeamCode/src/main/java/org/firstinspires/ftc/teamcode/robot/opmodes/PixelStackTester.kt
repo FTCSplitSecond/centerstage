@@ -1,32 +1,20 @@
 package org.firstinspires.ftc.teamcode.robot.opmodes
 
-import PropDetector
 import PropZone
 import com.acmerobotics.roadrunner.geometry.Pose2d
-import com.acmerobotics.roadrunner.geometry.Vector2d
-import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
-import dev.turtles.anchor.component.stock.delay
 import dev.turtles.anchor.component.stock.instant
-import dev.turtles.anchor.component.stock.parallel
 import dev.turtles.anchor.component.stock.series
 import dev.turtles.electriceel.opmode.AnchorOpMode
-import dev.turtles.lilypad.Button
 import dev.turtles.lilypad.impl.FTCGamepad
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.roadrunner.TrajectoryFollower
 import org.firstinspires.ftc.teamcode.roadrunner.drive.CenterstageMecanumDrive
-import org.firstinspires.ftc.teamcode.robot.subsystems.AutoConfig
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMechanism
 import org.firstinspires.ftc.teamcode.vision.processors.PixelStackDetector
-import org.openftc.easyopencv.OpenCvCamera
-import org.openftc.easyopencv.OpenCvCameraFactory
-import org.openftc.easyopencv.OpenCvCameraRotation
 import org.openftc.easyopencv.OpenCvWebcam
-import kotlin.math.PI
 
 @Autonomous
 class PixelStackTester : AnchorOpMode() {
@@ -72,16 +60,12 @@ class PixelStackTester : AnchorOpMode() {
             .build()
         val follower = TrajectoryFollower(drive, traj)
         + series (
-            instant {
-                smec.state = ScoringMechanism.State.STACK_INTAKE
-            },
+                smec.setArmState(ScoringMechanism.State.STACK_INTAKE),
             follower,
             instant {
-                smec.leftClawState = ClawPositions.CLOSED
+                robot.leftClaw.position = ClawPositions.CLOSED
             },
-            instant {
-                smec.state = ScoringMechanism.State.TRAVEL
-            }
+                smec.setArmState(ScoringMechanism.State.TRAVEL)
         )
     }
 }

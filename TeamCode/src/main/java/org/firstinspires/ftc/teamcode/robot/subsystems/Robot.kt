@@ -67,7 +67,6 @@ class Robot(val hardwareMap: HardwareMap, val hw: HardwareManager, t: Telemetry,
         entity.add(telescope)
         entity.add(elbow)
         entity.add(droneLauncher)
-        entity.add(scoringMechanism)
         world.add(entity)
     }
 }

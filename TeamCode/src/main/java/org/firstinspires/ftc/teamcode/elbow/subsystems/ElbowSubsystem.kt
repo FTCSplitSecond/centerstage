@@ -19,16 +19,6 @@ import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeConfig.TELES
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
 
 
-enum class ElbowPosition{
-    EXTENDED_INTAKE,
-    CLOSE_INTAKE,
-    ADJUST,
-    TRAVEL,
-    HOME,
-    CLIMB,
-    STACK_INTAKE,
-    STACK_INTAKE_CLOSE
-}
 class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager, val telescope: TelescopeSubsytem) : Subsystem() {
 
     var isEnabled = true
@@ -74,22 +64,13 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
         }
 
     /**
-     * Angle when the current state is [ElbowPosition.ADJUST]
+     * Angle when the current armState is [ElbowPosition.ADJUST]
      */
     var depositAngle = 0.0
 
-    var position : ElbowPosition = ElbowPosition.TRAVEL
+    var position : ElbowPosition = ElbowPosition.Travel
         set(value) {
-            targetAngle = when(value) {
-                ElbowPosition.TRAVEL -> ElbowConfig.ELBOW_TRAVEL
-                ElbowPosition.CLOSE_INTAKE -> ElbowConfig.ELBOW_CLOSE_INTAKE
-                ElbowPosition.ADJUST -> depositAngle
-                ElbowPosition.EXTENDED_INTAKE -> ElbowConfig.ELBOW_EXTENDED_INTAKE
-                ElbowPosition.HOME -> ElbowConfig.ELBOW_HOME
-                ElbowPosition.CLIMB -> ElbowConfig.ELBOW_CLIMB
-                ElbowPosition.STACK_INTAKE -> ElbowConfig.ELBOW_STACK_INTAKE
-                ElbowPosition.STACK_INTAKE_CLOSE -> ElbowConfig.ELBOW_STACK_INTAKE_CLOSE
-            }
+            targetAngle = value.angle
             field = value
         }
 

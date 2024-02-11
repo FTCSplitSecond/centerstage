@@ -5,7 +5,7 @@ import org.firstinspires.ftc.teamcode.SplitSecondComponent
 import org.firstinspires.ftc.teamcode.wrist.subsystems.WristPosition
 import org.firstinspires.ftc.teamcode.wrist.subsystems.WristSubsystem
 
-class SetWristPosition(private val wrist: WristSubsystem, private val position: WristPosition): SplitSecondComponent() {
+class SetWristPosition  (private val wrist: WristSubsystem, private val position: WristPosition): SplitSecondComponent() {
     override fun start() {
         wrist.position = position
     }
