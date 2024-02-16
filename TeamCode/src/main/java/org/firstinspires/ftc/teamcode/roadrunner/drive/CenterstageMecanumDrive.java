@@ -18,6 +18,10 @@ import com.acmerobotics.roadrunner.trajectory.constraints.MinVelocityConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
+import com.arcrobotics.ftclib.geometry.Translation2d;
+import com.arcrobotics.ftclib.kinematics.wpilibkinematics.ChassisSpeeds;
+import com.arcrobotics.ftclib.kinematics.wpilibkinematics.MecanumDriveKinematics;
+import com.arcrobotics.ftclib.kinematics.wpilibkinematics.MecanumDriveWheelSpeeds;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -290,6 +294,33 @@ public class CenterstageMecanumDrive extends MecanumDrive {
         }
 
         setDrivePower(vel);
+    }
+
+
+    private double wheelbase = 12.0;
+    private double trackwidth = 12.0;
+    private double x = wheelbase / 2.0;
+    private double y = trackwidth / 2.0;
+    private Translation2d frontLeftLocation = new Translation2d(x, y);
+    private Translation2d frontRightLocation = new Translation2d(x, -y);
+    private Translation2d backLeftLocation = new Translation2d(-x, y);
+    private Translation2d backRightLocation = new Translation2d(-x, -y);
+
+    //Create MecanumDriveKinematics object
+    private MecanumDriveKinematics mecanumDriveKinematics = new MecanumDriveKinematics(frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation);
+
+    @Override
+    public void setDrivePower(Pose2d drivePower) {
+        setDrivePower(drivePower, new Translation2d(0,0));
+    }
+
+    public void setDrivePower(Pose2d drivePower, Translation2d centerOfRotation) {
+        double scaleFactor = Math.sqrt(2.0);
+        ChassisSpeeds chassisSpeeds = new ChassisSpeeds(drivePower.getX()* scaleFactor, drivePower.getY()* scaleFactor, drivePower.getHeading()* scaleFactor);
+        MecanumDriveWheelSpeeds mecanumDriveWheelSpeeds = mecanumDriveKinematics.toWheelSpeeds(chassisSpeeds, centerOfRotation);
+        mecanumDriveWheelSpeeds.normalize(1);
+
+        setMotorPowers(mecanumDriveWheelSpeeds.frontLeftMetersPerSecond, mecanumDriveWheelSpeeds.rearLeftMetersPerSecond, mecanumDriveWheelSpeeds.rearRightMetersPerSecond, mecanumDriveWheelSpeeds.frontRightMetersPerSecond);
     }
 
     @NonNull
