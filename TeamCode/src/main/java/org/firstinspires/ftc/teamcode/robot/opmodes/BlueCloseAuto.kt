@@ -55,7 +55,7 @@ class BlueCloseAuto : AnchorOpMode() {
         )
         webcam = OpenCvCameraFactory.getInstance().createWebcam(
             hardwareMap.get(
-                WebcamName::class.java, "webcam1"
+                    WebcamName::class.java, "webcam1"
             ), cameraMonitorViewId
         )
         webcam.openCameraDeviceAsync(object : OpenCvCamera.AsyncCameraOpenListener {

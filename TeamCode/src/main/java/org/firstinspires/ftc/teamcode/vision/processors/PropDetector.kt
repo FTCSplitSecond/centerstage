@@ -18,20 +18,20 @@ class PropDetector(val telemetry : Telemetry) : OpenCvPipeline() {
     var zone = PropZone.UNKNOWN
     val out = Mat()
     val HSV = Mat()
-    val black = Scalar(0.0, 0.0, 0.0)
+    val white = Scalar(255.0, 255.0, 255.0)
 
     override fun processFrame(input: Mat): Mat {
         Imgproc.cvtColor(input, HSV, Imgproc.COLOR_RGB2HSV)
 
-        val leftRect = Rect(0, 0, 320, 720)
-        val centerRect = Rect(320, 0, 320, 720)
-        val rightRect = Rect(640, 0, 320, 720)
+        val leftRect = Rect(0, 100, 320, 500)
+        val centerRect = Rect(320, 100, 320, 500)
+        val rightRect = Rect(640, 100, 320, 500)
 
 //            input.copyTo(out)
 
-        Imgproc.rectangle(HSV, leftRect, black, 1)
-        Imgproc.rectangle(HSV, centerRect, black, 1)
-        Imgproc.rectangle(HSV, rightRect, black, 1)
+        Imgproc.rectangle(HSV, leftRect, white, 1)
+        Imgproc.rectangle(HSV, centerRect, white, 1)
+        Imgproc.rectangle(HSV, rightRect, white, 1)
 
         Core.extractChannel(HSV, out, 1)
 

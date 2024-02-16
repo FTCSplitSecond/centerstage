@@ -29,12 +29,17 @@
 
 package org.firstinspires.ftc.teamcode.vision.opmodes;
 
+import android.annotation.SuppressLint;
 import android.util.Size;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -44,6 +49,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -91,6 +97,7 @@ public class ConceptAprilTag extends LinearOpMode {
 
         initAprilTag();
 
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         // Wait for the DS start button to be touched.
         telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
         telemetry.addData(">", "Touch Play to start OpMode");
@@ -140,8 +147,7 @@ public class ConceptAprilTag extends LinearOpMode {
 
             // == CAMERA CALIBRATION ==
             // If you do not manually specify calibration parameters, the SDK will attempt
-            // to load a predefined calibration for your camera.
-
+            // to load a predefined calibration for your camera
             .setLensIntrinsics(1530.08, 1522.20, 1082.787, 551.41) // camera for "webcam 1"
             // ... these parameters are fx, fy, cx, cy.
 
@@ -161,7 +167,7 @@ public class ConceptAprilTag extends LinearOpMode {
 
         // Set the camera (webcam vs. built-in RC phone camera).
         if (USE_WEBCAM) {
-            builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
+            builder.setCamera(hardwareMap.get(WebcamName.class, "webcam1"));
         } else {
             builder.setCamera(BuiltinCameraDirection.BACK);
         }
@@ -192,9 +198,10 @@ public class ConceptAprilTag extends LinearOpMode {
     }   // end method initAprilTag()
 
 
-    /**
+    /*
      * Add telemetry about AprilTag detections.
      */
+    @SuppressLint("DefaultLocale")
     private void telemetryAprilTag() {
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
@@ -204,10 +211,24 @@ public class ConceptAprilTag extends LinearOpMode {
         for (AprilTagDetection detection : currentDetections) {
 
             if (detection.metadata != null) {
+                /*double xOffset = 7.75;
+                double adjustedX = detection.ftcPose.x + xOffset;
+                double yOffset = -4.25;
+                double adjustedY = detection.ftcPose.x + yOffset;*/
+                Vector2D tagLocation = new Vector2D(detection.metadata.fieldPosition.get(0), detection.metadata.fieldPosition.get(1));
+                Vector2D cameraToTag = new Vector2D(-detection.ftcPose.y/1.1, detection.ftcPose.x);
+                Vector2D robotCenterToCamera = new Vector2D(-6.5, 4.0);
+                Vector2D robotEstimatedPosition = tagLocation.add(cameraToTag.add(robotCenterToCamera));
+                double headingEstimate = 180 - detection.ftcPose.yaw;
+                Pose2d robotPoseEstimate = new Pose2d(robotEstimatedPosition.getX(), robotEstimatedPosition.getY(), headingEstimate);
+
+
                 telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
                 telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
                 telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
                 telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
+                telemetry.addLine(String.format("Tag %6.1f %6.1f (inch)", tagLocation.getX(), tagLocation.getY()));
+                telemetry.addLine(String.format("Pose %6.1f %6.1f %6.1f (inch/deg)", robotPoseEstimate.getX(), robotPoseEstimate.getY(), robotPoseEstimate.getHeading()));
             } else {
                 telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
                 telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
