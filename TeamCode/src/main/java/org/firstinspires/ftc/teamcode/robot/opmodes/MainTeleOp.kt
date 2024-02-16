@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot.opmodes
 
 import LaunchDrone
-import android.util.Log
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.turtles.anchor.component.stock.delay
 import dev.turtles.anchor.component.stock.instant
@@ -13,7 +12,6 @@ import dev.turtles.lilypad.impl.FTCGamepad
 import dev.turtles.lilypad.module.RoutineModule
 import org.firstinspires.ftc.teamcode.claw.commands.CloseBothClaw
 import org.firstinspires.ftc.teamcode.claw.commands.DropBothClaw
-import org.firstinspires.ftc.teamcode.claw.subsystems.ClawConfig
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.drone_launcher.Subsystems.DronePositions
 import org.firstinspires.ftc.teamcode.mecanum.commands.DriveMecanum
@@ -31,7 +29,6 @@ class MainTeleOp : AnchorOpMode() {
     lateinit var robot: Robot
 
     override fun prerun() {
-        // TODO: Investigate a better way to do this.
         robot = Robot(hardwareMap, this.hardwareManager, telemetry, OpModeType.TELEOP)
         driver = FTCGamepad(gamepad1)
     }
@@ -159,15 +156,11 @@ class MainTeleOp : AnchorOpMode() {
                     + when (smec.armState) {
                         ScoringMechanism.State.CLOSE_INTAKE -> smec.setArmState(ScoringMechanism.State.EXTENDED_INTAKE)
                         ScoringMechanism.State.EXTENDED_INTAKE -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
-                        else -> instant {
-                            smec.pixelHeight -= 1.0
-                    }
+                        else -> smec.setDepositPixelLevel(smec.depositPixelLevel - 1.0)
                 }
             }
 
-        driverRightTrigger onActivate instant {
-            smec.pixelHeight += 1.0
-        }
+        driverRightTrigger onActivate smec.setDepositPixelLevel(smec.depositPixelLevel + 1.0)
 
         driver[Button.Key.LEFT_JOSTICK_PRESS] onActivate
                 instant {

@@ -9,7 +9,7 @@ import dev.turtles.electriceel.opmode.AnchorOpMode
 import dev.turtles.lilypad.impl.FTCGamepad
 import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
-import org.firstinspires.ftc.teamcode.roadrunner.TrajectoryFollower
+import org.firstinspires.ftc.teamcode.mecanum.commands.TrajectoryFollower
 import org.firstinspires.ftc.teamcode.roadrunner.drive.CenterstageMecanumDrive
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMechanism

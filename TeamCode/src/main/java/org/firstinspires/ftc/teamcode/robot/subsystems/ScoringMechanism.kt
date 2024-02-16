@@ -1,19 +1,18 @@
 package org.firstinspires.ftc.teamcode.robot.subsystems
 
 import dev.turtles.anchor.component.Component
+import dev.turtles.anchor.component.FinishReason
 import dev.turtles.anchor.component.stock.delay
 import dev.turtles.anchor.component.stock.instant
 import dev.turtles.anchor.component.stock.parallel
 import dev.turtles.anchor.component.stock.series
 import org.firstinspires.ftc.robotcore.external.Telemetry
-import org.firstinspires.ftc.teamcode.util.InverseKinematicsConfig
-import org.firstinspires.ftc.teamcode.util.InverseKinematicsConfig.WRIST_ANGLE
+import org.firstinspires.ftc.teamcode.robot.subsystems.InverseKinematicsConfig.WRIST_ANGLE
 import org.firstinspires.ftc.teamcode.claw.subsystems.LeftClawSubsystem
 import org.firstinspires.ftc.teamcode.claw.subsystems.RightClawSubsystem
 import org.firstinspires.ftc.teamcode.elbow.commands.SetElbowPosition
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowPosition
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowSubsystem
-import org.firstinspires.ftc.teamcode.robot.commands.UpdateTelemetry
 import org.firstinspires.ftc.teamcode.telescope.commands.SetTelescopePosition
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopePosition
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
@@ -51,7 +50,8 @@ class ScoringMechanism(
 
     var armState = State.TRAVEL
         private set;
-    var pixelHeight = 0.0
+    var depositPixelLevel = 0.0
+        private set;
 
     /**
      * Does inverse kinematics to derive:
@@ -162,7 +162,7 @@ class ScoringMechanism(
                 }
 
                 State.DEPOSIT -> {
-                    val ikResults = runKinematics(pixelHeight)
+                    val ikResults = runKinematics(depositPixelLevel)
                     series(
                         SetElbowPosition(elbow, ElbowPosition.Adjust(ikResults.elbowAngle)),
                         parallel(
@@ -202,4 +202,13 @@ class ScoringMechanism(
             updateState
         )
     }
+
+    fun setDepositPixelLevel(pixelLevel: Double) : Component{
+        depositPixelLevel = pixelLevel
+        return when(armState) {
+            State.DEPOSIT -> setArmState(State.DEPOSIT)
+            else -> instant { }
+        }
+    }
 }
+

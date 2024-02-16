@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.claw.commands.CloseBothClaw
 import org.firstinspires.ftc.teamcode.claw.commands.DropBothClaw
 import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
-import org.firstinspires.ftc.teamcode.roadrunner.TrajectoryFollower
+import org.firstinspires.ftc.teamcode.mecanum.commands.TrajectoryFollower
 import org.firstinspires.ftc.teamcode.roadrunner.drive.CenterstageMecanumDrive
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMechanism
@@ -235,7 +235,7 @@ class BlueCloseAuto : AnchorOpMode() {
         val moveToNearBackdrop = TrajectoryFollower(drive, moveToNearBackdropTrajectory)
         val moveToNearBackdropWhite = TrajectoryFollower(drive, moveToNearBackdropWhiteTrajectory)
         val moveToDeposit = parallel(
-            instant { smec.pixelHeight = -0.5},
+            smec.setDepositPixelLevel(smec.depositPixelLevel - 0.5),
             smec.setArmState(ScoringMechanism.State.DEPOSIT)
         )
         val moveToScoreBackDrop = TrajectoryFollower(drive, moveToScoreBackDropTrajectory)
@@ -312,7 +312,7 @@ class BlueCloseAuto : AnchorOpMode() {
                 moveToNearBackdropWhite,
                 series(
                     moveToDeposit,
-                    instant {smec.pixelHeight = 4.0}
+                    smec.setDepositPixelLevel( 4.0)
                 )
             ),
 

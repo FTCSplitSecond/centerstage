@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode.roadrunner
+package org.firstinspires.ftc.teamcode.mecanum.commands
 
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.trajectory.Trajectory
 import dev.turtles.anchor.component.FinishReason
-import org.firstinspires.ftc.teamcode.SplitSecondComponent
+import org.firstinspires.ftc.teamcode.util.SplitSecondComponent
 import org.firstinspires.ftc.teamcode.roadrunner.drive.CenterstageMecanumDrive
 
 /**

@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.elbow.commands
-import com.arcrobotics.ftclib.command.CommandBase
-import org.firstinspires.ftc.teamcode.SplitSecondComponent
+import org.firstinspires.ftc.teamcode.util.SplitSecondComponent
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowPosition
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowSubsystem
 

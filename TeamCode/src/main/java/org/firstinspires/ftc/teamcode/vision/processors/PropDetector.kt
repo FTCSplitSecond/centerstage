@@ -16,6 +16,7 @@ enum class PropZone {
 class PropDetector(val telemetry : Telemetry) : OpenCvPipeline() {
 
     var zone = PropZone.UNKNOWN
+        private set
     val out = Mat()
     val HSV = Mat()
     val white = Scalar(255.0, 255.0, 255.0)
@@ -59,4 +60,5 @@ class PropDetector(val telemetry : Telemetry) : OpenCvPipeline() {
 
         return HSV
     }
+
 }

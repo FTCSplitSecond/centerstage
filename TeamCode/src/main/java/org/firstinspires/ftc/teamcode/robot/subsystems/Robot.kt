@@ -60,9 +60,5 @@ class Robot(val hardwareMap: HardwareMap, val hw: HardwareManager, t: Telemetry,
         entity.add(droneLauncher)
         world.add(entity)
 
-        val allHubs = hardwareMap.getAll(LynxModule::class.java)
-        for (hub in allHubs) {
-          hub.bulkCachingMode = LynxModule.BulkCachingMode.AUTO
-        }
     }
 }
