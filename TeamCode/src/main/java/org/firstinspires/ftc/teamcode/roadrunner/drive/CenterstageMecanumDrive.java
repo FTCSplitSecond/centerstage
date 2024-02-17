@@ -40,6 +40,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.util.LynxModuleUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.DoubleStream;
 
 import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MAX_ACCEL;
 import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MAX_ANG_ACCEL;
@@ -52,6 +53,7 @@ import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.enc
 import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kA;
 import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kStatic;
 import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kV;
+import static java.lang.Math.abs;
 
 /*
  * Simple mecanum drive hardware implementation for REV hardware.
@@ -277,12 +279,12 @@ public class CenterstageMecanumDrive extends MecanumDrive {
     public void setWeightedDrivePower(Pose2d drivePower, Translation2d centerOfRotation) {
         Pose2d vel = drivePower;
 
-        if (Math.abs(drivePower.getX()) + Math.abs(drivePower.getY())
-                + Math.abs(drivePower.getHeading()) > 1) {
+        if (abs(drivePower.getX()) + abs(drivePower.getY())
+                + abs(drivePower.getHeading()) > 1) {
             // re-normalize the powers according to the weights
-            double denom = VX_WEIGHT * Math.abs(drivePower.getX())
-                    + VY_WEIGHT * Math.abs(drivePower.getY())
-                    + OMEGA_WEIGHT * Math.abs(drivePower.getHeading());
+            double denom = VX_WEIGHT * abs(drivePower.getX())
+                    + VY_WEIGHT * abs(drivePower.getY())
+                    + OMEGA_WEIGHT * abs(drivePower.getHeading());
 
             vel = new Pose2d(
                     VX_WEIGHT * drivePower.getX(),
@@ -318,8 +320,32 @@ public class CenterstageMecanumDrive extends MecanumDrive {
                 drivePower.getX() * scaleFactor,
                 drivePower.getY()* scaleFactor,
                 drivePower.getHeading()* scaleFactor);
-        MecanumDriveWheelSpeeds mecanumDriveWheelSpeeds = mecanumDriveKinematics.toWheelSpeeds(chassisSpeeds, centerOfRotation);
-        setMotorPowers(mecanumDriveWheelSpeeds.frontLeftMetersPerSecond, mecanumDriveWheelSpeeds.rearLeftMetersPerSecond, mecanumDriveWheelSpeeds.rearRightMetersPerSecond, mecanumDriveWheelSpeeds.frontRightMetersPerSecond);
+        MecanumDriveWheelSpeeds mecanumDriveWheelSpeeds = normalizeWheelSpeedsToPowers(
+                mecanumDriveKinematics.toWheelSpeeds(chassisSpeeds, centerOfRotation));
+
+        setMotorPowers(
+                adjustPowerForKStatic(mecanumDriveWheelSpeeds.frontLeftMetersPerSecond),
+                adjustPowerForKStatic(mecanumDriveWheelSpeeds.rearLeftMetersPerSecond),
+                adjustPowerForKStatic(mecanumDriveWheelSpeeds.rearRightMetersPerSecond),
+                adjustPowerForKStatic(mecanumDriveWheelSpeeds.frontRightMetersPerSecond));
+    }
+    public Double adjustPowerForKStatic(Double basePower) {
+        double adjustedPower = 0.0;
+        double epsilon = 1e-10;
+        if (Math.abs(basePower) > epsilon)  adjustedPower =  Math.signum(basePower) * kStatic + basePower;
+        return Math.min(Math.max(adjustedPower, -1.0), 1.0);
+    }
+    public MecanumDriveWheelSpeeds normalizeWheelSpeedsToPowers(MecanumDriveWheelSpeeds wheelSpeeds) {
+        double maxAbsSpeed = DoubleStream.of(wheelSpeeds.frontLeftMetersPerSecond,
+                        wheelSpeeds.frontRightMetersPerSecond, wheelSpeeds.rearLeftMetersPerSecond, wheelSpeeds.rearRightMetersPerSecond)
+                .map(Math::abs).max().getAsDouble();
+
+        if (maxAbsSpeed > 1.0) {
+            return new MecanumDriveWheelSpeeds(wheelSpeeds.frontLeftMetersPerSecond/maxAbsSpeed,
+            wheelSpeeds.frontRightMetersPerSecond/maxAbsSpeed,
+            wheelSpeeds.rearLeftMetersPerSecond/maxAbsSpeed,
+            wheelSpeeds.rearRightMetersPerSecond/maxAbsSpeed);
+        } else return wheelSpeeds;
     }
 
     @NonNull

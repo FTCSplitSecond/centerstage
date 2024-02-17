@@ -17,10 +17,12 @@ import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.drone_launcher.Subsystems.DronePositions
 import org.firstinspires.ftc.teamcode.mecanum.commands.DriveMecanum
+import org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants
 import org.firstinspires.ftc.teamcode.robot.commands.UpdateTelemetry
 import org.firstinspires.ftc.teamcode.robot.util.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMechanism
+import org.firstinspires.ftc.teamcode.robot.util.adjustPowerForKStatic
 import kotlin.math.absoluteValue
 import kotlin.math.pow
 import kotlin.math.sign
@@ -46,21 +48,26 @@ class MainTeleOp : AnchorOpMode() {
             }
         )
 
+        val shapeJoystickResponse : (Double) -> Double = {
+            val shapedPower = it.absoluteValue.pow(DriveConstants.JOYSTICK_EXPONENT) * sign(it)
+            shapedPower
+        }
         val command = DriveMecanum(robot.driveBase,
             {
                 val leftY = -driver[Button.Joystick.LEFT].y
-                leftY.absoluteValue.pow(3) * sign(leftY)
+                shapeJoystickResponse(leftY)
             },
             {
-                val leftX = driver[Button.Joystick.LEFT].x
-                leftX.absoluteValue.pow(3) * -sign(leftX)
+                val leftX = -driver[Button.Joystick.LEFT].x
+                shapeJoystickResponse(leftX)
             },
             {
-                val rightX = -driver[Button.Joystick.RIGHT].x
+                val rightX = -driver[Button.Joystick.RIGHT].x * DriveConstants.OMEGA_WEIGHT
                 if (smec.armState == ScoringMechanism.State.EXTENDED_INTAKE || smec.armState == ScoringMechanism.State.DEPOSIT) {
                     rightX * 0.5
                 } else
                     rightX
+                shapeJoystickResponse(rightX)
             })
         schedule(command)
 
