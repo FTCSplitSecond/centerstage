@@ -39,7 +39,8 @@ class ScoringMechanism(
     data class KinematicResults(
         val elbowAngle: Double,
         val telescopeExtension: Double,
-        val wristAngle: Double
+        val wristAngle: Double,
+        val depositCoRX: Double
     )
 
     enum class State {
@@ -95,22 +96,19 @@ class ScoringMechanism(
                 Math.cos(backdropAngle + Math.PI / 2) * backdropClawDistance,
                 Math.sin(backdropAngle + Math.PI / 2) * backdropClawDistance
             )
-
         val c: Double = goal.distance(tPivot) // initial distance- hypot
-
-        // simple distance- we can assume the angle to be 90 deg on the offset, so we find the correct distance
-
         // simple distance- we can assume the angle to be 90 deg on the offset, so we find the correct distance
         val telescopeLength = Math.sqrt(c * c - offset * offset)
 
         val uncompensatedAngle = Math.atan2(goal.y - tPivot.y, goal.x - tPivot.x)
         val finalAngle = -Math.PI / 2 + (uncompensatedAngle + Math.asin(telescopeLength / c))
         val elbow = Math.toDegrees(finalAngle)
-
+        val depositCoRX = -5.0 - telescopeLength * Math.cos(finalAngle)
         return KinematicResults(
             180.0 - elbow,
             telescopeLength - retractedTelescopeLength,
-            (elbow + WRIST_ANGLE) / 2 + WristConfig.WRIST_OFFSET
+            (elbow + WRIST_ANGLE) / 2 + WristConfig.WRIST_OFFSET,
+            depositCoRX
         )
     }
 
@@ -200,7 +198,10 @@ class ScoringMechanism(
             updateState
         )
     }
-
+    fun getDepositXCenterOfRotation() : Double {
+        val ikResults = runKinematics(depositPixelLevel)
+        return ikResults.depositCoRX
+    }
     fun setDepositPixelLevel(pixelLevel: Double): Component {
         depositPixelLevel = pixelLevel
         return when (armState) {

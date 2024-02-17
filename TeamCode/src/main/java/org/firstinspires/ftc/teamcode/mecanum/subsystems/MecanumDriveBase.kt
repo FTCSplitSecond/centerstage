@@ -29,10 +29,14 @@ class MecanumDriveBase(val robot : Robot) : Subsystem() {
         val centerOfRobot = Translation2d(0.0,0.0)
         val extendedIntakeCoR = Translation2d(TelescopeConfig.TELESCOPE_EXTENDED_INTAKE_COR_X,0.0)
         val closeIntakeCoR = Translation2d(TelescopeConfig.TELESCOPE_CLOSE_INTAKE_COR_X,0.0)
+//        val depositCoR = Translation2d(TelescopeConfig.TELESCOPE_DEPOSIT_COR_X, 0.0)
+        val depositCoR = Translation2d(robot.scoringMechanism.getDepositXCenterOfRotation() + TelescopeConfig.TELESCOPE_DEPOSIT_COR_X_OFFSET, 0.0)
+
 
         val centerOfRotation = when (robot.scoringMechanism.armState) {
             ScoringMechanism.State.EXTENDED_INTAKE -> extendedIntakeCoR
             ScoringMechanism.State.CLOSE_INTAKE -> closeIntakeCoR
+            ScoringMechanism.State.DEPOSIT -> depositCoR
             else -> centerOfRobot
         }
 

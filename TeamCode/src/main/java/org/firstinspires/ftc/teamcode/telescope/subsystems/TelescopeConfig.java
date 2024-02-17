@@ -15,6 +15,7 @@ public class TelescopeConfig {
     // These seems to "feel better" when out in front of the claw a bit
     public static double TELESCOPE_EXTENDED_INTAKE_COR_X = 32.0; //  inches from center of robot to center of rotation
     public static double TELESCOPE_CLOSE_INTAKE_COR_X = 15.0; //  inches from center of robot to center of rotation
+    public static double TELESCOPE_DEPOSIT_COR_X_OFFSET = -5.0; //  inches from center of robot to center of rotation
     public static double TELESCOPE_CLOSE_INTAKE = 1.0; //   inches
 
     public static double TELESCOPE_ADJUST = 0.0; // inches
