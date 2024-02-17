@@ -9,7 +9,6 @@ import com.acmerobotics.roadrunner.drive.MecanumDrive;
 import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
 import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectory.constraints.AngularVelocityConstraint;
@@ -41,7 +40,6 @@ import org.firstinspires.ftc.teamcode.roadrunner.util.LynxModuleUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
 
 import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MAX_ACCEL;
 import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MAX_ANG_ACCEL;
@@ -54,8 +52,6 @@ import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.enc
 import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kA;
 import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kStatic;
 import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kV;
-
-import dev.turtles.electriceel.util.Vector2;
 
 /*
  * Simple mecanum drive hardware implementation for REV hardware.
@@ -275,8 +271,10 @@ public class CenterstageMecanumDrive extends MecanumDrive {
             motor.setPIDFCoefficients(runMode, compensatedCoefficients);
         }
     }
-
     public void setWeightedDrivePower(Pose2d drivePower) {
+        setWeightedDrivePower(drivePower, new Translation2d(0.0, 0.0));
+    }
+    public void setWeightedDrivePower(Pose2d drivePower, Translation2d centerOfRotation) {
         Pose2d vel = drivePower;
 
         if (Math.abs(drivePower.getX()) + Math.abs(drivePower.getY())
@@ -293,33 +291,34 @@ public class CenterstageMecanumDrive extends MecanumDrive {
             ).div(denom);
         }
 
-        setDrivePower(vel);
+        setDrivePower(vel, centerOfRotation);
     }
 
 
-    private double wheelbase = 12.0;
-    private double trackwidth = 12.0;
-    private double x = wheelbase / 2.0;
-    private double y = trackwidth / 2.0;
-    private Translation2d frontLeftLocation = new Translation2d(x, y);
-    private Translation2d frontRightLocation = new Translation2d(x, -y);
-    private Translation2d backLeftLocation = new Translation2d(-x, y);
-    private Translation2d backRightLocation = new Translation2d(-x, -y);
+    private double wheelbase = 313.0/25.4; //mm to inched
+    private double trackwidth = 287.5/25.4; //mm to inches
+    private double wheelBaseX = wheelbase / 2.0;
+    private double trackWidthY = trackwidth / 2.0;
+    private Translation2d frontLeftLocation = new Translation2d(wheelBaseX, trackWidthY);
+    private Translation2d frontRightLocation = new Translation2d(wheelBaseX, -trackWidthY);
+    private Translation2d backLeftLocation = new Translation2d(-wheelBaseX, trackWidthY);
+    private Translation2d backRightLocation = new Translation2d(-wheelBaseX, -trackWidthY);
 
-    //Create MecanumDriveKinematics object
+    //Create teh FTCLib MecanumDriveKinematics object with the above wheel geometry
     private MecanumDriveKinematics mecanumDriveKinematics = new MecanumDriveKinematics(frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation);
 
     @Override
-    public void setDrivePower(Pose2d drivePower) {
+    public void setDrivePower(@NonNull Pose2d drivePower) {
         setDrivePower(drivePower, new Translation2d(0,0));
     }
 
     public void setDrivePower(Pose2d drivePower, Translation2d centerOfRotation) {
-        double scaleFactor = Math.sqrt(2.0);
-        ChassisSpeeds chassisSpeeds = new ChassisSpeeds(drivePower.getX()* scaleFactor, drivePower.getY()* scaleFactor, drivePower.getHeading()* scaleFactor);
+        double scaleFactor = Math.sqrt(2.0); // exists here to make the ftclib kinematics work as RR kinematics
+        ChassisSpeeds chassisSpeeds = new ChassisSpeeds(
+                drivePower.getX() * scaleFactor,
+                drivePower.getY()* scaleFactor,
+                drivePower.getHeading()* scaleFactor);
         MecanumDriveWheelSpeeds mecanumDriveWheelSpeeds = mecanumDriveKinematics.toWheelSpeeds(chassisSpeeds, centerOfRotation);
-        mecanumDriveWheelSpeeds.normalize(1);
-
         setMotorPowers(mecanumDriveWheelSpeeds.frontLeftMetersPerSecond, mecanumDriveWheelSpeeds.rearLeftMetersPerSecond, mecanumDriveWheelSpeeds.rearRightMetersPerSecond, mecanumDriveWheelSpeeds.frontRightMetersPerSecond);
     }
 

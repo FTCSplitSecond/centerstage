@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.roadrunner.drive.CenterstageMecanumDrive
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMechanism
+import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeConfig
 
 class MecanumDriveBase(val robot : Robot) : Subsystem() {
     val hardwareMap = robot.hardwareMap
@@ -25,20 +26,17 @@ class MecanumDriveBase(val robot : Robot) : Subsystem() {
         var input = com.arcrobotics.ftclib.geometry.Vector2d(xVelocity, yVelocity)
         input = input.rotateBy(Math.toDegrees(robot.awayFromDriverStationHeading - dt.poseEstimate.heading))
 
-        val depressionAngle = 5.0 //deg
-        val baseTelescopeLength = 8.0 //in
-        val telescopeBaseToCenter = 4.0 //in
-        val centerOfRotation = when {
-            robot.scoringMechanism.armState == ScoringMechanism.State.EXTENDED_INTAKE -> {
-                Translation2d(
-                    Math.cos(Math.toRadians(depressionAngle)) * (robot.telescope.currentExtensionInches + baseTelescopeLength) - telescopeBaseToCenter,
-                    0.0
-                )
-            }
-            else -> Translation2d(0.0, 0.0)
+        val centerOfRobot = Translation2d(0.0,0.0)
+        val extendedIntakeCoR = Translation2d(TelescopeConfig.TELESCOPE_EXTENDED_INTAKE_COR_X,0.0)
+        val closeIntakeCoR = Translation2d(TelescopeConfig.TELESCOPE_CLOSE_INTAKE_COR_X,0.0)
+
+        val centerOfRotation = when (robot.scoringMechanism.armState) {
+            ScoringMechanism.State.EXTENDED_INTAKE -> extendedIntakeCoR
+            ScoringMechanism.State.CLOSE_INTAKE -> closeIntakeCoR
+            else -> centerOfRobot
         }
 
-        dt.setDrivePower(Pose2d(input.x, input.y, turnVelocity), centerOfRotation)
+        dt.setWeightedDrivePower(Pose2d(input.x, input.y, turnVelocity), centerOfRotation)
     }
 
     override fun end(reason: FinishReason) {
