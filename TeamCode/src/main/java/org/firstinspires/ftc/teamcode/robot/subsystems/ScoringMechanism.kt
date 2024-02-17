@@ -2,7 +2,10 @@ package org.firstinspires.ftc.teamcode.robot.subsystems
 
 import dev.turtles.anchor.component.Component
 import dev.turtles.anchor.component.FinishReason
+import dev.turtles.anchor.component.stock.Delay
+import dev.turtles.anchor.component.stock.Idler
 import dev.turtles.anchor.component.stock.delay
+import dev.turtles.anchor.component.stock.idler
 import dev.turtles.anchor.component.stock.instant
 import dev.turtles.anchor.component.stock.parallel
 import dev.turtles.anchor.component.stock.series
@@ -17,6 +20,7 @@ import org.firstinspires.ftc.teamcode.telescope.commands.SetTelescopePosition
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopePosition
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
 import org.firstinspires.ftc.teamcode.wrist.commands.SetWristPosition
+import org.firstinspires.ftc.teamcode.wrist.subsystems.WristConfig
 import org.firstinspires.ftc.teamcode.wrist.subsystems.WristPosition
 import org.firstinspires.ftc.teamcode.wrist.subsystems.WristSubsystem
 import org.joml.Vector2d
@@ -101,16 +105,12 @@ class ScoringMechanism(
 
         val uncompensatedAngle = Math.atan2(goal.y - tPivot.y, goal.x - tPivot.x)
         val finalAngle = -Math.PI / 2 + (uncompensatedAngle + Math.asin(telescopeLength / c))
-
-        // it's really that shrimple
         val elbow = Math.toDegrees(finalAngle)
 
-
-        // it's really that shrimple
         return KinematicResults(
             180.0 - elbow,
             telescopeLength - retractedTelescopeLength,
-            (elbow + WRIST_ANGLE) / 2
+            (elbow + WRIST_ANGLE) / 2 + WristConfig.WRIST_OFFSET
         )
     }
 
@@ -139,7 +139,9 @@ class ScoringMechanism(
                             SetTelescopePosition(telescope, TelescopePosition.Travel),
                             parallel(
                                 SetElbowPosition(elbow, ElbowPosition.Travel),
-                                SetWristPosition(wrist, WristPosition.Travel)
+                                series(
+                                    delay(0.25), // figure out idler here
+                                    SetWristPosition(wrist, WristPosition.Travel))
                             ),
                         )
 
@@ -164,15 +166,13 @@ class ScoringMechanism(
                 State.DEPOSIT -> {
                     val ikResults = runKinematics(depositPixelLevel)
                     series(
-                        SetElbowPosition(elbow, ElbowPosition.Adjust(ikResults.elbowAngle)),
-                        parallel(
-                            SetTelescopePosition(
-                                telescope,
-                                TelescopePosition.Adjust(ikResults.telescopeExtension)
+                            parallel(
+                                SetElbowPosition(elbow, ElbowPosition.Adjust(ikResults.elbowAngle)),
+                                series(
+                                    Delay(0.25),
+                                    SetWristPosition(wrist, WristPosition.Adjust(ikResults.wristAngle)))
                             ),
-                            SetWristPosition(wrist, WristPosition.Adjust(ikResults.wristAngle))
-                        ),
-                    )
+                            SetTelescopePosition(telescope, TelescopePosition.Adjust(ikResults.telescopeExtension)))
                 }
 
                 State.STACK_INTAKE -> series(
@@ -191,23 +191,28 @@ class ScoringMechanism(
                     ),
                 )
 
-                State.CLIMB -> series(
-                    SetElbowPosition(elbow, ElbowPosition.Travel),
-                    parallel(
-                        SetTelescopePosition(telescope, TelescopePosition.Travel),
-                        SetWristPosition(wrist, WristPosition.Travel)
-                    ),
+                State.CLIMB -> parallel(
+                    SetElbowPosition(elbow, ElbowPosition.Climb),
+                    SetTelescopePosition(telescope, TelescopePosition.Climb),
+                    SetWristPosition(wrist, WristPosition.Travel )
                 )
             },
             updateState
         )
     }
 
-    fun setDepositPixelLevel(pixelLevel: Double) : Component{
+    fun setDepositPixelLevel(pixelLevel: Double): Component {
         depositPixelLevel = pixelLevel
-        return when(armState) {
-            State.DEPOSIT -> setArmState(State.DEPOSIT)
-            else -> instant { }
+        return when (armState) {
+            State.DEPOSIT -> {
+                val ikResults = runKinematics(depositPixelLevel)
+                parallel(
+                    SetTelescopePosition(telescope, TelescopePosition.Adjust(ikResults.telescopeExtension)),
+                    SetElbowPosition(elbow, ElbowPosition.Adjust(ikResults.elbowAngle)),
+                    SetWristPosition(wrist, WristPosition.Adjust(ikResults.wristAngle))
+                )
+            }
+            else -> instant { } // do nothing
         }
     }
 }

@@ -137,7 +137,7 @@ public class AutomaticFeedforwardTuner extends LinearOpMode {
             telemetry.addLine(Misc.formatInvariant("kV = %.5f, kStatic = %.5f (R^2 = %.2f)",
                     rampResult.kV, rampResult.kStatic, rampResult.rSquare));
         } else {
-            telemetry.addLine(Misc.formatInvariant("kV = %.5f (R^2 = %.2f)",
+            telemetry.addLine(Misc.formatInvariant("kS = %.5f (R^2 = %.2f)",
                     rampResult.kStatic, rampResult.rSquare));
         }
         telemetry.addLine("Would you like to fit kA?");
