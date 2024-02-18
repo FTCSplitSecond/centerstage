@@ -60,8 +60,8 @@ import static java.lang.Math.abs;
  */
 @Config
 public class CenterstageMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(8.0, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(8.0, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(10.0, 0, 1.0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(8.0, 0, 0.15);
     public double IMU_OFFSET = 0.0;
     public Pose2d startPose = new Pose2d();
 

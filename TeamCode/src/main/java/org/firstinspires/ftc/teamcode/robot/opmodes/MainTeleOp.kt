@@ -152,7 +152,7 @@ class MainTeleOp : AnchorOpMode() {
         driver[Button.Key.CROSS] onActivate instant {
                 +series(
                     DropBothClaw(robot.leftClaw, robot.rightClaw),
-                    delay(0.25),
+                    delay(0.125),
                     smec.setArmState(ScoringMechanism.State.TRAVEL)
                 )
             }

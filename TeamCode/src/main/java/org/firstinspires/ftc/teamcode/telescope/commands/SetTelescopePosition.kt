@@ -10,7 +10,7 @@ open class SetTelescopePosition(val telescope: TelescopeSubsytem, private val po
     override fun end(reason: FinishReason) {}
 
     override fun isComplete() : Boolean {
-        val timedOut = timer.elapsedTime > 1.0
+        val timedOut = timer.elapsedTime > 0.25
         if(timedOut) Log.d("telescope","timeout")
         return telescope.isAtTarget() || timedOut
     }

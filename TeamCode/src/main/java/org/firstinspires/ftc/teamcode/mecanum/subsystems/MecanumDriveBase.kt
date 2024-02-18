@@ -36,7 +36,7 @@ class MecanumDriveBase(val robot : Robot) : Subsystem() {
         val centerOfRotation = when (robot.scoringMechanism.armState) {
             ScoringMechanism.State.EXTENDED_INTAKE -> extendedIntakeCoR
             ScoringMechanism.State.CLOSE_INTAKE -> closeIntakeCoR
-            ScoringMechanism.State.DEPOSIT -> depositCoR
+//          ScoringMechanism.State.DEPOSIT -> depositCoR
             else -> centerOfRobot
         }
 
