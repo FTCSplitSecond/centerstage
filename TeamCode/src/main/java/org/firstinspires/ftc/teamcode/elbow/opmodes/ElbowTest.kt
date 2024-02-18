@@ -2,28 +2,51 @@ package org.firstinspires.ftc.teamcode.elbow.opmodes
 
 import com.arcrobotics.ftclib.command.CommandOpMode
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import dev.turtles.anchor.component.stock.instant
+import dev.turtles.electriceel.opmode.AnchorOpMode
+import dev.turtles.lilypad.Button
+import dev.turtles.lilypad.impl.FTCGamepad
+import org.firstinspires.ftc.teamcode.elbow.commands.SetElbowPosition
+import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig
+import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowPosition
+import org.firstinspires.ftc.teamcode.robot.commands.UpdateTelemetry
+import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
+import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMechanism
+import org.firstinspires.ftc.teamcode.robot.util.OpModeType
+import org.firstinspires.ftc.teamcode.telescope.commands.SetTelescopePosition
+import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeConfig
+import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopePosition
 
-@Autonomous
-class ElbowTest() : CommandOpMode() {
-    override fun initialize() {
-//
-//        val driver = GamepadEx(gamepad1)
-//        val robot = Robot(hardwareMap, telemetry)
-//
-//        robot.elbow.isTelemetryEnabled = true
-//        robot.elbow.isEnabled = true
-//        val triggerThreshold = 0.2
-//        val driverRightTrigger = Trigger { driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > triggerThreshold }
-//        val gamePadA = driver.getGamepadButton(GamepadKeys.Button.A)
-//        val gamePadB = driver.getGamepadButton(GamepadKeys.Button.B)
-//        val gamePadX = driver.getGamepadButton(GamepadKeys.Button.X)
-//        val gamePadY = driver.getGamepadButton(GamepadKeys.Button.Y)
-//
-//        driverRightTrigger.toggleWhenActive(MoveToDeposit(robot))
-//        gamePadA.whenPressed(SetElbowPosition(robot.elbow, ElbowPosition.TRAVEL))
-//        gamePadB.whenPressed(SetElbowPosition(robot.elbow, ElbowPosition.DEPOSIT))
-//        gamePadX.whenPressed(SetElbowPosition(robot.elbow, ElbowPosition.CLOSE_INTAKE))
-//        gamePadY.whenPressed(SetElbowPosition(robot.elbow, ElbowPosition.EXTENDED_INTAKE))
+@TeleOp
+class ElbowTest() : AnchorOpMode() {
+    lateinit var driver: FTCGamepad
+    lateinit var robot: Robot
+    override fun prerun() {
+        robot = Robot(hardwareMap, this.hardwareManager, telemetry, OpModeType.TELEOP)
+        driver = FTCGamepad(gamepad1)
+        robot.init(this.world)
 
+        +robot.scoringMechanism.setArmState(ScoringMechanism.State.TRAVEL)
+    }
+
+    override fun run() {
+
+        driver[Button.Key.DPAD_DOWN] onActivate instant {
+            +SetElbowPosition(robot.elbow, ElbowPosition.Adjust(robot.elbow.targetAngle - ElbowConfig.ELBOW_TEST_INCREMENT))
+        }
+        driver[Button.Key.DPAD_UP] onActivate instant {
+            +SetElbowPosition(robot.elbow, ElbowPosition.Adjust(robot.elbow.targetAngle + ElbowConfig.ELBOW_TEST_INCREMENT))
+        }
+
+        +UpdateTelemetry(robot) {
+            robot.telemetry.addData("Elbow Kg: ", ElbowConfig.KG)
+            robot.telemetry.addData("Elbow Ks: ", ElbowConfig.KS)
+            robot.telemetry.addData("Elbow Target Angle", robot.elbow.targetAngle)
+            robot.telemetry.addData("Elbow Angle", robot.elbow.currentAngle)
+            robot.telemetry.addData("Wrist Angle", robot.wrist.angle)
+            robot.telemetry.addData("Telescope Ext", robot.telescope.currentExtensionInches)
+
+        }
     }
 }

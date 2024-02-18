@@ -138,7 +138,8 @@ class ScoringMechanism(
                             parallel(
                                 SetElbowPosition(elbow, ElbowPosition.Travel),
                                 series(
-                                    delay(0.25), // figure out idler here
+                                    idler { deltaTime, elapsedTime -> elbow.currentAngle < 100.0 || elapsedTime > 0.25 },
+//                                    delay(0.25), // figure out idler here
                                     SetWristPosition(wrist, WristPosition.Travel))
                             ),
                         )

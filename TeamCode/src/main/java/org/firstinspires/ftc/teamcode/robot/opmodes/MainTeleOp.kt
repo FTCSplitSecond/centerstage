@@ -39,7 +39,6 @@ class MainTeleOp : AnchorOpMode() {
 
     override fun run() {
         val smec = robot.scoringMechanism
-
         robot.init(this.world)
 
         schedule(
@@ -130,17 +129,16 @@ class MainTeleOp : AnchorOpMode() {
         driver[Button.Key.LEFT_JOSTICK_PRESS] onActivate
                 instant {
                     +when (smec.armState) {
-                        ScoringMechanism.State.DEPOSIT, ScoringMechanism.State.EXTENDED_INTAKE, ScoringMechanism.State.CLOSE_INTAKE -> {
-                            smec.setArmState(ScoringMechanism.State.TRAVEL)
-                        }
-
+                        ScoringMechanism.State.DEPOSIT,
+                        ScoringMechanism.State.EXTENDED_INTAKE,
+                        ScoringMechanism.State.CLOSE_INTAKE -> smec.setArmState(ScoringMechanism.State.TRAVEL)
                         else -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
                     }
                 }
         driver[Button.Key.RIGHT_JOYSTICK_PRESS] onActivate instant {
             +when (smec.armState) {
-                ScoringMechanism.State.DEPOSIT -> smec.setArmState(ScoringMechanism.State.TRAVEL)
-                else -> smec.setArmState(ScoringMechanism.State.DEPOSIT)
+                ScoringMechanism.State.TRAVEL -> smec.setArmState(ScoringMechanism.State.DEPOSIT)
+                else -> smec.setArmState(ScoringMechanism.State.TRAVEL)
             }
         }
         driver[Button.Key.SQUARE] onActivate instant {
@@ -170,9 +168,9 @@ class MainTeleOp : AnchorOpMode() {
             robot.telemetry.addData("Elbow Angle", robot.elbow.currentAngle)
             robot.telemetry.addData("Wrist Angle", robot.wrist.angle)
             robot.telemetry.addData("Telescope Ext", robot.telescope.currentExtensionInches)
-            robot.telemetry.addData("left claw", robot.leftClaw.position)
-            robot.telemetry.addData("right claw", robot.rightClaw.position)
-            robot.telemetry.addData("arm state", smec.armState)
+            robot.telemetry.addData("Left Claw", robot.leftClaw.position)
+            robot.telemetry.addData("Light Claw", robot.rightClaw.position)
+            robot.telemetry.addData("Arm State", smec.armState)
         }
     }
 

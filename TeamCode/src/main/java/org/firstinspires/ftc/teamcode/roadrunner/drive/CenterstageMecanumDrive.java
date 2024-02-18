@@ -89,13 +89,25 @@ public class CenterstageMecanumDrive extends MecanumDrive {
 
     private HardwareMap hardwareMap;
 
+    private static final double wheelbase = 313.0/25.4; //mm to inched
+    private static final double trackwidth = 287.5/25.4; //mm to inches
+    private final double wheelBaseX = wheelbase / 2.0;
+    private final double trackWidthY = trackwidth / 2.0;
+    private final Translation2d frontLeftLocation = new Translation2d(wheelBaseX, trackWidthY);
+    private final Translation2d frontRightLocation = new Translation2d(wheelBaseX, -trackWidthY);
+    private final Translation2d backLeftLocation = new Translation2d(-wheelBaseX, trackWidthY);
+    private final Translation2d backRightLocation = new Translation2d(-wheelBaseX, -trackWidthY);
+
+    //Create the FTCLib MecanumDriveKinematics object with the above wheel geometry
+    private final MecanumDriveKinematics mecanumDriveKinematics = new MecanumDriveKinematics(frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation);
+
 
     public CenterstageMecanumDrive(HardwareMap hardwareMap) {
         this(hardwareMap, new Pose2d());
     }
 
     public CenterstageMecanumDrive(HardwareMap hardwareMap, Pose2d startPose) {
-        super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
+        super(kV, kA, kStatic, trackwidth, wheelbase, LATERAL_MULTIPLIER);
 
         this.hardwareMap = hardwareMap;
 
@@ -297,17 +309,6 @@ public class CenterstageMecanumDrive extends MecanumDrive {
     }
 
 
-    private double wheelbase = 313.0/25.4; //mm to inched
-    private double trackwidth = 287.5/25.4; //mm to inches
-    private double wheelBaseX = wheelbase / 2.0;
-    private double trackWidthY = trackwidth / 2.0;
-    private Translation2d frontLeftLocation = new Translation2d(wheelBaseX, trackWidthY);
-    private Translation2d frontRightLocation = new Translation2d(wheelBaseX, -trackWidthY);
-    private Translation2d backLeftLocation = new Translation2d(-wheelBaseX, trackWidthY);
-    private Translation2d backRightLocation = new Translation2d(-wheelBaseX, -trackWidthY);
-
-    //Create teh FTCLib MecanumDriveKinematics object with the above wheel geometry
-    private MecanumDriveKinematics mecanumDriveKinematics = new MecanumDriveKinematics(frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation);
 
     @Override
     public void setDrivePower(@NonNull Pose2d drivePower) {
