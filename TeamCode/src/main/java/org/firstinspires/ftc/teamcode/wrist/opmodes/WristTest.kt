@@ -20,6 +20,8 @@ class WristTest : AnchorOpMode() {
         robot.init(this.world)
         robot.elbow.isTelemetryEnabled = true
         robot.wrist.isTelemetryEnabled = true
+//        + UpdateTelemetry(robot) {
+//        }
     }
 
     override fun run() {

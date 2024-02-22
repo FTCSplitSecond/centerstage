@@ -17,35 +17,28 @@ class LeftClawSubsystem(private val robot : Robot, private val hw: HardwareManag
 
     private var movementStartTime = System.currentTimeMillis()
     private var lastPos = 0.0
-    var isTelemetryEnabled = false
+    private var isTelemetryEnabled = false
 
     override fun init() {
+        leftServo.axonPwmRange()
+    // = PwmControl.PwmRange(500.0, 2500.0)
     }
 
     var position: ClawPositions = ClawPositions.CLOSED
         set(value) {
-            updateServoFromPosition(value)
+            lastPos = getServoPositionFromPulseWidth(when (value) {
+                ClawPositions.OPEN -> ClawConfig.LEFT_SERVO_OPEN_MICROSECONDS
+                ClawPositions.CLOSED -> when (robot.opModeType) {
+                    OpModeType.TELEOP -> ClawConfig.LEFT_SERVO_CLOSED_TELEOP_MICROSECONDS
+                    OpModeType.AUTONOMOUS -> ClawConfig.LEFT_SERVO_CLOSED_AUTO_MICROSECONDS
+                }
+                ClawPositions.DROP -> ClawConfig.LEFT_SERVO_DROP_MICROSECONDS
+            }, leftServo)
+
+            leftServo goto lastPos
             movementStartTime = System.currentTimeMillis()
             field = value
         }
-
-    init {
-        leftServo.axonPwmRange() // = PwmControl.PwmRange(500.0, 2500.0)
-        updateServoFromPosition(position)
-    }
-
-    private fun updateServoFromPosition(position : ClawPositions) {
-        val lastPos = getServoPositionFromPulseWidth(when (position) {
-            ClawPositions.OPEN -> ClawConfig.LEFT_SERVO_OPEN_MICROSECONDS
-            ClawPositions.CLOSED -> when (robot.opModeType) {
-                OpModeType.TELEOP -> ClawConfig.LEFT_SERVO_CLOSED_TELEOP_MICROSECONDS
-                OpModeType.AUTONOMOUS -> ClawConfig.LEFT_SERVO_CLOSED_AUTO_MICROSECONDS
-            }
-            ClawPositions.DROP -> ClawConfig.LEFT_SERVO_DROP_MICROSECONDS
-        }, leftServo)
-
-        leftServo goto lastPos
-    }
     fun getServoPositionFromPulseWidth(pulseWidth : Double, servo : Servo) : Double {
         return (pulseWidth - servo.pwmRange().usPulseLower) / (servo.pwmRange().usPulseUpper - servo.pwmRange().usPulseLower)
     }
@@ -59,6 +52,7 @@ class LeftClawSubsystem(private val robot : Robot, private val hw: HardwareManag
             telemetry.addLine("Left Claw: Telemetry Enabled")
             telemetry.addData("left claw position", position.toString())
             telemetry.addData("leftServo.position", lastPos)
+            telemetry.update()
         }
     }
 

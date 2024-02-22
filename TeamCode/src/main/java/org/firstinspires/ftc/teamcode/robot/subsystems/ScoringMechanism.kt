@@ -5,7 +5,6 @@ import dev.turtles.anchor.component.stock.delay
 import dev.turtles.anchor.component.stock.instant
 import dev.turtles.anchor.component.stock.parallel
 import dev.turtles.anchor.component.stock.series
-import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.util.InverseKinematicsConfig
 import org.firstinspires.ftc.teamcode.util.InverseKinematicsConfig.WRIST_ANGLE
 import org.firstinspires.ftc.teamcode.claw.subsystems.LeftClawSubsystem
@@ -13,7 +12,6 @@ import org.firstinspires.ftc.teamcode.claw.subsystems.RightClawSubsystem
 import org.firstinspires.ftc.teamcode.elbow.commands.SetElbowPosition
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowPosition
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowSubsystem
-import org.firstinspires.ftc.teamcode.robot.commands.UpdateTelemetry
 import org.firstinspires.ftc.teamcode.telescope.commands.SetTelescopePosition
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopePosition
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
@@ -26,19 +24,12 @@ import org.joml.Vector2d
  * Overarching scoring mechanism subsystem.
  * Handles the claw, wrist, telescope, and elbow integration.
  */
-class ScoringMechanism(
-    private val leftClaw: LeftClawSubsystem,
-    private val rightClaw: RightClawSubsystem,
-    private val wrist: WristSubsystem,
-    private val telescope: TelescopeSubsytem,
-    private val elbow: ElbowSubsystem, private val telemetry: Telemetry
-) {
-    data class KinematicResults(
-        val elbowAngle: Double,
-        val telescopeExtension: Double,
-        val wristAngle: Double
-    )
-
+class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
+                       private val rightClaw: RightClawSubsystem,
+                       private val wrist: WristSubsystem,
+                       private val telescope: TelescopeSubsytem,
+                       private val elbow: ElbowSubsystem) {
+    data class KinematicResults(val elbowAngle : Double, val telescopeExtension : Double, val wristAngle : Double)
     enum class State {
         CLOSE_INTAKE,
         EXTENDED_INTAKE,
@@ -61,36 +52,25 @@ class ScoringMechanism(
      *     <li>Wrist angle</li>
      * </ul>
      */
-    private fun runKinematics(pixelHeight: Double): KinematicResults {
+    private fun runKinematics(pixelHeight : Double) : KinematicResults {
 
         val retractedTelescopeLength = InverseKinematicsConfig.MINIMUM_EXTENSION
 
         val goalTrans = pixelHeight * 3.0 + 8.25 // distance along the backdrop from the bottom
 
-        val backdropClawDistance =
-            InverseKinematicsConfig.BACKBOARD_OFFSET // distance "off" of the backdrop to target
+        val backdropClawDistance = InverseKinematicsConfig.BACKBOARD_OFFSET // distance "off" of the backdrop to target
 
         val offset = InverseKinematicsConfig.TELESCOPE_OFFSET // offset off of the pivot point
 
-        val backdropAngle =
-            Math.toRadians(InverseKinematicsConfig.BACKBOARD_ANGLE) // angle the backdrop is to the ground
+        val backdropAngle = Math.toRadians(InverseKinematicsConfig.BACKBOARD_ANGLE) // angle the backdrop is to the ground
 
-        val tPivot = Vector2d(
-            -InverseKinematicsConfig.PIVOT_DISTANCE,
-            InverseKinematicsConfig.PIVOT_HEIGHT
-        ) // relative to the bottom of the backdrop
+        val tPivot = Vector2d(-InverseKinematicsConfig.PIVOT_DISTANCE, InverseKinematicsConfig.PIVOT_HEIGHT) // relative to the bottom of the backdrop
 
-        val backdropFacing: Vector2d = Vector2d(
-            Math.cos(backdropAngle),
-            Math.sin(backdropAngle)
-        ).normalize() // backdrop normal
+        val backdropFacing: Vector2d = Vector2d(Math.cos(backdropAngle), Math.sin(backdropAngle)).normalize() // backdrop normal
 
         // goal position for the claw to be at
         val goal: Vector2d = backdropFacing.mul(goalTrans, Vector2d())
-            .add(
-                Math.cos(backdropAngle + Math.PI / 2) * backdropClawDistance,
-                Math.sin(backdropAngle + Math.PI / 2) * backdropClawDistance
-            )
+                .add(Math.cos(backdropAngle + Math.PI / 2) * backdropClawDistance, Math.sin(backdropAngle + Math.PI / 2) * backdropClawDistance)
 
         val c: Double = goal.distance(tPivot) // initial distance- hypot
 
@@ -108,12 +88,13 @@ class ScoringMechanism(
 
         // it's really that shrimple
         return KinematicResults(
-            180.0 - elbow,
-            telescopeLength - retractedTelescopeLength,
-            (elbow + WRIST_ANGLE) / 2
+                180.0 - elbow,
+                telescopeLength - retractedTelescopeLength,
+            (elbow + WRIST_ANGLE)/2
         )
     }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     fun setArmState(newState: State): Component {
         val updateState = instant {
@@ -127,13 +108,25 @@ class ScoringMechanism(
                     SetElbowPosition(elbow, ElbowPosition.CloseIntake),
                     SetTelescopePosition(telescope, TelescopePosition.CloseIntake),
                 )
+=======
+    fun setArmState(newState : State) : Component {
+        val updateState = instant { armState = newState}
+        return series(when(newState){
+            State.CLOSE_INTAKE -> parallel(
+                //TODO redo series
+                SetWristPosition(wrist, WristPosition.CloseIntake),
+                SetElbowPosition(elbow, ElbowPosition.CloseIntake),
+                SetTelescopePosition(telescope, TelescopePosition.CloseIntake),
+            )
+>>>>>>> parent of efd0440 (Fixed claws and ported most instants over to components)
 
-                State.EXTENDED_INTAKE -> parallel(
-                    SetWristPosition(wrist, WristPosition.ExtendedIntake),
-                    SetElbowPosition(elbow, ElbowPosition.ExtendedIntake),
-                    SetTelescopePosition(telescope, TelescopePosition.ExtendedIntake),
-                )
+            State.EXTENDED_INTAKE -> parallel(
+                SetWristPosition(wrist, WristPosition.ExtendedIntake),
+                SetElbowPosition(elbow, ElbowPosition.ExtendedIntake),
+                SetTelescopePosition(telescope, TelescopePosition.ExtendedIntake),
+            )
 
+<<<<<<< HEAD
                 State.TRAVEL -> when (armState) {
                     State.DEPOSIT ->
 =======
@@ -198,38 +191,59 @@ class ScoringMechanism(
 
                 State.DEPOSIT -> {
                     val ikResults = runKinematics(pixelHeight)
+=======
+            State.TRAVEL -> when(armState) {
+                State.DEPOSIT ->
+>>>>>>> parent of efd0440 (Fixed claws and ported most instants over to components)
                     series(
-                        SetElbowPosition(elbow, ElbowPosition.Adjust(ikResults.elbowAngle)),
+                        SetTelescopePosition(telescope, TelescopePosition.Travel),
                         parallel(
-                            SetTelescopePosition(
-                                telescope,
-                                TelescopePosition.Adjust(ikResults.telescopeExtension)
-                            ),
-                            SetWristPosition(wrist, WristPosition.Adjust(ikResults.wristAngle))
+                            SetElbowPosition(elbow, ElbowPosition.Travel),
+                            SetWristPosition(wrist, WristPosition.Travel)
                         ),
                         updateState
                     )
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+                State.CLIMB ->
+                    parallel(
+                        SetTelescopePosition(telescope, TelescopePosition.Travel),
+                        series(
+                            delay(0.25),
+                            SetElbowPosition(elbow, ElbowPosition.Travel),
+                            SetWristPosition(wrist, WristPosition.Travel)
+                        ),
+                    )
+>>>>>>> parent of efd0440 (Fixed claws and ported most instants over to components)
                 else ->
                     parallel(
                         SetWristPosition(wrist, WristPosition.Travel),
                         SetElbowPosition(elbow, ElbowPosition.Travel),
                         SetTelescopePosition(telescope, TelescopePosition.Travel),
+<<<<<<< HEAD
                         updateState
                     )
 >>>>>>> parent of 4cb1952 (Fixed TERRIBLE HORRIBLE AWFUL wrist issue)
+=======
+                    )
+>>>>>>> parent of efd0440 (Fixed claws and ported most instants over to components)
                 }
 
-                State.STACK_INTAKE -> series(
-                    SetElbowPosition(elbow, ElbowPosition.Travel),
+            State.DEPOSIT -> {
+                val ikResults = runKinematics(pixelHeight)
+                series(
+                    SetElbowPosition(elbow, ElbowPosition.Adjust(ikResults.elbowAngle)),
                     parallel(
-                        SetTelescopePosition(telescope, TelescopePosition.Travel),
-                        SetWristPosition(wrist, WristPosition.Travel)
+                        SetTelescopePosition(telescope, TelescopePosition.Adjust(ikResults.telescopeExtension)),
+                        SetWristPosition(wrist, WristPosition.Adjust(ikResults.wristAngle))
                     ),
                     updateState
                 )
+            }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
                 State.STACK_INTAKE_CLOSE -> series(
                     SetElbowPosition(elbow, ElbowPosition.Travel),
@@ -259,13 +273,26 @@ class ScoringMechanism(
                 updateState
             )
 
+=======
+            State.STACK_INTAKE -> series(
+                SetElbowPosition(elbow, ElbowPosition.Travel),
+                parallel(
+                    SetTelescopePosition(telescope, TelescopePosition.Travel),
+                    SetWristPosition(wrist, WristPosition.Travel)
+                ),
+            )
+
+>>>>>>> parent of efd0440 (Fixed claws and ported most instants over to components)
             State.STACK_INTAKE_CLOSE -> series(
                 SetElbowPosition(elbow, ElbowPosition.Travel),
                 parallel(
                     SetTelescopePosition(telescope, TelescopePosition.Travel),
                     SetWristPosition(wrist, WristPosition.Travel)
                 ),
+<<<<<<< HEAD
                 updateState
+=======
+>>>>>>> parent of efd0440 (Fixed claws and ported most instants over to components)
             )
 
             State.CLIMB -> series(
@@ -274,9 +301,15 @@ class ScoringMechanism(
                     SetTelescopePosition(telescope, TelescopePosition.Travel),
                     SetWristPosition(wrist, WristPosition.Travel)
                 ),
+<<<<<<< HEAD
                 updateState
             )
         }
 >>>>>>> parent of 4cb1952 (Fixed TERRIBLE HORRIBLE AWFUL wrist issue)
+=======
+            )
+        },
+            updateState)
+>>>>>>> parent of efd0440 (Fixed claws and ported most instants over to components)
     }
 }
