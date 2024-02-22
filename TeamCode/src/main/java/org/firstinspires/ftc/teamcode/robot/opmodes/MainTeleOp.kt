@@ -173,6 +173,7 @@ class MainTeleOp : AnchorOpMode() {
         driver[Button.Key.LEFT_JOSTICK_PRESS] onActivate
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 instant {
                     +when (smec.armState) {
                         ScoringMechanism.State.DEPOSIT, ScoringMechanism.State.EXTENDED_INTAKE, ScoringMechanism.State.CLOSE_INTAKE -> {
@@ -188,10 +189,15 @@ class MainTeleOp : AnchorOpMode() {
                         else -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
                     }
 =======
+=======
+>>>>>>> parent of efd0440 (Fixed claws and ported most instants over to components)
             when (smec.armState) {
                 ScoringMechanism.State.DEPOSIT, ScoringMechanism.State.EXTENDED_INTAKE, ScoringMechanism.State.CLOSE_INTAKE -> {
                     Log.d("ARM", "Button pressed")
                     smec.setArmState(ScoringMechanism.State.TRAVEL)
+<<<<<<< HEAD
+>>>>>>> parent of efd0440 (Fixed claws and ported most instants over to components)
+=======
 >>>>>>> parent of efd0440 (Fixed claws and ported most instants over to components)
                 }
                 else -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)

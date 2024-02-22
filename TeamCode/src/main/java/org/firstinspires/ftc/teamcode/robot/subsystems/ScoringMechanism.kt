@@ -96,6 +96,7 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     fun setArmState(newState: State): Component {
         val updateState = instant {
             armState = newState
@@ -109,6 +110,8 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
                     SetTelescopePosition(telescope, TelescopePosition.CloseIntake),
                 )
 =======
+=======
+>>>>>>> parent of efd0440 (Fixed claws and ported most instants over to components)
     fun setArmState(newState : State) : Component {
         val updateState = instant { armState = newState}
         return series(when(newState){
@@ -118,6 +121,9 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
                 SetElbowPosition(elbow, ElbowPosition.CloseIntake),
                 SetTelescopePosition(telescope, TelescopePosition.CloseIntake),
             )
+<<<<<<< HEAD
+>>>>>>> parent of efd0440 (Fixed claws and ported most instants over to components)
+=======
 >>>>>>> parent of efd0440 (Fixed claws and ported most instants over to components)
 
             State.EXTENDED_INTAKE -> parallel(
@@ -126,6 +132,7 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
                 SetTelescopePosition(telescope, TelescopePosition.ExtendedIntake),
             )
 
+<<<<<<< HEAD
 <<<<<<< HEAD
                 State.TRAVEL -> when (armState) {
                     State.DEPOSIT ->
@@ -195,6 +202,10 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
             State.TRAVEL -> when(armState) {
                 State.DEPOSIT ->
 >>>>>>> parent of efd0440 (Fixed claws and ported most instants over to components)
+=======
+            State.TRAVEL -> when(armState) {
+                State.DEPOSIT ->
+>>>>>>> parent of efd0440 (Fixed claws and ported most instants over to components)
                     series(
                         SetTelescopePosition(telescope, TelescopePosition.Travel),
                         parallel(
@@ -203,6 +214,7 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
                         ),
                         updateState
                     )
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -283,6 +295,44 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
             )
 
 >>>>>>> parent of efd0440 (Fixed claws and ported most instants over to components)
+=======
+                State.CLIMB ->
+                    parallel(
+                        SetTelescopePosition(telescope, TelescopePosition.Travel),
+                        series(
+                            delay(0.25),
+                            SetElbowPosition(elbow, ElbowPosition.Travel),
+                            SetWristPosition(wrist, WristPosition.Travel)
+                        ),
+                    )
+                else ->
+                    parallel(
+                        SetWristPosition(wrist, WristPosition.Travel),
+                        SetElbowPosition(elbow, ElbowPosition.Travel),
+                        SetTelescopePosition(telescope, TelescopePosition.Travel),
+                    )
+                }
+
+            State.DEPOSIT -> {
+                val ikResults = runKinematics(pixelHeight)
+                series(
+                    SetElbowPosition(elbow, ElbowPosition.Adjust(ikResults.elbowAngle)),
+                    parallel(
+                        SetTelescopePosition(telescope, TelescopePosition.Adjust(ikResults.telescopeExtension)),
+                        SetWristPosition(wrist, WristPosition.Adjust(ikResults.wristAngle))
+                    ),
+                )
+            }
+
+            State.STACK_INTAKE -> series(
+                SetElbowPosition(elbow, ElbowPosition.Travel),
+                parallel(
+                    SetTelescopePosition(telescope, TelescopePosition.Travel),
+                    SetWristPosition(wrist, WristPosition.Travel)
+                ),
+            )
+
+>>>>>>> parent of efd0440 (Fixed claws and ported most instants over to components)
             State.STACK_INTAKE_CLOSE -> series(
                 SetElbowPosition(elbow, ElbowPosition.Travel),
                 parallel(
@@ -290,7 +340,10 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
                     SetWristPosition(wrist, WristPosition.Travel)
                 ),
 <<<<<<< HEAD
+<<<<<<< HEAD
                 updateState
+=======
+>>>>>>> parent of efd0440 (Fixed claws and ported most instants over to components)
 =======
 >>>>>>> parent of efd0440 (Fixed claws and ported most instants over to components)
             )
@@ -302,10 +355,16 @@ class ScoringMechanism(private val leftClaw: LeftClawSubsystem,
                     SetWristPosition(wrist, WristPosition.Travel)
                 ),
 <<<<<<< HEAD
+<<<<<<< HEAD
                 updateState
             )
         }
 >>>>>>> parent of 4cb1952 (Fixed TERRIBLE HORRIBLE AWFUL wrist issue)
+=======
+            )
+        },
+            updateState)
+>>>>>>> parent of efd0440 (Fixed claws and ported most instants over to components)
 =======
             )
         },
