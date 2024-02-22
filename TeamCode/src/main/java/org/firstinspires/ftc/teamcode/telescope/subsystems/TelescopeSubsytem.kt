@@ -18,12 +18,18 @@ class TelescopeSubsytem(private val hardwareManager: HardwareManager, private va
 
     var isTelemetryEnabled = false
 
-    private val motor = hardwareManager.motor("telescope")
+    private val motor1 = hardwareManager.motor("telescope1")
+    private val motor2 = hardwareManager.motor("telescope1")
+
+
 
     init {
         if (robot.opModeType == OpModeType.AUTONOMOUS)
-            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER)
-        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)
+            motor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER)
+        motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)
+        if (robot.opModeType == OpModeType.AUTONOMOUS)
+            motor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER)
+        motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)
     }
 
     val TELESCOPE_MOTOR_PPR = 384.5 // https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-13-7-1-ratio-24mm-length-8mm-rex-shaft-435-rpm-3-3-5v-encoder/
@@ -41,7 +47,7 @@ class TelescopeSubsytem(private val hardwareManager: HardwareManager, private va
 
     val currentExtensionInches : Double
         get() {
-            return getExtensionInchesFromEncoderTicks(motor.encoder.getCounts())
+            return getExtensionInchesFromEncoderTicks(motor1.encoder.getCounts())
         }
     var targetExtenstionInches : Double = 0.0
 
@@ -69,7 +75,8 @@ class TelescopeSubsytem(private val hardwareManager: HardwareManager, private va
 
     override fun loop() {
         val clampedTarget = targetExtenstionInches.clamp(TELESCOPE_MIN, TELESCOPE_MAX)
-        motor power controller.calculate(currentExtensionInches, clampedTarget)
+        motor1 power controller.calculate(currentExtensionInches, clampedTarget)
+        motor2 power controller.calculate(currentExtensionInches, clampedTarget)
 
         if(isTelemetryEnabled) {
             robot.telemetry.addLine("Telescope: Telemetry Enabled")
@@ -77,8 +84,8 @@ class TelescopeSubsytem(private val hardwareManager: HardwareManager, private va
             robot.telemetry.addData("Current Extension Inches", currentExtensionInches)
             robot.telemetry.addData("Extension Error Inches", targetExtenstionInches - currentExtensionInches)
             robot.telemetry.addData("Is At Target", this.isAtTarget())
-            robot.telemetry.addData("motor.getCurrrent (mA)", motor.getCurrent() * 1000.0)
-            robot.telemetry.addData("motor.position", motor.encoder.getCounts())
+            robot.telemetry.addData("motor.getCurrrent (mA)", motor1.getCurrent() * 1000.0)
+            robot.telemetry.addData("motor.position", motor1.encoder.getCounts())
         }
     }
 
