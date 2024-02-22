@@ -82,6 +82,7 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
     }
 
     var constant = 1.0
+    //TODO: What the fuck is this
 
     override fun loop() {
         val deltaT = deltaTimer.seconds()
@@ -106,7 +107,7 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
             val minExtension = 13.5
             val maxTotalExtension = minExtension + TELESCOPE_MAX
             val currentTotalExtension = minExtension + telescope.currentExtensionInches
-            val gravityAdjustment = Math.cos(Math.toRadians(currentAngle)) * constant * ElbowConfig.KG
+            val gravityAdjustment = Math.cos(Math.toRadians(currentAngle)) * (currentTotalExtension/maxTotalExtension) * ElbowConfig.KG
             motor power controller.calculate(currentAngle, motionProfile[motionProfileTimer.seconds()].x) + gravityAdjustment
         } else motor power 0.0
 
