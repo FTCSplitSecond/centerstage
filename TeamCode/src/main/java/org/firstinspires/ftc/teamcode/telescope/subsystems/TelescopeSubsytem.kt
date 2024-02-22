@@ -1,7 +1,11 @@
 package org.firstinspires.ftc.teamcode.telescope.subsystems
 
+import com.acmerobotics.roadrunner.profile.MotionProfileGenerator
+import com.acmerobotics.roadrunner.profile.MotionState
+import com.acmerobotics.roadrunner.util.epsilonEquals
 import com.arcrobotics.ftclib.controller.PIDController
 import com.qualcomm.robotcore.hardware.DcMotor
+import com.qualcomm.robotcore.util.ElapsedTime
 import dev.turtles.anchor.component.FinishReason
 import dev.turtles.anchor.entity.Subsystem
 import dev.turtles.electriceel.wrapper.HardwareManager
@@ -35,6 +39,19 @@ class TelescopeSubsytem(private val hardwareManager: HardwareManager, private va
     val TELESCOPE_MOTOR_PPR = 384.5 // https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-13-7-1-ratio-24mm-length-8mm-rex-shaft-435-rpm-3-3-5v-encoder/
     val INCHES_PER_REVOLUTION = 30.0/25.4 * Math.PI //inches
     val PIDTolerance = 1.0 // inches
+    var targetExtenstionInches : Double = 0.0
+    val motionProfileTimer = ElapsedTime()
+    var previousTarget = targetExtenstionInches
+    var motionProfile = MotionProfileGenerator.generateMotionProfile(
+        MotionState(currentExtensionInches, 0.0, 0.0),
+        MotionState(targetExtenstionInches, 0.0, 0.0),
+        { TELESCOPE_MAX_ACCELERATION },
+        { TELESCOPE_MAX_VELOCITY },
+    )
+    var deltaTimer = ElapsedTime()
+    private var X : Double = currentExtensionInches
+    private var V : Double = 0.0
+    private var A : Double = 0.0
 
     private fun getEncoderTicksFromExtensionInches(extensionInches : Double) : Double {
         return extensionInches/ INCHES_PER_REVOLUTION * TELESCOPE_MOTOR_PPR // ticks
@@ -49,7 +66,7 @@ class TelescopeSubsytem(private val hardwareManager: HardwareManager, private va
         get() {
             return getExtensionInchesFromEncoderTicks(motor1.encoder.getCounts())
         }
-    var targetExtenstionInches : Double = 0.0
+
 
     /**
      * Angle when the current armState is [TelescopePosition.ADJUST]
@@ -74,9 +91,21 @@ class TelescopeSubsytem(private val hardwareManager: HardwareManager, private va
     }
 
     override fun loop() {
+        val deltaT = deltaTimer.seconds()
+        deltaTimer.reset()
+        val newX = currentExtensionInches
+        val newV = (newX - X) / deltaT
+        val newA = (newV - V) / deltaT
+        X = newX
+        V = newV
+        A = newA
+        val currentMotionProfileX = motionProfile[motionProfileTimer.seconds()].x
         val clampedTarget = targetExtenstionInches.clamp(TELESCOPE_MIN, TELESCOPE_MAX)
-        motor1 power controller.calculate(currentExtensionInches, clampedTarget)
-        motor2 power controller.calculate(currentExtensionInches, clampedTarget)
+        generateMotionProfile(clampedTarget, currentMotionProfileX, V, A)
+
+
+        motor1 power controller.calculate(currentExtensionInches, motionProfile[motionProfileTimer.seconds()].x)
+        motor2 power controller.calculate(currentExtensionInches, motionProfile[motionProfileTimer.seconds()].x)
 
         if(isTelemetryEnabled) {
             robot.telemetry.addLine("Telescope: Telemetry Enabled")
@@ -91,5 +120,18 @@ class TelescopeSubsytem(private val hardwareManager: HardwareManager, private va
 
     override fun end(reason: FinishReason) {
 
+    }
+
+    private fun generateMotionProfile(target: Double, currentX: Double, currentV: Double, currentA: Double) {
+        if (!(previousTarget epsilonEquals target)) {
+            previousTarget = target
+            motionProfile = MotionProfileGenerator.generateMotionProfile(
+                MotionState(currentX, currentV, currentA),
+                MotionState(target, 0.0, 0.0),
+                { TelescopeConfig.TELESCOPE_MAX_VELOCITY},
+                { TelescopeConfig.TELESCOPE_MAX_ACCELERATION },
+            )
+            motionProfileTimer.reset()
+        }
     }
 }

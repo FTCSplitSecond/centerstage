@@ -18,6 +18,9 @@ public class TelescopeConfig {
     public static double TELESCOPE_DEPOSIT_COR_X_OFFSET = -3.0; //  inches from center of robot to center of rotation
     public static double TELESCOPE_CLOSE_INTAKE = 1.0; //   inches
 
+    public static double TELESCOPE_MAX_ACCELERATION = 10.0; //inches per second per second
+    public static double TELESCOPE_MAX_VELOCITY = 10.0; // inches per second
+
     public static double TELESCOPE_ADJUST = 0.0; // inches
 
     public static double TELESCOPE_TRAVEL = 0.0; //  inches
