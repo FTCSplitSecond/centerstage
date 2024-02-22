@@ -8,6 +8,7 @@ public class TelescopeConfig {
             ;
     public static double TELESCOPE_KI = 0.0;
     public static double TELESCOPE_KD = 0.025;
+    public static double TELESCOPE_KS = 0.0;
     public static double TELESCOPE_MAX = 19.0; //  inches
     public static double TELESCOPE_MIN = 0.0; //  inches
     public static double TELESCOPE_EXTENDED_INTAKE = TELESCOPE_MAX - 0.75; //  inches

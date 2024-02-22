@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeConfig.*
 import org.firstinspires.ftc.teamcode.robot.util.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
+import org.firstinspires.ftc.teamcode.robot.util.adjustPowerForKStatic
 import org.firstinspires.ftc.teamcode.swerve.utils.clamp
 
 
@@ -102,10 +103,10 @@ class TelescopeSubsytem(private val hardwareManager: HardwareManager, private va
         val currentMotionProfileX = motionProfile[motionProfileTimer.seconds()].x
         val clampedTarget = targetExtenstionInches.clamp(TELESCOPE_MIN, TELESCOPE_MAX)
         generateMotionProfile(clampedTarget, currentMotionProfileX, V, A)
+        val pidPower = controller.calculate(currentExtensionInches, motionProfile[motionProfileTimer.seconds()].x).adjustPowerForKStatic(TELESCOPE_KS)
 
-
-        motor1 power controller.calculate(currentExtensionInches, motionProfile[motionProfileTimer.seconds()].x)
-        motor2 power controller.calculate(currentExtensionInches, motionProfile[motionProfileTimer.seconds()].x)
+        motor1 power pidPower
+        motor2 power pidPower
 
         if(isTelemetryEnabled) {
             robot.telemetry.addLine("Telescope: Telemetry Enabled")
