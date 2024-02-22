@@ -11,7 +11,7 @@ class SetElbowPosition(private val elbow : ElbowSubsystem, private val position:
     }
 
     override fun isComplete(): Boolean {
-        return elbow.isAtTarget() || this.timer.elapsedTime > 1.0
+        return elbow.isAtTarget()
     }
 
 }

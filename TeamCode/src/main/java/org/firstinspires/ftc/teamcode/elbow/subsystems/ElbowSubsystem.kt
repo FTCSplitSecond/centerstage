@@ -115,10 +115,9 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
             robot.telemetry.addData("IsEnabled:", isEnabled)
             robot.telemetry.addData("Target Angle Degree:", targetAngle)
             robot.telemetry.addData("Current Angle Degree", currentAngle)
-            robot.telemetry.addData("Angle Error Degree", targetAngle - currentAngle)
-            robot.telemetry.addData("Is At Target", this.isAtTarget())
             robot.telemetry.addData("motor.getCurrrent (mA)", motor.getCurrent() * 1000)
             robot.telemetry.addData("Apple", motionProfile[motionProfileTimer.seconds()].x)
+            robot.telemetry.update()
         }
     }
 

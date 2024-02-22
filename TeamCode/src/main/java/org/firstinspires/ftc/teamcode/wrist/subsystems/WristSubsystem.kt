@@ -24,23 +24,17 @@ class WristSubsystem(private val wristServo: Servo, private val telemetry: Telem
     }
 
     override fun init() {
-
+        wristServo.axonPwmRange()
     }
     var position: WristPosition = WristPosition.Travel
-        set(value) {
-            if(value != position) {
-                angle = value.angle
-                updateServoFromAngle(angle)
-                field = value
-                movementStartTime = System.currentTimeMillis()
-            }
+    set(value) {
+        if(value != position) {
+            angle = position.angle
+            updateServoFromAngle(angle)
+            field = value
+            movementStartTime = System.currentTimeMillis()
         }
-
-    init {
-        wristServo.axonPwmRange()
-        updateServoFromAngle(angle)
     }
-
     fun updateServoFromAngle(angle: Double) {
         val wristServoPulseWidth = getServoPulseWidthFromAngle(angle, WristConfig.WRIST_SERVO_ZERO_POSITION)
 
@@ -61,10 +55,9 @@ class WristSubsystem(private val wristServo: Servo, private val telemetry: Telem
     override fun loop() {
         if(isTelemetryEnabled) {
             telemetry.addLine("Wrist: Telemetry Enabled")
-            telemetry.addData("Position", position)
-            telemetry.addData("Angle", angle)
-            telemetry.addData("Should be complete", this.movementShouldBeComplete())
+            telemetry.addData("Position:", position)
             //telemetry.addData("Wrist Servo Position:", wristServo.position)
+            telemetry.update()
         }
     }
 }

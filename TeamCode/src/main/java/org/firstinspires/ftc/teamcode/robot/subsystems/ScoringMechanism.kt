@@ -114,6 +114,7 @@ class ScoringMechanism(
         )
     }
 
+<<<<<<< HEAD
     fun setArmState(newState: State): Component {
         val updateState = instant {
             armState = newState
@@ -135,6 +136,40 @@ class ScoringMechanism(
 
                 State.TRAVEL -> when (armState) {
                     State.DEPOSIT ->
+=======
+    fun setArmState(newState : State) : Component {
+        val updateState = instant { armState = newState}
+        return when(newState){
+            State.CLOSE_INTAKE -> parallel(
+                //TODO redo series
+                SetWristPosition(wrist, WristPosition.CloseIntake),
+                SetElbowPosition(elbow, ElbowPosition.CloseIntake),
+                SetTelescopePosition(telescope, TelescopePosition.CloseIntake),
+                updateState
+            )
+
+            State.EXTENDED_INTAKE -> parallel(
+                SetWristPosition(wrist, WristPosition.ExtendedIntake),
+                SetElbowPosition(elbow, ElbowPosition.ExtendedIntake),
+                SetTelescopePosition(telescope, TelescopePosition.ExtendedIntake),
+                updateState
+            )
+
+            State.TRAVEL -> when(armState) {
+                State.DEPOSIT ->
+                    series(
+                        SetTelescopePosition(telescope, TelescopePosition.Travel),
+                        parallel(
+                            SetElbowPosition(elbow, ElbowPosition.Travel),
+                            SetWristPosition(wrist, WristPosition.Travel)
+                        ),
+                        updateState
+
+                    )
+                State.CLIMB ->
+                    parallel(
+                        SetTelescopePosition(telescope, TelescopePosition.Travel),
+>>>>>>> parent of 4cb1952 (Fixed TERRIBLE HORRIBLE AWFUL wrist issue)
                         series(
                             SetTelescopePosition(telescope, TelescopePosition.Travel),
                             parallel(
@@ -172,7 +207,18 @@ class ScoringMechanism(
                             ),
                             SetWristPosition(wrist, WristPosition.Adjust(ikResults.wristAngle))
                         ),
+                        updateState
                     )
+<<<<<<< HEAD
+=======
+                else ->
+                    parallel(
+                        SetWristPosition(wrist, WristPosition.Travel),
+                        SetElbowPosition(elbow, ElbowPosition.Travel),
+                        SetTelescopePosition(telescope, TelescopePosition.Travel),
+                        updateState
+                    )
+>>>>>>> parent of 4cb1952 (Fixed TERRIBLE HORRIBLE AWFUL wrist issue)
                 }
 
                 State.STACK_INTAKE -> series(
@@ -181,8 +227,10 @@ class ScoringMechanism(
                         SetTelescopePosition(telescope, TelescopePosition.Travel),
                         SetWristPosition(wrist, WristPosition.Travel)
                     ),
+                    updateState
                 )
 
+<<<<<<< HEAD
                 State.STACK_INTAKE_CLOSE -> series(
                     SetElbowPosition(elbow, ElbowPosition.Travel),
                     parallel(
@@ -201,5 +249,34 @@ class ScoringMechanism(
             },
             updateState
         )
+=======
+            State.STACK_INTAKE -> series(
+                SetElbowPosition(elbow, ElbowPosition.Travel),
+                parallel(
+                    SetTelescopePosition(telescope, TelescopePosition.Travel),
+                    SetWristPosition(wrist, WristPosition.Travel)
+                ),
+                updateState
+            )
+
+            State.STACK_INTAKE_CLOSE -> series(
+                SetElbowPosition(elbow, ElbowPosition.Travel),
+                parallel(
+                    SetTelescopePosition(telescope, TelescopePosition.Travel),
+                    SetWristPosition(wrist, WristPosition.Travel)
+                ),
+                updateState
+            )
+
+            State.CLIMB -> series(
+                SetElbowPosition(elbow, ElbowPosition.Travel),
+                parallel(
+                    SetTelescopePosition(telescope, TelescopePosition.Travel),
+                    SetWristPosition(wrist, WristPosition.Travel)
+                ),
+                updateState
+            )
+        }
+>>>>>>> parent of 4cb1952 (Fixed TERRIBLE HORRIBLE AWFUL wrist issue)
     }
 }

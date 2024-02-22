@@ -28,7 +28,7 @@ class TelescopeSubsytem(private val hardwareManager: HardwareManager, private va
 
     val TELESCOPE_MOTOR_PPR = 384.5 // https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-13-7-1-ratio-24mm-length-8mm-rex-shaft-435-rpm-3-3-5v-encoder/
     val INCHES_PER_REVOLUTION = 30.0/25.4 * Math.PI //inches
-    val PIDTolerance = 1.0 // inches
+    val PIDTolerance = 0.25 // inches
 
     private fun getEncoderTicksFromExtensionInches(extensionInches : Double) : Double {
         return extensionInches/ INCHES_PER_REVOLUTION * TELESCOPE_MOTOR_PPR // ticks
@@ -75,8 +75,6 @@ class TelescopeSubsytem(private val hardwareManager: HardwareManager, private va
             robot.telemetry.addLine("Telescope: Telemetry Enabled")
             robot.telemetry.addData("Target Extension Inches:", targetExtenstionInches)
             robot.telemetry.addData("Current Extension Inches", currentExtensionInches)
-            robot.telemetry.addData("Extension Error Inches", targetExtenstionInches - currentExtensionInches)
-            robot.telemetry.addData("Is At Target", this.isAtTarget())
             robot.telemetry.addData("motor.getCurrrent (mA)", motor.getCurrent() * 1000.0)
             robot.telemetry.addData("motor.position", motor.encoder.getCounts())
         }

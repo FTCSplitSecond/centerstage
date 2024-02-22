@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.telescope.subsystems.*
 open class SetTelescopePosition(val telescope: TelescopeSubsytem, private val position: TelescopePosition) : Component() {
     override fun end(reason: FinishReason) {}
 
-    override fun isComplete() = telescope.isAtTarget() || this.timer.elapsedTime > 1.0
+    override fun isComplete() = telescope.isAtTarget()
 
     override fun loop() {}
 
