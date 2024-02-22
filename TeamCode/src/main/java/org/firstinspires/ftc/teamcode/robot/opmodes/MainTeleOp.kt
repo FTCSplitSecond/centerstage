@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.claw.commands.CloseBothClaw
 import org.firstinspires.ftc.teamcode.claw.commands.DropBothClaw
 import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
-import org.firstinspires.ftc.teamcode.drone_launcher.Subsystems.DronePositions
+import org.firstinspires.ftc.teamcode.drone_launcher.Subsystems.TriggerPositions
 import org.firstinspires.ftc.teamcode.mecanum.commands.DriveMecanum
 import org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants
 import org.firstinspires.ftc.teamcode.robot.commands.UpdateTelemetry
@@ -43,7 +43,7 @@ class MainTeleOp : AnchorOpMode() {
 
         schedule(
             instant {
-                robot.droneLauncher.position = DronePositions.HELD
+                robot.droneLauncher.triggerPosition = TriggerPositions.HELD
             }
         )
 

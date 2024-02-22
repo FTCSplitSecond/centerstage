@@ -219,6 +219,7 @@ class RedFarcCloseAuto : AnchorOpMode() {
             .build()
 
         // commands
+        val moveToStack = TrajectoryFollower(drive, moveToStackTrajectory)
         val extendToDropPurple = smec.setArmState(ScoringMechanism.State.STACK_INTAKE)
         val alignWithStack = TrajectoryFollower(drive, moveToAlignWithStackTrajectory)
         val pickUpToStack = TrajectoryFollower(drive, moveToStackTrajectory)
@@ -262,7 +263,7 @@ class RedFarcCloseAuto : AnchorOpMode() {
                 smec.setArmState(ScoringMechanism.State.STACK_INTAKE_CLOSE),
                 alignWithStack,
                 )
-            ),
+            ,
 
             moveToStack,
 
