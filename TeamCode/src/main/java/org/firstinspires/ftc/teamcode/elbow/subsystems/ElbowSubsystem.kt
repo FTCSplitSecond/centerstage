@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
 
 class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager, val telescope: TelescopeSubsytem) : Subsystem() {
 
-    var isEnabled = true
+    var isEnabled = false
     var isTelemetryEnabled = false
     private val motor = hw.motor("elbow")
 
