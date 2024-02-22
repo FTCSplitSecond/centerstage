@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.drone_launcher.Subsystems
 
+
 import com.qualcomm.robotcore.hardware.PwmControl
 import com.qualcomm.robotcore.hardware.ServoImplEx
 import dev.turtles.anchor.component.FinishReason
@@ -7,35 +8,52 @@ import dev.turtles.anchor.entity.Subsystem
 import dev.turtles.electriceel.wrapper.HardwareManager
 import dev.turtles.electriceel.wrapper.interfaces.Servo
 import org.firstinspires.ftc.robotcore.external.Telemetry
-import org.firstinspires.ftc.teamcode.claw.subsystems.DroneConfig
+import org.firstinspires.ftc.teamcode.drone_launcher.Subsystems.DroneConfig
 
-enum class DronePositions{
+enum class TriggerPositions{
     HELD,
-    LAUNCH
+    RELEASE
 }
 
-class DroneSubsystem(private val servo : Servo, private val telemetry: Telemetry) : Subsystem() {
-    constructor(hw: HardwareManager, telemetry: Telemetry) : this(hw.servo("droneServo"), telemetry)
+enum class PitchPositions {
+    STOWED,
+    LAUNCH
+}
+class DroneSubsystem(private val triggerServo : Servo, private  val pitchServo: Servo, private val telemetry: Telemetry) : Subsystem() {
+    constructor(hw: HardwareManager, telemetry: Telemetry) : this(hw.servo("droneServo"), hw.servo("dronePitch"), telemetry)
 
     private var movementStartTime = System.currentTimeMillis()
 
     override fun init() {
-        servo.axonPwmRange()
-//        servo.pwmRange = PwmControl.PwmRange(500.0, 2500.0)
+        triggerServo.axonPwmRange()
+        pitchServo.axonPwmRange()
+//        triggerServo.pwmRange = PwmControl.PwmRange(500.0, 2500.0)
     }
 
-    var position: DronePositions = DronePositions.HELD
+    var triggerPosition: TriggerPositions = TriggerPositions.HELD
         set(value) {
-            servo goto getServoPositionFromPulseWidth(when (value) {
-                DronePositions.HELD -> DroneConfig.HELD_MICROSECONDS
-                DronePositions.LAUNCH -> DroneConfig.LAUNCH_MICROSECONDS
-            }, servo)
+            triggerServo goto getTriggerServoPositionFromPulseWidth(when (value) {
+                TriggerPositions.HELD -> DroneConfig.HELD_MICROSECONDS
+                TriggerPositions.RELEASE -> DroneConfig.RELEASE_MICROSECONDS
+            }, triggerServo)
+            movementStartTime = System.currentTimeMillis()
+            field = value
+        }
+    var pitchPosition: PitchPositions = PitchPositions.STOWED
+        set(value) {
+            pitchServo goto getPitchServoPositionFromPulseWidth(when (value) {
+                PitchPositions.STOWED -> DroneConfig.STOWED
+                PitchPositions.LAUNCH -> DroneConfig.LAUNCH
+            }, pitchServo)
             movementStartTime = System.currentTimeMillis()
             field = value
         }
 
-    fun getServoPositionFromPulseWidth(pulseWidth: Double, servo: Servo): Double {
-        return (pulseWidth - servo.pwmRange().usPulseLower) / (servo.pwmRange().usPulseUpper - servo.pwmRange().usPulseLower)
+    fun getTriggerServoPositionFromPulseWidth(pulseWidth: Double, triggerServo: Servo): Double {
+        return (pulseWidth - triggerServo.pwmRange().usPulseLower) / (triggerServo.pwmRange().usPulseUpper - triggerServo.pwmRange().usPulseLower)
+    }
+    fun getPitchServoPositionFromPulseWidth(pulseWidth: Double, pitchServo: Servo): Double {
+        return (pulseWidth - pitchServo.pwmRange().usPulseLower) / (pitchServo.pwmRange().usPulseUpper - triggerServo.pwmRange().usPulseLower)
     }
 
     fun movementShouldBeComplete(): Boolean {
