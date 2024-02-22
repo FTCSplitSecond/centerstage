@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot.opmodes
 
 import LaunchDrone
+import android.util.Log
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.turtles.anchor.component.stock.delay
 import dev.turtles.anchor.component.stock.instant
@@ -37,9 +38,6 @@ class MainTeleOp : AnchorOpMode() {
 
     override fun run() {
         val smec = robot.scoringMechanism
-        val leftClaw = robot.leftClaw
-        val rightClaw = robot.rightClaw
-        val dt = robot.driveBase
 
         robot.init(this.world)
         robot.wrist.isTelemetryEnabled = true
@@ -174,17 +172,14 @@ class MainTeleOp : AnchorOpMode() {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> parent of 0f0779e (Files)
                 instant {
                     +when (smec.armState) {
                         ScoringMechanism.State.DEPOSIT, ScoringMechanism.State.EXTENDED_INTAKE, ScoringMechanism.State.CLOSE_INTAKE -> {
                             smec.setArmState(ScoringMechanism.State.TRAVEL)
                         }
-=======
-            when (smec.armState) {
-                ScoringMechanism.State.DEPOSIT, ScoringMechanism.State.EXTENDED_INTAKE, ScoringMechanism.State.CLOSE_INTAKE -> smec.setArmState(ScoringMechanism.State.TRAVEL)
-                else -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
-            }
->>>>>>> parent of 4cb1952 (Fixed TERRIBLE HORRIBLE AWFUL wrist issue)
 
                         else -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
                     }
