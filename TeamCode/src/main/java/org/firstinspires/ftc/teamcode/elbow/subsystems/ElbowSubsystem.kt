@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_MAX_ANG
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_MAX_ANGULAR_VELOCITY
 import org.firstinspires.ftc.teamcode.robot.util.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
+import org.firstinspires.ftc.teamcode.robot.util.adjustPowerForKStatic
 import org.firstinspires.ftc.teamcode.swerve.utils.clamp
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeConfig.TELESCOPE_MAX
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
@@ -108,7 +109,8 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
             val maxTotalExtension = minExtension + TELESCOPE_MAX
             val currentTotalExtension = minExtension + telescope.currentExtensionInches
             val gravityAdjustment = Math.cos(Math.toRadians(currentAngle)) * (currentTotalExtension/maxTotalExtension) * ElbowConfig.KG
-            motor power controller.calculate(currentAngle, motionProfile[motionProfileTimer.seconds()].x) + gravityAdjustment
+            val pidPower = controller.calculate(currentAngle, motionProfile[motionProfileTimer.seconds()].x).adjustPowerForKStatic(ElbowConfig.KS)
+            motor power pidPower + gravityAdjustment
         } else motor power 0.0
 
         if(isTelemetryEnabled) {
