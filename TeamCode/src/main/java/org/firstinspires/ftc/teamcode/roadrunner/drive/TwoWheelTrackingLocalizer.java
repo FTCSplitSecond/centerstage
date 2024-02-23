@@ -72,10 +72,19 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
         parallelEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "fL"));
         perpendicularEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "bL"));
 
-        correctionFromImuToFieldHeading = AngleUnit.normalizeRadians(startPose.getHeading() - drive.getRawExternalHeading());
+        updateIMUHeadingCorrection(startPose.getHeading());
         setPoseEstimate(startPose);
     }
 
+    @Override
+    public void setPoseEstimate(@NonNull Pose2d value) {
+        super.setPoseEstimate(value);
+        updateIMUHeadingCorrection(value.getHeading());
+    }
+
+    public void updateIMUHeadingCorrection(Double newHeading) {
+        correctionFromImuToFieldHeading = AngleUnit.normalizeRadians(newHeading - drive.getRawExternalHeading());
+    }
     public static double encoderTicksToInches(double ticks) {
         return WHEEL_RADIUS * 2 * Math.PI * GEAR_RATIO * ticks / TICKS_PER_REV;
     }

@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowSubsystem
 import org.firstinspires.ftc.teamcode.mecanum.subsystems.MecanumDriveBase
 import org.firstinspires.ftc.teamcode.robot.util.Alliance
 import org.firstinspires.ftc.teamcode.robot.util.OpModeType
+import org.firstinspires.ftc.teamcode.vision.subsystems.VisionSubsystem
 import org.firstinspires.ftc.teamcode.wrist.subsystems.WristSubsystem
 
 
@@ -49,6 +50,7 @@ class Robot(val hardwareMap: HardwareMap, val hw: HardwareManager, t: Telemetry,
     val elbow = ElbowSubsystem(this, hw, telescope)
     val droneLauncher = DroneSubsystem(hw, telemetry)
     val scoringMechanism = ScoringMechanism(leftClaw, rightClaw, wrist, telescope, elbow, telemetry);
+    val vision = VisionSubsystem(this)
 
     fun init(world: World) {
         entity.add(driveBase)

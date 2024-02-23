@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot.opmodes
 
 import PropDetector
-import PropZone
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
@@ -22,6 +21,7 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMechanism
 import org.firstinspires.ftc.teamcode.robot.util.Alliance
 import org.firstinspires.ftc.teamcode.robot.util.adjustForAlliance
+import org.firstinspires.ftc.teamcode.vision.processors.PropZoneDetected
 import org.openftc.easyopencv.OpenCvCamera
 import org.openftc.easyopencv.OpenCvCameraFactory
 import org.openftc.easyopencv.OpenCvCameraRotation
@@ -34,8 +34,6 @@ class RedFarAuto2p0 : AnchorOpMode() {
     lateinit var robot: Robot
     lateinit var smec: ScoringMechanism
     lateinit var drive: CenterstageMecanumDrive
-    lateinit var webcam: OpenCvWebcam
-    var detector = PropDetector(telemetry)
     val startPose = Pose2d(-40.0, -62.0, -PI / 2)
     val alliance = Alliance.RED
     
@@ -45,27 +43,9 @@ class RedFarAuto2p0 : AnchorOpMode() {
         robot = Robot(hardwareMap, this.hardwareManager, telemetry, startPose = startPose)
         smec = robot.scoringMechanism
         drive = robot.driveBase.dt
-        robot.elbow.isEnabled = true
         robot.init(this.world)
-        val cameraMonitorViewId = hardwareMap.appContext.resources.getIdentifier(
-            "cameraMonitorViewId",
-            "id",
-            hardwareMap.appContext.packageName
-        )
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(
-            hardwareMap.get(
-                WebcamName::class.java, "webcam1"
-            ), cameraMonitorViewId
-        )
-        webcam.openCameraDeviceAsync(object : OpenCvCamera.AsyncCameraOpenListener {
-            override fun onOpened() {
-                webcam.startStreaming(960, 720, OpenCvCameraRotation.UPRIGHT)
-            }
 
-            override fun onError(errorCode: Int) {}
-        })
-        webcam.setPipeline(detector)
-        OpenBothClaw(robot.leftClaw, robot.rightClaw)
+        +OpenBothClaw(robot.leftClaw, robot.rightClaw)
 
         driver[Button.Key.DPAD_LEFT] onActivate instant {
             robot.leftClaw.position = when (robot.leftClaw.position) {
@@ -104,8 +84,8 @@ class RedFarAuto2p0 : AnchorOpMode() {
     }
 
     override fun run() {
-        val zoneDetected = detector.zone
-        webcam.stopStreaming()
+        val zoneDetected = robot.vision.propZoneDetected
+        robot.vision.disablePropZoneDetector()
 
         val spinOffset = when(alliance) {
             Alliance.RED -> 0.0001
@@ -119,9 +99,9 @@ class RedFarAuto2p0 : AnchorOpMode() {
         val purplePixelPoseCenter = Pose2d(Vector2d(-36.0, 13.0), startPose.heading).adjustForAlliance(alliance)
         val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(-46.0, 17.0), startPose.heading).adjustForAlliance(alliance)
         val purplePixelPose = when (zoneDetected) {
-            PropZone.LEFT -> if(alliance== Alliance.BLUE) purplePixelPoseBackdropSide else purplePixelPoseAwayFromBackdrop
-            PropZone.CENTER, PropZone.UNKNOWN -> purplePixelPoseCenter
-            PropZone.RIGHT -> if(alliance== Alliance.BLUE) purplePixelPoseAwayFromBackdrop else purplePixelPoseBackdropSide
+            PropZoneDetected.LEFT -> if(alliance== Alliance.BLUE) purplePixelPoseBackdropSide else purplePixelPoseAwayFromBackdrop
+            PropZoneDetected.CENTER, PropZoneDetected.NONE -> purplePixelPoseCenter
+            PropZoneDetected.RIGHT -> if(alliance== Alliance.BLUE) purplePixelPoseAwayFromBackdrop else purplePixelPoseBackdropSide
         }
 
         val transitLaneY = 12.0
@@ -139,9 +119,9 @@ class RedFarAuto2p0 : AnchorOpMode() {
         val nearBackDropLeft = Vector2d(nearBackDropLaneX, nearBackDropCenter.y + backDropZoneSpacing)
         val nearBackDropRight = Vector2d(nearBackDropLaneX, nearBackDropCenter.y - backDropZoneSpacing)
         val nearBackDropPosition = when (zoneDetected) {
-            PropZone.LEFT -> nearBackDropLeft
-            PropZone.CENTER, PropZone.UNKNOWN -> nearBackDropCenter
-            PropZone.RIGHT -> nearBackDropRight
+            PropZoneDetected.LEFT -> nearBackDropLeft
+            PropZoneDetected.CENTER, PropZoneDetected.NONE -> nearBackDropCenter
+            PropZoneDetected.RIGHT -> nearBackDropRight
         }
         val backDropScoringPosition = Vector2d(backDropScoreX, nearBackDropPosition.y)  // no need to adjust for alliance (already there)
         val parkPosition = Vector2d(48.0, transitLaneY).adjustForAlliance(alliance)
@@ -251,217 +231,5 @@ class RedFarAuto2p0 : AnchorOpMode() {
 
             parallel(moveToTravel, parkRightSide)
         )
-
-//        lateinit var t1: Trajectory
-//        lateinit var t2: Trajectory
-//        lateinit var t2_5: Trajectory
-//        lateinit var t3: Trajectory
-//        lateinit var t4: Trajectory
-//        lateinit var t5: Trajectory
-//        lateinit var t6: Trajectory
-//        lateinit var t7: Trajectory
-//        when (zone) {
-//            // if UNKNOWN default to CENTER
-//            PropZone.CENTER, PropZone.UNKNOWN -> {
-//                t1 = drive.trajectoryBuilder(startPose)
-//                    .lineTo(
-//                        Vector2d(
-//                            AutoConfig.BLUE_FAR_CENTER_X[0],
-//                            AutoConfig.BLUE_FAR_CENTER_Y[0]
-//                        )
-//                    )
-//                    .build()
-//                t2 = drive.trajectoryBuilder(t1.end())
-//                    .lineTo(
-//                        Vector2d(
-//                            AutoConfig.BLUE_FAR_CENTER_X[1],
-//                            AutoConfig.BLUE_FAR_CENTER_Y[1]
-//                        )
-//                    )
-//                    .build()
-//                t3 = drive.trajectoryBuilder(t2.end())
-//                    .lineTo(
-//                        Vector2d(
-//                            AutoConfig.BLUE_FAR_CENTER_X[2],
-//                            AutoConfig.BLUE_FAR_CENTER_Y[2]
-//                        )
-//                    )
-//                    .build()
-//                t4 = drive.trajectoryBuilder(t3.end())
-//                    .lineToLinearHeading(
-//                        Pose2d(
-//                            AutoConfig.BLUE_FAR_CENTER_X[3],
-//                            AutoConfig.BLUE_FAR_CENTER_Y[3],
-//                            PI
-//                        )
-//                    )
-//                    .build()
-//                t5 = drive.trajectoryBuilder(t4.end())
-//                    .lineTo(
-//                        Vector2d(
-//                            AutoConfig.BLUE_FAR_CENTER_X[4],
-//                            AutoConfig.BLUE_FAR_CENTER_Y[4]
-//                        )
-//                    )
-//                    .build()
-//                t6 = drive.trajectoryBuilder(t5.end())
-//                    .lineTo(
-//                        Vector2d(
-//                            AutoConfig.BLUE_FAR_CENTER_X[5],
-//                            AutoConfig.BLUE_FAR_CENTER_Y[5]
-//                        )
-//                    )
-//                    .build()
-//                t7 = drive.trajectoryBuilder(t6.end())
-//                    .lineTo(
-//                        Vector2d(
-//                            AutoConfig.BLUE_FAR_CENTER_X[6],
-//                            AutoConfig.BLUE_FAR_CENTER_Y[6]
-//                        )
-//                    )
-//                    .build()
-//            }
-//
-//            PropZone.RIGHT -> {
-//                t1 = drive.trajectoryBuilder(startPose)
-//                    .lineTo(
-//                        Vector2d(
-//                            AutoConfig.BLUE_FAR_RIGHT_X[0],
-//                            AutoConfig.BLUE_FAR_RIGHT_Y[0]
-//                        )
-//                    )
-//                    .build()
-//                t2 = drive.trajectoryBuilder(t1.end())
-//                    .lineTo(
-//                        Vector2d(
-//                            AutoConfig.BLUE_FAR_RIGHT_X[1],
-//                            AutoConfig.BLUE_FAR_RIGHT_Y[1]
-//                        )
-//                    )
-//                    .build()
-//                t3 = drive.trajectoryBuilder(t2.end())
-//                    .lineTo(
-//                        Vector2d(
-//                            AutoConfig.BLUE_FAR_RIGHT_X[2],
-//                            AutoConfig.BLUE_FAR_RIGHT_Y[2]
-//                        )
-//                    )
-//                    .build()
-//                t4 = drive.trajectoryBuilder(t3.end())
-//                    .lineToLinearHeading(
-//                        Pose2d(
-//                            AutoConfig.BLUE_FAR_RIGHT_X[3],
-//                            AutoConfig.BLUE_FAR_RIGHT_Y[3],
-//                            PI
-//                        )
-//                    )
-//                    .build()
-//                t5 = drive.trajectoryBuilder(t4.end())
-//                    .lineTo(
-//                        Vector2d(
-//                            AutoConfig.BLUE_FAR_RIGHT_X[4],
-//                            AutoConfig.BLUE_FAR_RIGHT_Y[4]
-//                        )
-//                    )
-//                    .build()
-//                t6 = drive.trajectoryBuilder(t5.end())
-//                    .lineTo(
-//                        Vector2d(
-//                            AutoConfig.BLUE_FAR_RIGHT_X[5],
-//                            AutoConfig.BLUE_FAR_RIGHT_Y[5]
-//                        )
-//                    )
-//                    .build()
-//                t7 = drive.trajectoryBuilder(t6.end())
-//                    .lineTo(
-//                        Vector2d(
-//                            AutoConfig.BLUE_FAR_RIGHT_X[6],
-//                            AutoConfig.BLUE_FAR_RIGHT_Y[6]
-//                        )
-//                    )
-//                    .build()
-//            }
-//
-//            PropZone.LEFT -> {
-//                t1 = drive.trajectoryBuilder(startPose)
-//                    .lineTo(Vector2d(AutoConfig.BLUE_FAR_LEFT_X[0], AutoConfig.BLUE_FAR_LEFT_Y[0]))
-//                    .build()
-//                t2 = drive.trajectoryBuilder(t1.end())
-//                    .lineToLinearHeading(
-//                        Pose2d(
-//                            AutoConfig.BLUE_FAR_LEFT_X[1],
-//                            AutoConfig.BLUE_FAR_LEFT_Y[1],
-//                            0.0
-//                        )
-//                    )
-//                    .build()
-//                t2_5 = drive.trajectoryBuilder(t2.end())
-//                    .lineTo(Vector2d(AutoConfig.BLUE_FAR_LEFT_X[2], AutoConfig.BLUE_FAR_LEFT_Y[2]))
-//                    .build()
-//                t3 = drive.trajectoryBuilder(t2_5.end())
-//                    .lineTo(Vector2d(AutoConfig.BLUE_FAR_LEFT_X[3], AutoConfig.BLUE_FAR_LEFT_Y[3]))
-//                    .build()
-//                t4 = drive.trajectoryBuilder(t3.end())
-//                    .lineToLinearHeading(
-//                        Pose2d(
-//                            AutoConfig.BLUE_FAR_LEFT_X[4],
-//                            AutoConfig.BLUE_FAR_LEFT_Y[4],
-//                            PI
-//                        )
-//                    )
-//                    .build()
-//                t5 = drive.trajectoryBuilder(t4.end())
-//                    .lineTo(Vector2d(AutoConfig.BLUE_FAR_LEFT_X[5], AutoConfig.BLUE_FAR_LEFT_Y[5]))
-//                    .build()
-//                t6 = drive.trajectoryBuilder(t5.end())
-//                    .lineTo(Vector2d(AutoConfig.BLUE_FAR_LEFT_X[6], AutoConfig.BLUE_FAR_LEFT_Y[6]))
-//                    .build()
-//                t7 = drive.trajectoryBuilder(t6.end())
-//                    .lineTo(Vector2d(AutoConfig.BLUE_FAR_LEFT_X[7], AutoConfig.BLUE_FAR_LEFT_Y[7]))
-//                    .build()
-//            }
-//        }
-//
-//        val t1follower = TrajectoryFollower(drive, t1)
-//        val t2follower = TrajectoryFollower(drive, t2)
-//        val t2_5follower = TrajectoryFollower(drive, t2_5)
-//        val t3follower = TrajectoryFollower(drive, t3)
-//        val t4follower = TrajectoryFollower(drive, t4)
-//        val t5follower = TrajectoryFollower(drive, t5)
-//        val t6follower = TrajectoryFollower(drive, t6)
-//        val t7follower = TrajectoryFollower(drive, t7)
-//        +series(
-//            t1follower,
-//            parallel(
-//                series(
-//                    delay(1.0),
-//                    instant { smec.armState = ScoringMechanism.State.CLOSE_INTAKE },
-//                ),
-//                t2follower,
-//            ),
-//            instant { smec.leftClawState = ClawPositions.OPEN },
-//            parallel(
-//                instant { smec.armState = ScoringMechanism.State.TRAVEL },
-//                // We want to follow only trajectory t3 UNLESS we are on the left path, in which case we have to follow t2_5 and t3
-//                if(zone == PropZone.LEFT)
-//                    series(t2_5follower, t3follower)
-//                else
-//                    t3follower
-//            ),
-//
-//            // TODO: these are all of the steps for after we reach the backdrop side of the field
-//            // TODO: should be more or less the same for each randomization
-////            parallel(
-////                instant {smec.armState = ScoringMechanism.State.DEPOSIT},
-////                t4follower
-////            ),
-////            t5follower,
-////            instant {smec.rightClawState = ClawPositions.OPEN},
-////            t6follower,
-////            instant {smec.armState = ScoringMechanism.State.TRAVEL},
-////            t7follower
-//        )
-
-
     }
 }
