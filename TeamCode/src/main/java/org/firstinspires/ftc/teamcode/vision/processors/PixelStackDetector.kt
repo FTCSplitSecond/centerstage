@@ -16,9 +16,6 @@ class PixelStackDetector(val telemetry: Telemetry) : VisionProcessor {
     }
     override fun processFrame(input: Mat?, captureTimeNanos: Long): Any? {
         Imgproc.cvtColor(input, out, Imgproc.COLOR_RGB2GRAY)
-//            Core.extractChannel(out, out, 1)
-//        if (PropConfig.MODE == 2) {
-//        }
         return out
     }
     override fun onDrawFrame(
