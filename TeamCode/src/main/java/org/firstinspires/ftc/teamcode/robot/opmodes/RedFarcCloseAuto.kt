@@ -171,11 +171,7 @@ class RedFarcCloseAuto : AnchorOpMode() {
 
 
         // trajectories
-        val moveAwayFromWallTrajectory = drive.trajectoryBuilder(startPose)
-            .lineTo(awayFromWallPosition)
-            .build()
-        val moveToScorePurplePixelTrajectory =
-            drive.trajectoryBuilder(moveAwayFromWallTrajectory.end())
+        val moveToScorePurplePixelTrajectory = drive.trajectoryBuilder(startPose)
                 .lineToLinearHeading(purplePixelPose)
                 .build()
         val moveToAlignWithStackTrajectory =
@@ -223,10 +219,9 @@ class RedFarcCloseAuto : AnchorOpMode() {
             .build()
 
         // commands
-        val moveAwayFromWall = TrajectoryFollower(drive, moveAwayFromWallTrajectory)
-        val moveToExtendedIntake = smec.setArmState(ScoringMechanism.State.EXTENDED_INTAKE)
+        val extendToDropPurple = smec.setArmState(ScoringMechanism.State.STACK_INTAKE)
         val alignWithStack = TrajectoryFollower(drive, moveToAlignWithStackTrajectory)
-        val moveToStack = TrajectoryFollower(drive, moveToStackTrajectory)
+        val pickUpToStack = TrajectoryFollower(drive, moveToStackTrajectory)
         val moveToScorePurplePixel = TrajectoryFollower(drive, moveToScorePurplePixelTrajectory)
         val scorePurplePixel = instant { robot.leftClaw.position = ClawPositions.OPEN }
         val moveToTravel = smec.setArmState(ScoringMechanism.State.TRAVEL)
@@ -258,17 +253,14 @@ class RedFarcCloseAuto : AnchorOpMode() {
 
         // Now we schedule the commands
         +series(
-            moveAwayFromWall,
 
-            parallel(moveToScorePurplePixel, moveToExtendedIntake),
+            parallel(moveToScorePurplePixel, extendToDropPurple),
 
             scorePurplePixel,
 
             parallel(
-                smec.setArmState(ScoringMechanism.State.STACK_INTAKE),
-                series(
-                    delay(0.5),
-                    alignWithStack,
+                smec.setArmState(ScoringMechanism.State.STACK_INTAKE_CLOSE),
+                alignWithStack,
                 )
             ),
 

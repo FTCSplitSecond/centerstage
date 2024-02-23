@@ -17,7 +17,7 @@ fun main() {
 
     val myBot =
         DefaultBotBuilder(meepMeep) // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-            .setConstraints(60.0, 60.0, Math.toRadians(180.0), Math.toRadians(180.0), 15.0)
+            .setConstraints(60.0, 50.0, Math.toRadians(360.0), Math.toRadians(180.0), 13.0)
             .setDimensions(15.5, 15.75)
             .followTrajectorySequence { drive ->
                 farAuto(
@@ -28,7 +28,7 @@ fun main() {
             }
 
     meepMeep.setBackground(Background.FIELD_CENTERSTAGE_JUICE_DARK)
-        .setDarkModeq(true)
+        .setDarkMode(true)
         .setBackgroundAlpha(0.95f)
         .addEntity(myBot)
         .start()
