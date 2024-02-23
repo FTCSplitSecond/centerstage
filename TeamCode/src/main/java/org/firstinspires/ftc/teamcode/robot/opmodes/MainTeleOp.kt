@@ -15,6 +15,8 @@ import org.firstinspires.ftc.teamcode.claw.commands.CloseBothClaw
 import org.firstinspires.ftc.teamcode.claw.commands.DropBothClaw
 import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
+import org.firstinspires.ftc.teamcode.drone_launcher.Commands.SetDroneForInit
+import org.firstinspires.ftc.teamcode.drone_launcher.Subsystems.PitchPositions
 import org.firstinspires.ftc.teamcode.drone_launcher.Subsystems.TriggerPositions
 import org.firstinspires.ftc.teamcode.mecanum.commands.DriveMecanum
 import org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants
@@ -35,17 +37,12 @@ class MainTeleOp : AnchorOpMode() {
     override fun prerun() {
         robot = Robot(hardwareMap, this.hardwareManager, telemetry, OpModeType.TELEOP)
         driver = FTCGamepad(gamepad1)
+        +SetDroneForInit(robot.droneLauncher)
     }
 
     override fun run() {
         val smec = robot.scoringMechanism
         robot.init(this.world)
-
-        schedule(
-            instant {
-                robot.droneLauncher.triggerPosition = TriggerPositions.HELD
-            }
-        )
 
         val shapeJoystickResponse : (Double) -> Double = {
             val shapedPower = it.absoluteValue.pow(DriveConstants.JOYSTICK_EXPONENT) * sign(it)
@@ -160,7 +157,14 @@ class MainTeleOp : AnchorOpMode() {
                     else -> smec.setArmState(ScoringMechanism.State.CLIMB)
                 }
         }
-        driver[Button.Key.SHARE] onActivate LaunchDrone(robot.droneLauncher)
+        driver[Button.Key.SHARE] onActivate  ( instant { robot.droneLauncher.pitchPosition = PitchPositions.LAUNCH } )
+        driver[Button.Key.SHARE] onDeactivate   (
+                series(
+                    instant {robot.droneLauncher.triggerPosition = TriggerPositions.RELEASE},
+                    delay(0.25),
+                    instant {robot.droneLauncher.pitchPosition = PitchPositions.STOWED}
+                )
+        )
 
         +UpdateTelemetry(robot) {
             robot.telemetry.addData("X", robot.driveBase.poseEstimate().x)

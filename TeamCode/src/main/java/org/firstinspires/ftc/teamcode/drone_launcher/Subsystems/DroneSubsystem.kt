@@ -20,7 +20,10 @@ enum class PitchPositions {
     LAUNCH
 }
 class DroneSubsystem(private val triggerServo : Servo, private  val pitchServo: Servo, private val telemetry: Telemetry) : Subsystem() {
-    constructor(hw: HardwareManager, telemetry: Telemetry) : this(hw.servo("droneServo"), hw.servo("dronePitch"), telemetry)
+    constructor(hw: HardwareManager, telemetry: Telemetry) : this(
+        hw.servo("droneServo"),
+        hw.servo("dronePitch"),
+        telemetry)
 
     private var movementStartTime = System.currentTimeMillis()
 
@@ -53,7 +56,7 @@ class DroneSubsystem(private val triggerServo : Servo, private  val pitchServo: 
         return (pulseWidth - triggerServo.pwmRange().usPulseLower) / (triggerServo.pwmRange().usPulseUpper - triggerServo.pwmRange().usPulseLower)
     }
     fun getPitchServoPositionFromPulseWidth(pulseWidth: Double, pitchServo: Servo): Double {
-        return (pulseWidth - pitchServo.pwmRange().usPulseLower) / (pitchServo.pwmRange().usPulseUpper - triggerServo.pwmRange().usPulseLower)
+        return (pulseWidth - pitchServo.pwmRange().usPulseLower) / (pitchServo.pwmRange().usPulseUpper - pitchServo.pwmRange().usPulseLower)
     }
 
     fun movementShouldBeComplete(): Boolean {
@@ -63,7 +66,6 @@ class DroneSubsystem(private val triggerServo : Servo, private  val pitchServo: 
     private var isTelemetryEnabled = false
     override fun loop() {
         if (isTelemetryEnabled) {
-
             telemetry.update()
         }
     }
