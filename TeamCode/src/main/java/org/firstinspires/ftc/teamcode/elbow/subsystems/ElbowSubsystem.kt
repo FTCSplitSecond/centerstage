@@ -22,8 +22,8 @@ import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
 
 class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager, val telescope: TelescopeSubsytem) : Subsystem() {
 
-    var isEnabled = false
-    var isTelemetryEnabled = false
+    var isEnabled = true
+    var isTelemetryEnabled = true
     private val motor = hw.motor("elbow")
 
 
@@ -34,8 +34,8 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
     }
 
 
-    val ELBOW_MOTOR_PPR = 8192.0 // https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-13-7-1-ratio-24mm-length-8mm-rex-shaft-435-rpm-3-3-5v-encoder/
-    val DEGREES_PER_REVOLUTION = 360.0  //degrees
+    val ELBOW_MOTOR_PPR = 751.8 // https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-13-7-1-ratio-24mm-length-8mm-rex-shaft-435-rpm-3-3-5v-encoder/
+    val DEGREES_PER_REVOLUTION = 360.0*(13.0/53.0)  //degrees
     val PIDTolerance = 5.0 // degrees
     var targetAngle : Double = 0.0
         private set
@@ -64,11 +64,6 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
             return getAngleFromEncoderTicks(motor.encoder.getCounts())
         }
 
-    /**
-     * Angle when the current armState is [ElbowPosition.ADJUST]
-     */
-    var depositAngle = 0.0
-
     var position : ElbowPosition = ElbowPosition.Travel
         set(value) {
             targetAngle = value.angle
@@ -82,8 +77,6 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
         return Math.abs(targetAngle-currentAngle)<PIDTolerance
     }
 
-    var constant = 1.0
-    //TODO: What the fuck is this
 
     override fun loop() {
         val deltaT = deltaTimer.seconds()
@@ -108,7 +101,8 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
             val minExtension = 13.5
             val maxTotalExtension = minExtension + TELESCOPE_MAX
             val currentTotalExtension = minExtension + telescope.currentExtensionInches
-            val gravityAdjustment = Math.cos(Math.toRadians(currentAngle)) * (currentTotalExtension/maxTotalExtension) * ElbowConfig.KG
+//            val gravityAdjustment = Math.cos(Math.toRadians(currentAngle)) * (currentTotalExtension/maxTotalExtension) * ElbowConfig.KG
+            val gravityAdjustment = Math.cos(Math.toRadians(currentAngle))  * ElbowConfig.KG
             val pidPower = controller.calculate(currentAngle, motionProfile[motionProfileTimer.seconds()].x).adjustPowerForKStatic(ElbowConfig.KS)
             motor power pidPower + gravityAdjustment
         } else motor power 0.0

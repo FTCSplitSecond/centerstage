@@ -73,7 +73,10 @@ public class CenterstageMecanumDrive extends MecanumDrive {
 
     public TrajectorySequenceRunner trajectorySequenceRunner;
 
-    private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(MAX_VEL, MAX_ANG_VEL, TRACK_WIDTH);
+
+    private static final double wheelbase = 350.0/25.4; //mm to inched
+    private static final double trackwidth = 292.275/25.4; //mm to inches
+    private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(MAX_VEL, MAX_ANG_VEL, trackwidth);
     private static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(MAX_ACCEL);
 
     private TrajectoryFollower follower;
@@ -88,9 +91,6 @@ public class CenterstageMecanumDrive extends MecanumDrive {
     private List<Integer> lastEncVels = new ArrayList<>();
 
     private HardwareMap hardwareMap;
-
-    private static final double wheelbase = 350.0/25.4; //mm to inched
-    private static final double trackwidth = 292.275/25.4; //mm to inches
     private final double wheelBaseX = wheelbase / 2.0;
     private final double trackWidthY = trackwidth / 2.0;
     private final Translation2d frontLeftLocation = new Translation2d(wheelBaseX, trackWidthY);

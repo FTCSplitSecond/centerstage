@@ -41,11 +41,11 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     public static double WHEEL_RADIUS = 0.689; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
 
-    public static double PARALLEL_X = -140.94061/25.4; // X is the up and down direction
-    public static double PARALLEL_Y = -95.23590/25.4; // Y is the strafe direction
+    public static double PARALLEL_X = -95.23590/25.4; // X is the up and down direction
+    public static double PARALLEL_Y = -140.94061/25.4; // Y is the strafe direction
 
-    public static double PERPENDICULAR_X = 140.94061/25.4;
-    public static double PERPENDICULAR_Y = -95.23590/25.4;
+    public static double PERPENDICULAR_X = -95.23590/25.4;
+    public static double PERPENDICULAR_Y = 140.94061/25.4;
 
     public static double X_MULTIPLIER = 1.0;
 //TO DO tune these
@@ -69,8 +69,8 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 
         this.drive = drive;
 
-        parallelEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "fL"));
-        perpendicularEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "bL"));
+        parallelEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "parallelEncoder"));
+        perpendicularEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "fL"));
 
         correctionFromImuToFieldHeading = AngleUnit.normalizeRadians(startPose.getHeading() - drive.getRawExternalHeading());
         setPoseEstimate(startPose);

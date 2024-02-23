@@ -22,9 +22,10 @@ import org.firstinspires.ftc.teamcode.swerve.utils.clamp
 class TelescopeSubsytem(private val hardwareManager: HardwareManager, private val robot: Robot) : Subsystem() {
 
     var isTelemetryEnabled = false
+    var isEnalbed = true
 
     private val motor1 = hardwareManager.motor("telescope1")
-    private val motor2 = hardwareManager.motor("telescope1")
+    private val motor2 = hardwareManager.motor("telescope2")
 
 
 
@@ -37,20 +38,20 @@ class TelescopeSubsytem(private val hardwareManager: HardwareManager, private va
         motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)
     }
 
-    val TELESCOPE_MOTOR_PPR = 384.5 // https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-13-7-1-ratio-24mm-length-8mm-rex-shaft-435-rpm-3-3-5v-encoder/
+    val TELESCOPE_MOTOR_PPR = 145.1 * (18.0/19.0) // https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-13-7-1-ratio-24mm-length-8mm-rex-shaft-435-rpm-3-3-5v-encoder/
     val INCHES_PER_REVOLUTION = 30.0/25.4 * Math.PI //inches
     val PIDTolerance = 1.0 // inches
     var targetExtenstionInches : Double = 0.0
     val motionProfileTimer = ElapsedTime()
     var previousTarget = targetExtenstionInches
     var motionProfile = MotionProfileGenerator.generateMotionProfile(
-        MotionState(currentExtensionInches, 0.0, 0.0),
-        MotionState(targetExtenstionInches, 0.0, 0.0),
+        MotionState(0.0, 0.0, 0.0),
+        MotionState(0.0, 0.0, 0.0),
         { TELESCOPE_MAX_ACCELERATION },
         { TELESCOPE_MAX_VELOCITY },
     )
     var deltaTimer = ElapsedTime()
-    private var X : Double = currentExtensionInches
+    private var X : Double = 0.0
     private var V : Double = 0.0
     private var A : Double = 0.0
 
@@ -105,8 +106,10 @@ class TelescopeSubsytem(private val hardwareManager: HardwareManager, private va
         generateMotionProfile(clampedTarget, currentMotionProfileX, V, A)
         val pidPower = controller.calculate(currentExtensionInches, motionProfile[motionProfileTimer.seconds()].x).adjustPowerForKStatic(TELESCOPE_KS)
 
-        motor1 power pidPower
-        motor2 power pidPower
+        if(isEnalbed) {
+            motor1 power pidPower
+            motor2 power pidPower
+        }
 
         if(isTelemetryEnabled) {
             robot.telemetry.addLine("Telescope: Telemetry Enabled")

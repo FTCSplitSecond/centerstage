@@ -54,9 +54,9 @@ public class DriveConstants {
      * motor encoders or have elected not to use them for velocity control, these values should be
      * empirically tuned.
      */
-    public static double kV = 0.0123; // updated 2/18 on qual robot
-    public static double kA = 0.00025; // updated 2/18 on qual robot
-    public static double kStatic = 0.025;  // updated 2/18 on qual robot
+    public static double kV = 0.0094; // updated 2/18 on qual robot
+    public static double kA = 0.00075; // updated 2/18 on qual robot
+    public static double kStatic = 0.113;  // updated 2/18 on qual robot
 
     /*
      * These values are used to generate the trajectories for you robot. To ensure proper operation,
@@ -66,10 +66,10 @@ public class DriveConstants {
      * inches.
      */
     public static double MAX_VEL = 60;
-    public static double MAX_ACCEL = 60;
+    public static double MAX_ACCEL = 30;
     public static double MAX_ANG_VEL = 6.3;
     public static double MAX_ANG_ACCEL = 6.3;
-    public static double OMEGA_WEIGHT = 1.0;
+    public static double OMEGA_WEIGHT = 0.6;
     public static int JOYSTICK_EXPONENT = 3;
 
     public static double PID_TOLERANCE = 0.5;
