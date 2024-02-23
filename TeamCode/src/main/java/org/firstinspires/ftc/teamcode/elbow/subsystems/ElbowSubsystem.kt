@@ -35,7 +35,7 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
 
 
     val ELBOW_MOTOR_PPR = 751.8 // https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-13-7-1-ratio-24mm-length-8mm-rex-shaft-435-rpm-3-3-5v-encoder/
-    val DEGREES_PER_REVOLUTION = 360.0*(13.0/53.0)  //degrees
+    val DEGREES_PER_REVOLUTION = 360.0*(14.0/53.0)  //degrees
     val PIDTolerance = 5.0 // degrees
     var targetAngle : Double = 0.0
         private set
