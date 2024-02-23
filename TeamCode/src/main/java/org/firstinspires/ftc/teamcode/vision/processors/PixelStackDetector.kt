@@ -11,9 +11,6 @@ class PixelStackDetector(val telemetry: Telemetry) : OpenCvPipeline() {
     var HSL = Mat()
     override fun processFrame(input: Mat?): Mat {
         Imgproc.cvtColor(input, out, Imgproc.COLOR_RGB2GRAY)
-//            Core.extractChannel(out, out, 1)
-//        if (PropConfig.MODE == 2) {
-//        }
         return out
     }
 }
