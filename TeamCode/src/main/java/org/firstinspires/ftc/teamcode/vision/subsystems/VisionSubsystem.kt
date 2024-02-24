@@ -86,11 +86,4 @@ class VisionSubsystem(private val robot: Robot): Subsystem() {
         // calibration data gathered empirically
         return x/1.1 - 0.25
     }
-
-    fun getWebcamName() : WebcamName {
-        return robot.hardwareMap.get(
-            WebcamName::class.java, "webcam1"
-        )
-    }
-
 }
