@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.robot.subsystems
 import com.acmerobotics.dashboard.FtcDashboard
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry
 import com.acmerobotics.roadrunner.geometry.Pose2d
-import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.hardware.HardwareMap
 import dev.turtles.anchor.entity.Entity
 import dev.turtles.anchor.world.World
