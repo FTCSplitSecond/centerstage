@@ -13,8 +13,6 @@ import dev.turtles.electriceel.opmode.AnchorOpMode
 import dev.turtles.lilypad.Button
 import dev.turtles.lilypad.impl.FTCGamepad
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
-import org.firstinspires.ftc.teamcode.claw.commands.DropBothClaw
-import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.mecanum.commands.TrajectoryFollower
 import org.firstinspires.ftc.teamcode.roadrunner.drive.CenterstageMecanumDrive
@@ -30,7 +28,7 @@ import kotlin.math.PI
 
 
 @Autonomous
-class BlueFarAuto : AnchorOpMode() {
+class BlueFarCloseAuto : AnchorOpMode() {
     lateinit var robot: Robot
     lateinit var smec: ScoringMechanism
     lateinit var drive: CenterstageMecanumDrive
@@ -65,7 +63,9 @@ class BlueFarAuto : AnchorOpMode() {
             override fun onError(errorCode: Int) {}
         })
         webcam.setPipeline(detector)
-        OpenBothClaw(robot.leftClaw, robot.rightClaw)
+
+//        +OpenBothClaw(robot.leftClaw, robot.rightClaw)
+        +smec.setDepositPixelLevel(-0.5)
 
         driver[Button.Key.DPAD_LEFT] onActivate instant {
             robot.leftClaw.position = when (robot.leftClaw.position) {
@@ -114,7 +114,7 @@ class BlueFarAuto : AnchorOpMode() {
         }
 //        val startHeading = getAllianceHeading(alliance)
 //        val startPose = Pose2d(-32.0, 62.0, startHeading).adjustForAlliance(alliance)
-        val awayFromWallPosition = Vector2d(-40.0, 43.0).adjustForAlliance(alliance)
+        val awayFromWallPosition = Vector2d(-42.0, 45.0).adjustForAlliance(alliance)
 
         val purplePixelPoseBackdropSide =
             Pose2d(Vector2d(-38.0, 51.0), (startPose.heading+PI/5.5)).adjustForAlliance(alliance)
@@ -129,7 +129,7 @@ class BlueFarAuto : AnchorOpMode() {
         }
 
         val stackAxis = Pose2d(Vector2d(-48.0, 35.0), PI).adjustForAlliance(alliance)
-        val stackLocation = Vector2d(-57.5, 35.0).adjustForAlliance(alliance)
+        val stackLocation = Vector2d(-57.7, 35.0).adjustForAlliance(alliance)
 
         val transitLaneY = 58.0
         val nearBackDropLaneX = 40.0
@@ -187,6 +187,10 @@ class BlueFarAuto : AnchorOpMode() {
         val moveToStackTrajectory = drive.trajectoryBuilder(moveToAlignWithStackTrajectory.end())
             .lineTo(stackLocation)
             .build()
+        val backAwayFromStackTrajectory =
+            drive.trajectoryBuilder(moveToStackTrajectory.end())
+                .lineToLinearHeading(stackAxis)
+                .build()
         // UNUSED W/ WHITE PIXEL
         val moveToCloseTransitLaneTrajectory =
             drive.trajectoryBuilder(moveToStackTrajectory.end())
@@ -253,6 +257,7 @@ class BlueFarAuto : AnchorOpMode() {
         val moveToCloseIntake = smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
         val alignWithStack = TrajectoryFollower(drive, moveToAlignWithStackTrajectory)
         val moveToStack = TrajectoryFollower(drive, moveToStackTrajectory)
+        val backAwayFromStack = TrajectoryFollower(drive, backAwayFromStackTrajectory)
         val moveToScorePurplePixel = TrajectoryFollower(drive, moveToScorePurplePixelTrajectory)
         val scorePurplePixel = instant { robot.rightClaw.position= ClawPositions.OPEN }
         val moveToTravel = smec.setArmState(ScoringMechanism.State.TRAVEL)
@@ -270,13 +275,8 @@ class BlueFarAuto : AnchorOpMode() {
         )
 
         val moveToScoreBackDrop = TrajectoryFollower(drive, moveToScoreBackDropTrajectory)
-        val backAwayFromBackDrop = parallel(
-            TrajectoryFollower(drive, backAwayFromBackDropTrajectory),
-            series(
-                delay(0.5),  // delay here is to not pull the pixel with us
-                moveToTravel
-            )
-        )
+        val backAwayFromBackDrop = TrajectoryFollower(drive, backAwayFromBackDropTrajectory)
+
 
         // used for extra cycles
 //        val moveToTransitLaneToPixelStacks = TrajectoryFollower(drive, moveToTransitLaneToPixelStacksTrajectory)
@@ -306,17 +306,18 @@ class BlueFarAuto : AnchorOpMode() {
                 alignWithStack
             )
             ),
-            smec.setArmState(ScoringMechanism.State.STACK_INTAKE),
+            moveToStack,
+            instant { robot.rightClaw.position = ClawPositions.CLOSED},
+            backAwayFromStack,
 
-            instant {robot.rightClaw.position = ClawPositions.CLOSED},
 
             parallel(
-                moveToTravel,
+                smec.setArmState(ScoringMechanism.State.TRAVEL),
                 moveToBackDrop
             ),
-            smec.setDepositPixelLevel(0.25),
+            smec.setDepositPixelLevel(-0.5),
             parallel(
-                moveToDeposit,
+                smec.setArmState(ScoringMechanism.State.DEPOSIT),
                 relocalizeFromAprilTags
             ),
 
@@ -329,32 +330,35 @@ class BlueFarAuto : AnchorOpMode() {
 
             backAwayFromBackDrop,
 
-            parallel(
-                moveToTravel
-            ) ,
+            smec.setArmState(ScoringMechanism.State.TRAVEL, ScoringMechanism.State.DEPOSIT),
+
+            parkInside
+
+
             // add extra cycles here to the pixel stack
-            moveToTransitLaneToPixelStacks,
-            moveToStackLane,
-            moveToPickUpFromStack,
-            moveToStack,
-            instant {robot.leftClaw.position = ClawPositions.CLOSED},
-            parallel(
-                moveToTravel,
-                moveToCloseTransitLane
-            ),
-            moveToBackDropLane,
-            parallel(
-                series(
-                    smec.setDepositPixelLevel(5.0),
-                    moveToDeposit
-                ),
-                moveToNearBackdrop,
-                relocalizeFromAprilTags,
-            ),
-            moveToScoreBackDrop,
-            instant {robot.rightClaw.position = ClawPositions.OPEN},
-            backAwayFromBackDrop
-            )
+//            moveToTransitLaneToPixelStacks,
+//            moveToStackLane,
+//            moveToPickUpFromStack,
+//            smec.setArmState(ScoringMechanism.State.STACK_INTAKE_CLOSE),
+//            moveToStack,
+//            instant {robot.leftClaw.position = ClawPositions.CLOSED},
+//            parallel(
+//                smec.setArmState(ScoringMechanism.State.TRAVEL),
+//                moveToCloseTransitLane
+//            ),
+//            moveToBackDropLane,
+//            parallel(
+//                series(
+//                    smec.setDepositPixelLevel(5.0),
+//                    smec.setArmState(ScoringMechanism.State.DEPOSIT)
+//                ),
+//                moveToNearBackdrop,
+//                relocalizeFromAprilTags,
+//            ),
+//            moveToScoreBackDrop,
+//            instant { robot.rightClaw.position = ClawPositions.OPEN },
+//            backAwayFromBackDrop
+//            )
 
 
             // add extra cycles here to the pixel stack
@@ -581,6 +585,6 @@ class BlueFarAuto : AnchorOpMode() {
 ////            t7follower
 //        )
 
-
+        )
     }
 }

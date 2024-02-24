@@ -36,7 +36,7 @@ class RedFarAuto2p0 : AnchorOpMode() {
     lateinit var drive: CenterstageMecanumDrive
     lateinit var webcam: OpenCvWebcam
     var detector = PropDetector(telemetry)
-    val startPose = Pose2d(-40.0, -62.0, -PI / 2)
+    val startPose = Pose2d(-41.0, -63.0, -PI / 2)
     val alliance = Alliance.RED
     
     override fun prerun() {
@@ -113,9 +113,9 @@ class RedFarAuto2p0 : AnchorOpMode() {
         }
 //        val startHeading = getAllianceHeading(alliance)
 //        val startPose = Pose2d(-32.0, 62.0, startHeading).adjustForAlliance(alliance)
-        val awayFromWallPosition = Vector2d(-45.0, 50.0).adjustForAlliance(alliance)
+        val awayFromWallPosition = Vector2d(-45.0, 36.0).adjustForAlliance(alliance)
 
-        val purplePixelPoseBackdropSide = Pose2d(Vector2d(-35.0, 30.0), 0.0).adjustForAlliance(alliance)
+        val purplePixelPoseBackdropSide = Pose2d(Vector2d(-35.0, 36.0), 0.0).adjustForAlliance(alliance)
         val purplePixelPoseCenter = Pose2d(Vector2d(-36.0, 13.0), startPose.heading).adjustForAlliance(alliance)
         val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(-46.0, 17.0), startPose.heading).adjustForAlliance(alliance)
         val purplePixelPose = when (zoneDetected) {
@@ -126,7 +126,7 @@ class RedFarAuto2p0 : AnchorOpMode() {
 
         val transitLaneY = 12.0
         val nearBackDropLaneX = 34.0
-        val backDropScoreX = 42.0
+        val backDropScoreX = 43.0
 
         val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(-36.0, transitLaneY), PI + spinOffset).adjustForAlliance(alliance)
         val transitLaneBackDropSide = Vector2d(nearBackDropLaneX, transitLaneY).adjustForAlliance(alliance)
@@ -134,7 +134,7 @@ class RedFarAuto2p0 : AnchorOpMode() {
 
         val backDropScoringClawOffset = 0.0 // offset to help pixels land better if needed
         val backDropZoneSpacing = 7.0
-        val backDropCenterY = 36.0
+        val backDropCenterY = 38.0
         val nearBackDropCenter = Vector2d(nearBackDropLaneX, backDropCenterY + backDropScoringClawOffset).adjustForAlliance(alliance)
         val nearBackDropLeft = Vector2d(nearBackDropLaneX, nearBackDropCenter.y + backDropZoneSpacing)
         val nearBackDropRight = Vector2d(nearBackDropLaneX, nearBackDropCenter.y - backDropZoneSpacing)
@@ -156,7 +156,7 @@ class RedFarAuto2p0 : AnchorOpMode() {
                 .lineToLinearHeading(purplePixelPose)
                 .build()
         val moveToFarTransitLaneTrajectory = drive.trajectoryBuilder(moveToScorePurplePixelTrajectory.end())
-                .lineToLinearHeading(transitLanePoseAfterPurplePixel)
+                .splineToLinearHeading(transitLanePoseAfterPurplePixel, 0.0)
                 .build()
         val moveToBackDropLaneTrajectory = drive.trajectoryBuilder(moveToFarTransitLaneTrajectory.end())
                 .lineTo(transitLaneBackDropSide)
@@ -186,7 +186,7 @@ class RedFarAuto2p0 : AnchorOpMode() {
         val moveAwayFromWall = TrajectoryFollower(drive, moveAwayFromWallTrajectory)
         val moveToCloseIntake = smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
         val moveToScorePurplePixel = TrajectoryFollower(drive, moveToScorePurplePixelTrajectory)
-        val scorePurplePixel = instant { robot.rightClaw.position = ClawPositions.OPEN }
+        val scorePurplePixel = instant { robot.leftClaw.position = ClawPositions.OPEN }
         val moveToTravel = smec.setArmState(ScoringMechanism.State.TRAVEL)
         val moveToFarTransitLane = TrajectoryFollower(drive, moveToFarTransitLaneTrajectory)
         val moveToBackDropLane = TrajectoryFollower(drive, moveToBackDropLaneTrajectory)
@@ -213,19 +213,18 @@ class RedFarAuto2p0 : AnchorOpMode() {
 
         // Now we schedule the commands
         +series(
-            delay(10.0), // DELAY FOR ARTIFICAL
+
             moveAwayFromWall,
 
             parallel(moveToScorePurplePixel, moveToCloseIntake),
 
+            instant { robot.leftClaw.position = ClawPositions.OPEN },
 
-            delay(0.5),
+            moveToTravel,
 
-            scorePurplePixel,
+            moveToFarTransitLane,
 
-            parallel(moveToTravel, series(delay(0.75), moveToFarTransitLane), instant {robot.rightClaw.position= ClawPositions.CLOSED}), //may need delay on moveToTravel
-
-            moveToBackDropLane, // here we are at transitLaneBackDropSide
+            moveToBackDropLane,
 
             parallel(moveToNearBackdrop, moveToDeposit),
 

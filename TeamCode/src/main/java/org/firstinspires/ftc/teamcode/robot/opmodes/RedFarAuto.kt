@@ -35,7 +35,7 @@ class RedFarAuto : AnchorOpMode() {
     lateinit var drive: CenterstageMecanumDrive
     lateinit var webcam: OpenCvWebcam
     var detector = PropDetector(telemetry)
-    val startPose = Pose2d(-40.0, -62.0, PI / 2)
+    val startPose = Pose2d(-40.5, -63.0, PI / 2)
     val alliance = Alliance.RED
     val robot = Robot(hardwareMap, this.hardwareManager, telemetry, startPose = startPose)
 
@@ -113,14 +113,14 @@ class RedFarAuto : AnchorOpMode() {
         }
 //        val startHeading = getAllianceHeading(alliance)
 //        val startPose = Pose2d(-32.0, 62.0, startHeading).adjustForAlliance(alliance)
-        val awayFromWallPosition = Vector2d(-45.0, 60.0).adjustForAlliance(alliance)
+        val awayFromWallPosition = Vector2d(-45.0, 36.0).adjustForAlliance(alliance)
 
         val purplePixelPoseBackdropSide =
             Pose2d(Vector2d(-35.0, 30.0), 0.0).adjustForAlliance(alliance)
         val purplePixelPoseCenter =
-            Pose2d(Vector2d(-36.0, 13.5), startPose.heading).adjustForAlliance(alliance)
+            Pose2d(Vector2d(-36.0, 13.0), startPose.heading).adjustForAlliance(alliance)
         val purplePixelPoseAwayFromBackdrop =
-            Pose2d(Vector2d(-44.0, 17.0), startPose.heading).adjustForAlliance(alliance)
+            Pose2d(Vector2d(-46.0, 17.0), startPose.heading).adjustForAlliance(alliance)
         val purplePixelPose = when (zoneDetected) {
             PropZone.LEFT -> if (alliance == Alliance.BLUE) purplePixelPoseBackdropSide else purplePixelPoseAwayFromBackdrop
             PropZone.CENTER, PropZone.UNKNOWN -> purplePixelPoseCenter
@@ -132,7 +132,7 @@ class RedFarAuto : AnchorOpMode() {
 
         val transitLaneY = 12.0
         val nearBackDropLaneX = 34.0
-        val backDropScoreX = 42.0
+        val backDropScoreX = 42.5
 
         val transitLanePoseAfterPurplePixel =
             Pose2d(Vector2d(-36.0, transitLaneY), PI + spinOffset).adjustForAlliance(alliance)
@@ -142,7 +142,7 @@ class RedFarAuto : AnchorOpMode() {
             Vector2d(-48.0, transitLaneY).adjustForAlliance(alliance)
 
         val backDropScoringClawOffset = 0.0 // offset to help pixels land better if needed
-        val backDropZoneSpacing = 6.0
+        val backDropZoneSpacing = 6.5
         val backDropCenterY = 36.0
         val nearBackDropCenter = Vector2d(
             nearBackDropLaneX,
@@ -225,7 +225,7 @@ class RedFarAuto : AnchorOpMode() {
         val alignWithStack = TrajectoryFollower(drive, moveToAlignWithStackTrajectory)
         val moveToStack = TrajectoryFollower(drive, moveToStackTrajectory)
         val moveToScorePurplePixel = TrajectoryFollower(drive, moveToScorePurplePixelTrajectory)
-        val scorePurplePixel = instant { robot.leftClaw.position = ClawPositions.OPEN }
+        val scorePurplePixel = instant { robot.rightClaw.position = ClawPositions.OPEN }
         val moveToTravel = smec.setArmState(ScoringMechanism.State.TRAVEL)
         val moveToFarTransitLane = TrajectoryFollower(drive, moveToFarTransitLaneTrajectory)
         val moveToBackDropLane = TrajectoryFollower(drive, moveToBackDropLaneTrajectory)
@@ -259,12 +259,7 @@ class RedFarAuto : AnchorOpMode() {
 
             parallel(moveToScorePurplePixel, moveToCloseIntake),
 
-
-            delay(0.5),
-
             scorePurplePixel,
-
-            delay(10.0),
 
             parallel(
                 smec.setArmState(ScoringMechanism.State.STACK_INTAKE),
@@ -276,28 +271,24 @@ class RedFarAuto : AnchorOpMode() {
 
             moveToStack,
 
-            instant {robot.leftClaw.position = ClawPositions.CLOSED},
+            instant {robot.rightClaw.position = ClawPositions.CLOSED},
 
 //            delay(10.0),
 
-            parallel(
-                moveToTravel,
+            moveToTravel,
 
-                parallel(
-                    series(
-                        delay(1.0),
-                        moveToDeposit
-                    ),
-                    moveToBackDropLane
-                )
+
+            moveToBackDropLane,
+
 //                instant { smec.leftClawState = ClawPositions.CLOSED}
-            ), //may need delay on moveToTravel
+             //may need delay on moveToTravel
 
 //            moveToBackDropLane, // here we are at transitLaneBackDropSide
 
 //            parallel(moveToNearBackdrop, moveToDeposit),
 
             moveToDeposit,
+
             smec.setDepositPixelLevel(0.0),
 
             moveToNearBackdrop,
