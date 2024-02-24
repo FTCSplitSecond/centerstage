@@ -87,10 +87,4 @@ class VisionSubsystem(private val robot: Robot): Subsystem() {
         return x/1.1 - 0.25
     }
 
-    fun getWebcamName() : WebcamName {
-        return hardwareMap.get(
-            WebcamName::class.java, "webcam1"
-        )
-    }
-
 }

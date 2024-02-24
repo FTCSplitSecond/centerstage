@@ -190,11 +190,12 @@ class ScoringMechanism(
                     ),
                 )
 
-                State.CLIMB -> parallel(
-                    SetElbowPosition(elbow, ElbowPosition.Climb),
-                    SetTelescopePosition(telescope, TelescopePosition.Climb),
-                    SetWristPosition(wrist, WristPosition.Travel )
-                )
+                State.CLIMB -> series(
+                    parallel(
+                        SetElbowPosition(elbow, ElbowPosition.Climb),
+                        SetWristPosition(wrist, WristPosition.Travel )
+                    ),
+                    SetTelescopePosition(telescope, TelescopePosition.Climb))
             },
             updateState
         )
