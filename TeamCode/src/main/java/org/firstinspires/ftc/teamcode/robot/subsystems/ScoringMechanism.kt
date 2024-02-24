@@ -50,7 +50,8 @@ class ScoringMechanism(
         DEPOSIT,
         CLIMB,
         STACK_INTAKE,
-        STACK_INTAKE_CLOSE
+        STACK_INTAKE_CLOSE,
+        PURPLE_DROP
     }
 
     var armState = State.TRAVEL
@@ -138,7 +139,7 @@ class ScoringMechanism(
                             parallel(
                                 SetElbowPosition(elbow, ElbowPosition.Travel),
                                 series(
-                                    idler { deltaTime, elapsedTime -> elbow.currentAngle < 100.0 || elapsedTime > 0.25 },
+                                    idler { deltaTime, elapsedTime -> elbow.currentAngle < 80.0 || elapsedTime > 0.5 },
 //                                    delay(0.25), // figure out idler here
                                     SetWristPosition(wrist, WristPosition.Travel))
                             ),
@@ -175,18 +176,18 @@ class ScoringMechanism(
                 }
 
                 State.STACK_INTAKE -> series(
-                    SetElbowPosition(elbow, ElbowPosition.Travel),
+                    SetElbowPosition(elbow, ElbowPosition.StackIntake),
                     parallel(
-                        SetTelescopePosition(telescope, TelescopePosition.Travel),
-                        SetWristPosition(wrist, WristPosition.Travel)
+                        SetTelescopePosition(telescope, TelescopePosition.StackIntake),
+                        SetWristPosition(wrist, WristPosition.ExtendedIntake)
                     ),
                 )
 
                 State.STACK_INTAKE_CLOSE -> series(
-                    SetElbowPosition(elbow, ElbowPosition.Travel),
+                    SetElbowPosition(elbow, ElbowPosition.StackIntakeClose),
                     parallel(
-                        SetTelescopePosition(telescope, TelescopePosition.Travel),
-                        SetWristPosition(wrist, WristPosition.Travel)
+                        SetTelescopePosition(telescope, TelescopePosition.StackIntakeClose),
+                        SetWristPosition(wrist, WristPosition.CloseIntake)
                     ),
                 )
 
@@ -196,7 +197,19 @@ class ScoringMechanism(
                         SetWristPosition(wrist, WristPosition.Travel )
                     ),
                     SetTelescopePosition(telescope, TelescopePosition.Climb))
+
+                State.PURPLE_DROP -> series(
+                    parallel(
+                        SetElbowPosition(elbow, ElbowPosition.PurpleDrop),
+                        series(
+                            delay(0.5),
+                            SetWristPosition(wrist, WristPosition.PurpleDrop)
+                        ),
+                        SetTelescopePosition(telescope, TelescopePosition.CloseIntake)
+                    ),
+                )
             },
+
             updateState
         )
     }
@@ -218,5 +231,15 @@ class ScoringMechanism(
             else -> instant { } // do nothing
         }
     }
+    fun setDepositPixelLevelAuto(pixelLevel: Double): Component {
+        depositPixelLevel = pixelLevel
+        val ikResults = runKinematics(depositPixelLevel)
+        return parallel(
+            SetTelescopePosition(telescope, TelescopePosition.Adjust(ikResults.telescopeExtension)),
+            SetElbowPosition(elbow, ElbowPosition.Adjust(ikResults.elbowAngle)),
+            SetWristPosition(wrist, WristPosition.Adjust(ikResults.wristAngle))
+        )
+    }
+
 }
 
