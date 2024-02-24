@@ -30,7 +30,7 @@ import org.firstinspires.ftc.teamcode.robot.util.adjustForAlliance
 
 
 @Autonomous
-class BlueFarAuto2p0 : AnchorOpMode() {
+class BlueStackSideFarAuto : AnchorOpMode() {
     lateinit var robot: Robot
     lateinit var smec: ScoringMechanism
     lateinit var drive: CenterstageMecanumDrive
@@ -115,9 +115,12 @@ class BlueFarAuto2p0 : AnchorOpMode() {
 //        val startPose = Pose2d(-32.0, 62.0, startHeading).adjustForAlliance(alliance)
         val awayFromWallPosition = Vector2d(-45.0, 36.0).adjustForAlliance(alliance)
 
-        val purplePixelPoseBackdropSide = Pose2d(Vector2d(-35.0, 36.0), 0.0).adjustForAlliance(alliance)
-        val purplePixelPoseCenter = Pose2d(Vector2d(-36.0, 13.0), startPose.heading).adjustForAlliance(alliance)
-        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(-44.0, 17.0), startPose.heading).adjustForAlliance(alliance)
+        val purplePixelPoseBackdropSide =
+            Pose2d(Vector2d(-35.0, 36.0), 0.0).adjustForAlliance(alliance)
+        val purplePixelPoseCenter =
+            Pose2d(Vector2d(-36.0, 13.0), startPose.heading).adjustForAlliance(alliance)
+        val purplePixelPoseAwayFromBackdrop =
+            Pose2d(Vector2d(-44.0, 17.0), startPose.heading).adjustForAlliance(alliance)
         val purplePixelPose = when (zoneDetected) {
             PropZone.LEFT -> if(alliance== Alliance.BLUE) purplePixelPoseBackdropSide else purplePixelPoseAwayFromBackdrop
             PropZone.CENTER, PropZone.UNKNOWN -> purplePixelPoseCenter
@@ -126,7 +129,7 @@ class BlueFarAuto2p0 : AnchorOpMode() {
 
         val transitLaneY = 12.0
         val nearBackDropLaneX = 34.0
-        val backDropScoreX = 42.5
+        val backDropScoreX = 43.5
 
         val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(-36.0, transitLaneY), PI + spinOffset).adjustForAlliance(alliance)
         val transitLaneBackDropSide = Vector2d(nearBackDropLaneX, transitLaneY).adjustForAlliance(alliance)
@@ -229,6 +232,8 @@ class BlueFarAuto2p0 : AnchorOpMode() {
             moveToFarTransitLane,
 
             instant { robot.leftClaw.position = ClawPositions.CLOSED}, //may need delay on moveToTravel
+
+            delay(8.0),
 
             moveToBackDropLane, // here we are at transitLaneBackDropSide
 

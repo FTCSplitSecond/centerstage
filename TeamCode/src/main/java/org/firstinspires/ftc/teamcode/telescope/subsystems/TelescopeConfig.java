@@ -25,7 +25,7 @@ public class TelescopeConfig {
     public static double TELESCOPE_ADJUST = 0.0; // inches
 
     public static double TELESCOPE_TRAVEL = 0.0; //  inches
-    public static double TELESCOPE_CLIMB = 18.0; //  inches
+    public static double TELESCOPE_CLIMB = 19.5; //  inches
     public static double IK_X_OFFSET = 0.0; //inches
 
 }

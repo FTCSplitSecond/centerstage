@@ -147,7 +147,7 @@ class ScoringMechanism(
                         parallel(
                             SetTelescopePosition(telescope, TelescopePosition.Travel),
                             series(
-                                delay(0.25),
+                                delay(0.1),
                                 SetElbowPosition(elbow, ElbowPosition.Travel),
                                 SetWristPosition(wrist, WristPosition.Travel)
                             ),
@@ -189,12 +189,13 @@ class ScoringMechanism(
                     ),
                 )
 
-                State.CLIMB -> series(
-                    parallel(
-                        SetElbowPosition(elbow, ElbowPosition.Climb),
-                        SetWristPosition(wrist, WristPosition.Travel )
-                    ),
-                    SetTelescopePosition(telescope, TelescopePosition.Climb))
+                State.CLIMB -> parallel(
+                    SetElbowPosition(elbow, ElbowPosition.Climb),
+                    SetWristPosition(wrist, WristPosition.Travel ),
+                    series(
+                        delay(0.1),
+                        SetTelescopePosition(telescope, TelescopePosition.Climb))
+                )
 
                 State.PURPLE_DROP -> series(
                     parallel(
