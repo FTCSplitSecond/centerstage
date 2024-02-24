@@ -6,5 +6,6 @@ sealed class WristPosition(private val angleProvider: () -> Double) {
     object ExtendedIntake : WristPosition({WristConfig.WRIST_EXTENDED_INTAKE})
     object CloseIntake : WristPosition({WristConfig.WRIST_CLOSE_INTAKE})
     object Travel : WristPosition({WristConfig.WRIST_TRAVEL})
+    object PurpleDrop : WristPosition({WristConfig.WRIST_PURPLE_DROP})
     class Adjust(angle : Double) : WristPosition({angle})
 }
