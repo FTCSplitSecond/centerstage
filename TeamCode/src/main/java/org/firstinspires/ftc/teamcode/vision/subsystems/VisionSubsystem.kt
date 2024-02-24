@@ -53,4 +53,10 @@ class VisionSubsystem(private val hardwareMap: HardwareMap, val telemetry: Telem
         telemetry.addData("Camera ID", cameraMonitorViewId)
     }
 
+    fun getWebcamName() : WebcamName {
+        return hardwareMap.get(
+            WebcamName::class.java, "webcam1"
+        )
+    }
+
 }
