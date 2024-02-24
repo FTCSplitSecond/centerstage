@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot.subsystems
 
 import dev.turtles.anchor.component.Component
-import dev.turtles.anchor.component.FinishReason
 import dev.turtles.anchor.component.stock.Delay
-import dev.turtles.anchor.component.stock.Idler
 import dev.turtles.anchor.component.stock.delay
 import dev.turtles.anchor.component.stock.idler
 import dev.turtles.anchor.component.stock.instant
@@ -113,12 +111,12 @@ class ScoringMechanism(
         )
     }
 
-    fun setArmState(newState: State): Component {
+    fun setArmState(toState: State, fromState : State = armState ): Component {
         val updateState = instant {
-            armState = newState
+            armState = toState
         }
         return series(
-            when (newState) {
+            when (toState) {
                 State.CLOSE_INTAKE -> parallel(
                     //TODO redo series
                     SetWristPosition(wrist, WristPosition.CloseIntake),
@@ -132,14 +130,14 @@ class ScoringMechanism(
                     SetTelescopePosition(telescope, TelescopePosition.ExtendedIntake),
                 )
 
-                State.TRAVEL -> when (armState) {
+                State.TRAVEL -> when (fromState) {
                     State.DEPOSIT ->
                         series(
                             SetTelescopePosition(telescope, TelescopePosition.Travel),
                             parallel(
                                 SetElbowPosition(elbow, ElbowPosition.Travel),
                                 series(
-                                    idler { deltaTime, elapsedTime -> elbow.currentAngle < 80.0 || elapsedTime > 0.5 },
+                                    idler { deltaTime, elapsedTime -> elbow.currentAngle < 90.0 || elapsedTime > 0.5 },
 //                                    delay(0.25), // figure out idler here
                                     SetWristPosition(wrist, WristPosition.Travel))
                             ),
@@ -217,9 +215,9 @@ class ScoringMechanism(
         val ikResults = runKinematics(depositPixelLevel)
         return ikResults.depositCoRX
     }
-    fun setDepositPixelLevel(pixelLevel: Double): Component {
+    fun setDepositPixelLevel(pixelLevel: Double, currentState:State = armState): Component {
         depositPixelLevel = pixelLevel
-        return when (armState) {
+        return when (currentState) {
             State.DEPOSIT -> {
                 val ikResults = runKinematics(depositPixelLevel)
                 parallel(

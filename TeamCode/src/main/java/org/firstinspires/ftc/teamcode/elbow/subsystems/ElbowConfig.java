@@ -17,7 +17,7 @@ public class ElbowConfig {
 
     public static double ELBOW_STACK_INTAKE = -2.0;
 
-    public static double ELBOW_STACK_INTAKE_CLOSE = 7.0;
+    public static double ELBOW_STACK_INTAKE_CLOSE = -1.25;
     public static double KG = 0.1;
     public static double KS = 0.00;
 
