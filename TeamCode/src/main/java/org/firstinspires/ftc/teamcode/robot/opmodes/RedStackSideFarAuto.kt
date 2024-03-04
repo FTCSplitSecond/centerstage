@@ -36,7 +36,7 @@ class RedStackSideFarAuto : AnchorOpMode() {
     lateinit var drive: CenterstageMecanumDrive
     lateinit var webcam: OpenCvWebcam
     var detector = PropDetector(telemetry)
-    val startPose = Pose2d(-41.0, -63.0, PI / 2)
+    val startPose = Pose2d(-41.0, -63.0, -PI/2)
     val alliance = Alliance.RED
 
     override fun prerun() {

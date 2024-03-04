@@ -14,6 +14,6 @@ public class WristConfig {
         public static double WRIST_MOVE_OFFSET = 30; //degrees
         public static double WRIST_MAX = 90.0; //  degrees
         public static double WRIST_MIN = -30.0; //  degrees
-        public static double WRIST_OFFSET = 3.0; // degrees
+        public static double WRIST_OFFSET = 5.0; // degrees
 
 }
