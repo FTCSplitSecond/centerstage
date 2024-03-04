@@ -130,7 +130,7 @@ class MainTeleOp : AnchorOpMode() {
                         ScoringMechanism.State.DEPOSIT,
                         ScoringMechanism.State.EXTENDED_INTAKE,
                         ScoringMechanism.State.CLOSE_INTAKE -> smec.setArmState(ScoringMechanism.State.TRAVEL)
-                        else -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
+                        else -> smec.setArmState(ScoringMechanism.State.EXTENDED_INTAKE)
                     }
                 }
         driver[Button.Key.TRIANGLE] onActivate instant {
