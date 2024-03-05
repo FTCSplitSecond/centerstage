@@ -43,7 +43,6 @@ class MainTeleOp : AnchorOpMode() {
     override fun run() {
         val smec = robot.scoringMechanism
         robot.init(this.world)
-        instant { +SetDroneForInit(robot.droneLauncher)}
 
         val shapeJoystickResponse : (Double) -> Double = {
             val shapedPower = it.absoluteValue.pow(DriveConstants.JOYSTICK_EXPONENT) * sign(it)
@@ -130,14 +129,9 @@ class MainTeleOp : AnchorOpMode() {
                         ScoringMechanism.State.DEPOSIT,
                         ScoringMechanism.State.EXTENDED_INTAKE,
                         ScoringMechanism.State.CLOSE_INTAKE -> smec.setArmState(ScoringMechanism.State.TRAVEL)
-                        else -> smec.setArmState(ScoringMechanism.State.EXTENDED_INTAKE)
+                        else -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
                     }
                 }
-        driver[Button.Key.TRIANGLE] onActivate instant {
-            ScoringMechanism.State.EXTENDED_INTAKE
-        }
-
-
         driver[Button.Key.RIGHT_JOYSTICK_PRESS] onActivate instant {
             +when (smec.armState) {
                 ScoringMechanism.State.TRAVEL -> smec.setArmState(ScoringMechanism.State.DEPOSIT)
