@@ -65,13 +65,13 @@ class VisionSubsystem(private val robot: Robot): Subsystem() {
                 Pose2d(
                     poseEstimates.sumOf{it.x}/detections.size,
                     poseEstimates.sumOf{it.y}/detections.size,
-                poseEstimates.sumOf{it.heading}/detections.size),detections.size)
+                    poseEstimates.sumOf{it.heading}/detections.size),detections.size)
         } else AprilTagPoseEstimate.None
 
         // update the propZone detected
         propZoneDetected = if(isPropZoneDetectorEnabled) propDetector.zone else PropZoneDetected.NONE
     }
-    fun getPoseEstimateFromDetection(detection : AprilTagDetection) : Pose2d {
+    private fun getPoseEstimateFromDetection(detection : AprilTagDetection) : Pose2d {
         val tagLocation = Vector2D(
             detection.metadata.fieldPosition.get(0).toDouble(),
             detection.metadata.fieldPosition.get(1).toDouble()
@@ -82,9 +82,8 @@ class VisionSubsystem(private val robot: Robot): Subsystem() {
         val headingEstimate: Double = 180 - detection.ftcPose.yaw
         return Pose2d(robotEstimatedPosition.x, robotEstimatedPosition.y, headingEstimate)
     }
-    fun calibrateDistance(x : Double) : Double {
+    private fun calibrateDistance(x : Double) : Double {
         // calibration data gathered empirically
         return x/1.1 - 0.25
     }
-
 }

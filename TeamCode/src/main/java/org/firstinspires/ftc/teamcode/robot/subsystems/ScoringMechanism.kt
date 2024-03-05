@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot.subsystems
 
 import dev.turtles.anchor.component.Component
-import dev.turtles.anchor.component.FinishReason
 import dev.turtles.anchor.component.stock.Delay
-import dev.turtles.anchor.component.stock.Idler
 import dev.turtles.anchor.component.stock.delay
 import dev.turtles.anchor.component.stock.idler
 import dev.turtles.anchor.component.stock.instant
@@ -50,7 +48,8 @@ class ScoringMechanism(
         DEPOSIT,
         CLIMB,
         STACK_INTAKE,
-        STACK_INTAKE_CLOSE
+        STACK_INTAKE_CLOSE,
+        PURPLE_DROP
     }
 
     var armState = State.TRAVEL
@@ -112,12 +111,12 @@ class ScoringMechanism(
         )
     }
 
-    fun setArmState(newState: State): Component {
+    fun setArmState(toState: State, fromState : State = armState ): Component {
         val updateState = instant {
-            armState = newState
+            armState = toState
         }
         return series(
-            when (newState) {
+            when (toState) {
                 State.CLOSE_INTAKE -> parallel(
                     //TODO redo series
                     SetWristPosition(wrist, WristPosition.CloseIntake),
@@ -131,14 +130,14 @@ class ScoringMechanism(
                     SetTelescopePosition(telescope, TelescopePosition.ExtendedIntake),
                 )
 
-                State.TRAVEL -> when (armState) {
+                State.TRAVEL -> when (fromState) {
                     State.DEPOSIT ->
                         series(
                             SetTelescopePosition(telescope, TelescopePosition.Travel),
                             parallel(
                                 SetElbowPosition(elbow, ElbowPosition.Travel),
                                 series(
-                                    idler { deltaTime, elapsedTime -> elbow.currentAngle < 100.0 || elapsedTime > 0.25 },
+                                    idler { deltaTime, elapsedTime -> elbow.currentAngle < 90.0 || elapsedTime > 0.5 },
 //                                    delay(0.25), // figure out idler here
                                     SetWristPosition(wrist, WristPosition.Travel))
                             ),
@@ -148,7 +147,7 @@ class ScoringMechanism(
                         parallel(
                             SetTelescopePosition(telescope, TelescopePosition.Travel),
                             series(
-                                delay(0.25),
+                                delay(0.1),
                                 SetElbowPosition(elbow, ElbowPosition.Travel),
                                 SetWristPosition(wrist, WristPosition.Travel)
                             ),
@@ -175,28 +174,41 @@ class ScoringMechanism(
                 }
 
                 State.STACK_INTAKE -> series(
-                    SetElbowPosition(elbow, ElbowPosition.Travel),
+                    SetElbowPosition(elbow, ElbowPosition.StackIntake),
                     parallel(
-                        SetTelescopePosition(telescope, TelescopePosition.Travel),
-                        SetWristPosition(wrist, WristPosition.Travel)
+                        SetTelescopePosition(telescope, TelescopePosition.StackIntake),
+                        SetWristPosition(wrist, WristPosition.ExtendedIntake)
                     ),
                 )
 
                 State.STACK_INTAKE_CLOSE -> series(
-                    SetElbowPosition(elbow, ElbowPosition.Travel),
+                    SetElbowPosition(elbow, ElbowPosition.StackIntakeClose),
                     parallel(
-                        SetTelescopePosition(telescope, TelescopePosition.Travel),
-                        SetWristPosition(wrist, WristPosition.Travel)
+                        SetTelescopePosition(telescope, TelescopePosition.StackIntakeClose),
+                        SetWristPosition(wrist, WristPosition.CloseIntake)
                     ),
                 )
 
-                State.CLIMB -> series(
+                State.CLIMB -> parallel(
+                    SetElbowPosition(elbow, ElbowPosition.Climb),
+                    SetWristPosition(wrist, WristPosition.Travel ),
+                    series(
+                        delay(0.1),
+                        SetTelescopePosition(telescope, TelescopePosition.Climb))
+                )
+
+                State.PURPLE_DROP -> series(
                     parallel(
-                        SetElbowPosition(elbow, ElbowPosition.Climb),
-                        SetWristPosition(wrist, WristPosition.Travel )
+                        SetElbowPosition(elbow, ElbowPosition.PurpleDrop),
+                        series(
+                            delay(0.5),
+                            SetWristPosition(wrist, WristPosition.PurpleDrop)
+                        ),
+                        SetTelescopePosition(telescope, TelescopePosition.CloseIntake)
                     ),
-                    SetTelescopePosition(telescope, TelescopePosition.Climb))
+                )
             },
+
             updateState
         )
     }
@@ -204,9 +216,9 @@ class ScoringMechanism(
         val ikResults = runKinematics(depositPixelLevel)
         return ikResults.depositCoRX
     }
-    fun setDepositPixelLevel(pixelLevel: Double): Component {
+    fun setDepositPixelLevel(pixelLevel: Double, currentState:State = armState): Component {
         depositPixelLevel = pixelLevel
-        return when (armState) {
+        return when (currentState) {
             State.DEPOSIT -> {
                 val ikResults = runKinematics(depositPixelLevel)
                 parallel(
@@ -218,5 +230,15 @@ class ScoringMechanism(
             else -> instant { } // do nothing
         }
     }
+    fun setDepositPixelLevelAuto(pixelLevel: Double): Component {
+        depositPixelLevel = pixelLevel
+        val ikResults = runKinematics(depositPixelLevel)
+        return parallel(
+            SetTelescopePosition(telescope, TelescopePosition.Adjust(ikResults.telescopeExtension)),
+            SetElbowPosition(elbow, ElbowPosition.Adjust(ikResults.elbowAngle)),
+            SetWristPosition(wrist, WristPosition.Adjust(ikResults.wristAngle))
+        )
+    }
+
 }
 
