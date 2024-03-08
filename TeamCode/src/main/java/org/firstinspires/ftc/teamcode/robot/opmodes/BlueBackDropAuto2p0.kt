@@ -86,11 +86,11 @@ class BlueBackDropAuto2p0 : AnchorOpMode() {
                 ClawPositions.DROP -> ClawPositions.CLOSED
 
                 ClawPositions.CLOSED -> {
-                    if (smec.armState == ScoringMechanism.State.EXTENDED_INTAKE)
-                        ClawPositions.OPEN
-                    else if (smec.armState == ScoringMechanism.State.CLOSE_INTAKE)
-                        ClawPositions.OPEN
-                    else ClawPositions.DROP;
+                    when (smec.armState) {
+                        ScoringMechanism.State.EXTENDED_INTAKE -> ClawPositions.OPEN
+                        ScoringMechanism.State.CLOSE_INTAKE -> ClawPositions.OPEN
+                        else -> ClawPositions.DROP
+                    };
                 }
             }
         }
@@ -137,9 +137,9 @@ class BlueBackDropAuto2p0 : AnchorOpMode() {
         val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(32.5,  30.0), PI).adjustForAlliance(alliance)
         // note here that zone right/left means different things for red and blue
         val purplePixelPose = when (zoneDetected) {
-            PropZone.LEFT -> if(alliance== Alliance.BLUE) purplePixelPoseBackdropSide else purplePixelPoseAwayFromBackdrop
+            PropZone.LEFT -> if(alliance == Alliance.BLUE) purplePixelPoseBackdropSide else purplePixelPoseAwayFromBackdrop
             PropZone.CENTER, PropZone.UNKNOWN -> purplePixelPoseCenter
-            PropZone.RIGHT -> if(alliance== Alliance.BLUE) purplePixelPoseAwayFromBackdrop else purplePixelPoseBackdropSide
+            PropZone.RIGHT -> if(alliance == Alliance.BLUE) purplePixelPoseAwayFromBackdrop else purplePixelPoseBackdropSide
         }
         val transitLaneY = 60.0
         val nearBackDropLaneX = 34.0
