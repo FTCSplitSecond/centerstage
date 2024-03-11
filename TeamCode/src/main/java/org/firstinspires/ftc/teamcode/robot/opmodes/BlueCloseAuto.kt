@@ -178,115 +178,115 @@ class BlueCloseAuto : AnchorOpMode() {
             .lineTo(parkInsidePosition)
             .build()
 
-        val parkOutsideTrajectory = drive.trajectoryBuilder(backAwayFromBackDropTrajectory.end())
-            .lineTo(parkOutsidePosition)
-            .build()
+       val parkOutsideTrajectory = drive.trajectoryBuilder(backAwayFromBackDropTrajectory.end())
+           .lineTo(parkOutsidePosition)
+           .build()
 
         // commands
-        val moveAwayFromWall = TrajectoryFollower(drive, moveAwayFromWallTrajectory)
-        val moveToCloseIntake =  smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
-        val moveToScorePurplePixel = TrajectoryFollower(drive, moveToScorePurplePixelTrajectory)
-        val scorePurplePixel = instant { robot.leftClaw.position = ClawPositions.OPEN }
-        val moveToTravel = smec.setArmState(ScoringMechanism.State.TRAVEL)
+       val moveAwayFromWall = TrajectoryFollower(drive, moveAwayFromWallTrajectory)
+       val moveToCloseIntake =  smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
+       val moveToScorePurplePixel = TrajectoryFollower(drive, moveToScorePurplePixelTrajectory)
+       val scorePurplePixel = instant { robot.leftClaw.position = ClawPositions.OPEN }
+       val moveToTravel = smec.setArmState(ScoringMechanism.State.TRAVEL)
 //        val moveToBackDropLane = TrajectoryFollower(drive, moveToBackDropLaneTrajectory)
-        val moveToNearBackdrop = TrajectoryFollower(drive, moveToNearBackdropTrajectory)
-        val moveToNearBackdropWhite = TrajectoryFollower(drive, moveToNearBackdropWhiteTrajectory)
-        val moveToDeposit = parallel(
-            smec.setDepositPixelLevel(smec.depositPixelLevel - 0.5),
-            smec.setArmState(ScoringMechanism.State.DEPOSIT)
-        )
-        val moveToScoreBackDrop = TrajectoryFollower(drive, moveToScoreBackDropTrajectory)
-        val scoreBackDrop = DropBothClaw(robot.leftClaw, robot.rightClaw)
-        val backAwayFromBackDrop = parallel(
-            TrajectoryFollower(drive, backAwayFromBackDropTrajectory),
-            series(
-                delay(0.5),  // delay here is to not pull the pixel with us
-                moveToTravel
-            )
-        )
+       val moveToNearBackdrop = TrajectoryFollower(drive, moveToNearBackdropTrajectory)
+       val moveToNearBackdropWhite = TrajectoryFollower(drive, moveToNearBackdropWhiteTrajectory)
+       val moveToDeposit = parallel(
+           smec.setDepositPixelLevel(smec.depositPixelLevel - 0.5),
+           smec.setArmState(ScoringMechanism.State.DEPOSIT)
+       )
+       val moveToScoreBackDrop = TrajectoryFollower(drive, moveToScoreBackDropTrajectory)
+       val scoreBackDrop = DropBothClaw(robot.leftClaw, robot.rightClaw)
+       val backAwayFromBackDrop = parallel(
+           TrajectoryFollower(drive, backAwayFromBackDropTrajectory),
+           series(
+               delay(0.5),  // delay here is to not pull the pixel with us
+               moveToTravel
+           )
+       )
 
-        val moveToTransitLane = TrajectoryFollower(drive, moveToTransitLaneTrajectory)
-        val moveToPixelStacks = parallel(
-                TrajectoryFollower(drive, moveToPixelStacksTrajectory),
-                smec.setArmState(ScoringMechanism.State.STACK_INTAKE_CLOSE)
-            )
+       val moveToTransitLane = TrajectoryFollower(drive, moveToTransitLaneTrajectory)
+       val moveToPixelStacks = parallel(
+               TrajectoryFollower(drive, moveToPixelStacksTrajectory),
+               smec.setArmState(ScoringMechanism.State.STACK_INTAKE_CLOSE)
+           )
 
-        val pickUpPixelStacks = series(
-            TrajectoryFollower(drive, pickUpPixelsTrajectory),
-            CloseBothClaw(robot.leftClaw, robot.rightClaw)
-        )
+       val pickUpPixelStacks = series(
+           TrajectoryFollower(drive, pickUpPixelsTrajectory),
+           CloseBothClaw(robot.leftClaw, robot.rightClaw)
+       )
 
-        val moveToTransitLaneFromPixelStacks = TrajectoryFollower(drive, moveToTransitLaneFromPixelStacksTrajectory)
+       val moveToTransitLaneFromPixelStacks = TrajectoryFollower(drive, moveToTransitLaneFromPixelStacksTrajectory)
 
-        val backAwayAfterScoringWhitePixel = TrajectoryFollower(drive, drive.trajectoryBuilder(moveToScoreBackDropTrajectory.end()).forward(12.0).build())
+       val backAwayAfterScoringWhitePixel = TrajectoryFollower(drive, drive.trajectoryBuilder(moveToScoreBackDropTrajectory.end()).forward(12.0).build())
 
         // used for extra cycles
 //        val moveToTransitLaneToPixelStacks = TrajectoryFollower(drive, moveToTransitLaneToPixelStacksTrajectory)
 //        val intakePixelsFromStack = instant {  } // add pixel intake here returns to transit lane when done
 //        val moveToTransitLaneFromPixelStacks = TrajectoryFollower(drive, moveToTransitLaneFromPixelStacksTrajectory)
 
-        val parkInside = TrajectoryFollower(drive, parkInsideTrajectory)
-        val parkOutside = TrajectoryFollower(drive, parkOutsideTrajectory)
-        val relocalizeFromAprilTags = instant {  } // add april tag relocalization here
+       val parkInside = TrajectoryFollower(drive, parkInsideTrajectory)
+       val parkOutside = TrajectoryFollower(drive, parkOutsideTrajectory)
+       val relocalizeFromAprilTags = instant {  } // add april tag relocalization here
 
         // Now we schedule the commands
-        +series(
-            moveAwayFromWall,
+       +series(
+           moveAwayFromWall,
 
-            parallel(moveToScorePurplePixel, series(delay(0.5), moveToCloseIntake)),
+           parallel(moveToScorePurplePixel, series(delay(0.5), moveToCloseIntake)),
 
-            scorePurplePixel,
+           scorePurplePixel,
 
-            parallel(
-                moveToDeposit,
-                moveToNearBackdrop,
-            ),
+           parallel(
+               moveToDeposit,
+               moveToNearBackdrop,
+           ),
 
-            relocalizeFromAprilTags,
+           relocalizeFromAprilTags,
 
-            delay(0.25),
+           delay(0.25),
 
-            moveToScoreBackDrop,
+           moveToScoreBackDrop,
 
-            scoreBackDrop,
+           scoreBackDrop,
 
-            backAwayFromBackDrop,
+           backAwayFromBackDrop,
 
-            moveToTravel,
+           moveToTravel,
 
-            moveToTransitLane,
+           moveToTransitLane,
 
-            moveToPixelStacks,
+           moveToPixelStacks,
 
-            pickUpPixelStacks,
+           pickUpPixelStacks,
 
-            parallel(
-                moveToTransitLaneFromPixelStacks,
-                moveToTravel
-            ),
+           parallel(
+               moveToTransitLaneFromPixelStacks,
+               moveToTravel
+           ),
 
-            parallel(
-                moveToNearBackdropWhite,
-                series(
-                    moveToDeposit,
-                    smec.setDepositPixelLevel( 4.0)
-                )
-            ),
+           parallel(
+               moveToNearBackdropWhite,
+               series(
+                   moveToDeposit,
+                   smec.setDepositPixelLevel( 4.0)
+               )
+           ),
 
 
-            moveToScoreBackDrop,
+           moveToScoreBackDrop,
 
-            scoreBackDrop,
+           scoreBackDrop,
 
 //            backAwayFromBackDrop,
 
 
-            backAwayAfterScoringWhitePixel,
+           backAwayAfterScoringWhitePixel,
 
-            moveToTravel,
+           moveToTravel,
 
-            parkInside
+           parkInside
 
-        )
+       )
     }
 }
