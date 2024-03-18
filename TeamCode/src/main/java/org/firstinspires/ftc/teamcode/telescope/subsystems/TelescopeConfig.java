@@ -11,7 +11,7 @@ public class TelescopeConfig {
     public static double TELESCOPE_MAX = 22.0; //  inches
     public static double TELESCOPE_MIN = 0.0; //  inches
     public static double TELESCOPE_EXTENDED_INTAKE = TELESCOPE_MAX - 0.75; //  inches
-    public static double TELESCOPE_STACK_INTAKE = 10.5;
+    public static double TELESCOPE_STACK_INTAKE = 17.0;
 
     // These seems to "feel better" when out in front of the claw a bit
     public static double TELESCOPE_EXTENDED_INTAKE_COR_X = 32.0; //  inches from center of robot to center of rotation

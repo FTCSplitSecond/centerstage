@@ -49,12 +49,13 @@ class ScoringMechanism(
         CLIMB,
         STACK_INTAKE,
         STACK_INTAKE_CLOSE,
-        PURPLE_DROP
+        PURPLE_DROP,
+        CYCLE_DROP
     }
 
     var armState = State.TRAVEL
         private set;
-    var depositPixelLevel = 0.0
+    var depositPixelLevel = -1.0
         private set;
 
     /**
@@ -139,7 +140,8 @@ class ScoringMechanism(
                                 series(
                                     idler { deltaTime, elapsedTime -> elbow.currentAngle < 90.0 || elapsedTime > 0.5 },
 //                                    delay(0.25), // figure out idler here
-                                    SetWristPosition(wrist, WristPosition.Travel))
+                                    SetWristPosition(wrist, WristPosition.Travel)
+                                )
                             ),
                         )
 
@@ -164,13 +166,18 @@ class ScoringMechanism(
                 State.DEPOSIT -> {
                     val ikResults = runKinematics(depositPixelLevel)
                     series(
-                            parallel(
-                                SetElbowPosition(elbow, ElbowPosition.Adjust(ikResults.elbowAngle)),
-                                series(
-                                    Delay(0.25),
-                                    SetWristPosition(wrist, WristPosition.Adjust(ikResults.wristAngle)))
-                            ),
-                            SetTelescopePosition(telescope, TelescopePosition.Adjust(ikResults.telescopeExtension)))
+                        parallel(
+                            SetElbowPosition(elbow, ElbowPosition.Adjust(ikResults.elbowAngle)),
+                            series(
+                                Delay(0.25),
+                                SetWristPosition(wrist, WristPosition.Adjust(ikResults.wristAngle))
+                            )
+                        ),
+                        SetTelescopePosition(
+                            telescope,
+                            TelescopePosition.Adjust(ikResults.telescopeExtension)
+                        )
+                    )
                 }
 
                 State.STACK_INTAKE -> series(
@@ -191,10 +198,11 @@ class ScoringMechanism(
 
                 State.CLIMB -> parallel(
                     SetElbowPosition(elbow, ElbowPosition.Climb),
-                    SetWristPosition(wrist, WristPosition.Travel ),
+                    SetWristPosition(wrist, WristPosition.Travel),
                     series(
                         delay(0.1),
-                        SetTelescopePosition(telescope, TelescopePosition.Climb))
+                        SetTelescopePosition(telescope, TelescopePosition.Climb)
+                    )
                 )
 
                 State.PURPLE_DROP -> series(
@@ -207,9 +215,23 @@ class ScoringMechanism(
                         SetTelescopePosition(telescope, TelescopePosition.CloseIntake)
                     ),
                 )
-            },
 
+                State.CYCLE_DROP -> {
+                    val ikResults = runKinematics(depositPixelLevel)
+                    series(
+                        parallel(
+                            SetElbowPosition(elbow, ElbowPosition.CycleDrop),
+                            series(
+                                Delay(0.25),
+                                SetWristPosition(wrist, WristPosition.Adjust(ikResults.wristAngle))
+                            )
+                        ),
+                        SetTelescopePosition(telescope, TelescopePosition.CycleDrop)
+                    )
+                }
+            },
             updateState
+
         )
     }
     fun getDepositXCenterOfRotation() : Double {
@@ -221,8 +243,8 @@ class ScoringMechanism(
         return when (currentState) {
             State.DEPOSIT -> {
                 val ikResults = runKinematics(depositPixelLevel)
-                parallel(
-                    SetTelescopePosition(telescope, TelescopePosition.Adjust(ikResults.telescopeExtension)),
+                            parallel(
+                            SetTelescopePosition(telescope, TelescopePosition.Adjust(ikResults.telescopeExtension)),
                     SetElbowPosition(elbow, ElbowPosition.Adjust(ikResults.elbowAngle)),
                     SetWristPosition(wrist, WristPosition.Adjust(ikResults.wristAngle))
                 )

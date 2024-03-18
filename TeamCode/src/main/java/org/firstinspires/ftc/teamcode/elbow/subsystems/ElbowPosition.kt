@@ -11,5 +11,6 @@ sealed class ElbowPosition(val angleProvider : () -> Double) {
     object StackIntake : ElbowPosition({ElbowConfig.ELBOW_STACK_INTAKE})
     object StackIntakeClose : ElbowPosition({ElbowConfig.ELBOW_STACK_INTAKE_CLOSE})
     object PurpleDrop : ElbowPosition({ElbowConfig.ELBOW_PURPLE_DROP})
+    object CycleDrop : ElbowPosition({ElbowConfig.CYCLE_DROP})
     class Adjust(angle : Double) : ElbowPosition({angle})
 }
