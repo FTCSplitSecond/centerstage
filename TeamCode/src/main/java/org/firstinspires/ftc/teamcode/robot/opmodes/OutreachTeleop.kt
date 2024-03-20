@@ -67,7 +67,7 @@ class OutreachTeleop : AnchorOpMode() {
             })
         schedule(command)
 
-        val triggerThreshold = 0.2
+        val triggerThreshold = 0.25
         val driverRightTrigger = EventTrigger { driver[Button.Trigger.RIGHT] > triggerThreshold }
         val driverLeftTrigger = EventTrigger { driver[Button.Trigger.LEFT] > triggerThreshold }
 
