@@ -22,10 +22,20 @@ android {
     packagingOptions {
         jniLibs.useLegacyPackaging true
     }
+
+    testOptions {
+        unitTests.all {
+            it.useJUnitPlatform()
+        }
+    }
 }
 
 repositories {
     mavenLocal()
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
 }
 
 dependencies {
@@ -49,10 +59,10 @@ dependencies {
     implementation 'com.lectra:koson:1.1.0'
 
     // these are for the kotest tests
-    testImplementation("io.mockk:mockk:1.13.7")
-    testImplementation("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
-    testImplementation("io.kotest:kotest-runner-junit5-jvm:5.8.0")
-    testImplementation("io.kotest:kotest-assertions-core-jvm:5.8.0")
-    testImplementation("io.kotest:kotest-property-jvm:5.8.0")
+    testImplementation("io.mockk:mockk:1.13.10")
+    testImplementation("org.jetbrains.kotlin:kotlin-reflect:1.9.23")
+    testImplementation("io.kotest:kotest-runner-junit5-jvm:5.8.1")
+    testImplementation("io.kotest:kotest-assertions-core-jvm:5.8.1")
+    testImplementation("io.kotest:kotest-property-jvm:5.8.1")
 
 }
