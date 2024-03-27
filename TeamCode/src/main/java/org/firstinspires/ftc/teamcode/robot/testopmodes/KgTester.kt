@@ -19,6 +19,5 @@ class KgTester : AnchorOpMode() {
 
     override fun run() {
         SetElbowPosition(robot.elbow, ElbowPosition.Adjust(0.0))
-        telemetry.addData("kG: ", ElbowConfig.KG)
     }
 }

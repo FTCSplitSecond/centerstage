@@ -9,11 +9,13 @@ import dev.turtles.lilypad.Button
 import dev.turtles.lilypad.impl.FTCGamepad
 import org.firstinspires.ftc.teamcode.elbow.commands.SetElbowPosition
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig
+import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_TEST_TELESCOPE_INCREMENT
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowPosition
 import org.firstinspires.ftc.teamcode.robot.commands.UpdateTelemetry
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMechanism
 import org.firstinspires.ftc.teamcode.robot.util.OpModeType
+import org.firstinspires.ftc.teamcode.swerve.utils.clamp
 import org.firstinspires.ftc.teamcode.telescope.commands.SetTelescopePosition
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeConfig
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopePosition
@@ -31,6 +33,7 @@ class ElbowTest() : AnchorOpMode() {
     }
 
     override fun run() {
+        robot.elbow.isTelemetryEnabled = true
 
         driver[Button.Key.DPAD_DOWN] onActivate instant {
             +SetElbowPosition(robot.elbow, ElbowPosition.Adjust(robot.elbow.targetAngle - ElbowConfig.ELBOW_TEST_INCREMENT))
@@ -39,13 +42,16 @@ class ElbowTest() : AnchorOpMode() {
             +SetElbowPosition(robot.elbow, ElbowPosition.Adjust(robot.elbow.targetAngle + ElbowConfig.ELBOW_TEST_INCREMENT))
         }
 
+        driver[Button.Key.DPAD_RIGHT] onActivate instant {
+            val rx = (robot.telescope.currentExtensionInches + ELBOW_TEST_TELESCOPE_INCREMENT).clamp(0.0,TelescopeConfig.TELESCOPE_MAX)
+            +SetTelescopePosition(robot.telescope, TelescopePosition.Adjust(rx))
+        }
+        driver[Button.Key.DPAD_LEFT] onActivate instant {
+            val rx = (robot.telescope.currentExtensionInches - ELBOW_TEST_TELESCOPE_INCREMENT).clamp(0.0,TelescopeConfig.TELESCOPE_MAX)
+            +SetTelescopePosition(robot.telescope, TelescopePosition.Adjust(rx))
+        }
+
         +UpdateTelemetry(robot) {
-            robot.telemetry.addData("Elbow Kg: ", ElbowConfig.KG)
-            robot.telemetry.addData("Elbow Ks: ", ElbowConfig.KS)
-            robot.telemetry.addData("Elbow Target Angle", robot.elbow.targetAngle)
-            robot.telemetry.addData("Elbow Angle", robot.elbow.currentAngle)
-            robot.telemetry.addData("Wrist Angle", robot.wrist.angle)
-            robot.telemetry.addData("Telescope Ext", robot.telescope.currentExtensionInches)
 
         }
     }

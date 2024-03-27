@@ -11,14 +11,15 @@ class ElbowTests :  ShouldSpec({
         should("the answers should match the expected values from the Excel sheet") {
 
             val testVectors = listOf(
-                ElbowFeedForwardTestVector(90.0,0.0,0.0,0.0,0.0 ),
                 ElbowFeedForwardTestVector(0.0,0.0,0.0,0.0,0.048195 ),
+                ElbowFeedForwardTestVector(90.0,0.0,0.0,0.0,0.0 ),
                 ElbowFeedForwardTestVector(0.0,0.0,0.0,20.0,0.197648 )
             )
             val tolerance = 0.0001
 
             for(test in testVectors) {
-                val power = ElbowSubsystem.getFeedForwardPower(test.theta, test.omega, test.alpha, test.extension)
+                val jt = ElbowSubsystem.getMoment(test.extension)
+                val power = ElbowSubsystem.getGravityFeedforward(test.theta, jt)
                 power shouldBe (test.expectedPower plusOrMinus tolerance)
             }
         }
