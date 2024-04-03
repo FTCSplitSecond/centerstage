@@ -10,7 +10,7 @@ import dev.turtles.anchor.component.FinishReason
 import dev.turtles.anchor.entity.Subsystem
 import dev.turtles.electriceel.wrapper.HardwareManager
 import org.apache.commons.math3.util.FastMath.pow
-import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.B_VISCOUS_DAMPING
+import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.B_VISCOUS_DAMPING_MULTIPLIER
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_HOME
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_KD
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_KI
@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.KA_MULTIPLIER
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.KG_MULTIPLIER
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.KK_VOLTS
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.KS_OMEGA_THRESHOLD
+import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.KS_POWER_THRESHOLD
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.KS_VOLTS
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.KV_MULTIPLIER
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
@@ -29,6 +30,7 @@ import org.firstinspires.ftc.teamcode.swerve.utils.clamp
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
 import kotlin.math.cos
 import kotlin.math.exp
+import kotlin.math.max
 import kotlin.math.sign
 import kotlin.math.sqrt
 
@@ -44,6 +46,7 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
         if (robot.opModeType == OpModeType.AUTONOMOUS)
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER)
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)
+        motor.brake(true)
     }
 
 
@@ -120,17 +123,20 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
 
         val jt = getMoment(telescope.currentExtensionInches)
         val gravityFeedForward = getGravityFeedforward(motionProfileTarget.x, jt)
-        val feedforwardVAPower = getVAFeedForwardPower(motionProfileTarget.v, motionProfileTarget.a, jt)
-        val pidPower = controller.calculate(currentAngle, motionProfileTarget.x)
+
+        val targetVelocity = motionProfileTarget.v
+        val feedforwardVAPower = getVAFeedForwardPower(targetVelocity, motionProfileTarget.a, jt)
+        val pidPower = controller.calculate(currentAngle, lastMotionProfileTarget.x)
         val basePower = feedforwardVAPower + pidPower
-        val frictionPower = getFrictionAdjustment(Math.toRadians(angularV), basePower)
+        val frictionPower = getFrictionAdjustment(angularV, basePower)
         val totalPower = basePower + frictionPower + gravityFeedForward
         val adjustedPower = adjustForBatteryVoltage(totalPower, hw.voltage())
 
         if (isEnabled)
             motor power adjustedPower
-        else
+        else {
             motor power 0.0
+        }
 
         lastMotionProfileTarget = motionProfileTarget
 
@@ -146,7 +152,6 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
             robot.telemetry.addData("totalPower", totalPower)
             robot.telemetry.addData("adjustedPower", adjustedPower)
             robot.telemetry.addData("Angle Error Degree", targetAngle - currentAngle)
-            robot.telemetry.addData("Wrist Angle", robot.wrist.angle)
             robot.telemetry.addData("Telescope Ext", robot.telescope.currentExtensionInches)
             robot.telemetry.addData("Is At Target", this.isAtTarget())
             robot.telemetry.addData("motor.getCurrrent (mA)", motor.getCurrent() * 1000)
@@ -194,11 +199,11 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
             val omega = Math.toRadians(omegaDegrees)
             val alpha = Math.toRadians(alphaDegrees)
 
-            val b = B_VISCOUS_DAMPING // viscous damping coefficient (assumed 0 for now - not true in reality)
-
+            val empericallyMeasuredB = (2.0 * pow(motorKt/ gearRatio, 2)/ motorResistance)
+            val b = B_VISCOUS_DAMPING_MULTIPLIER * empericallyMeasuredB
             // all of these are in Volts (will convert to nominal power later)
             val ka = KA_MULTIPLIER * motorResistance * gearRatio * jt / motorKt
-            val kv = KV_MULTIPLIER * motorKt/ gearRatio +  motorResistance * gearRatio * b / motorKt
+            val kv = KV_MULTIPLIER * (motorKt/ gearRatio +  motorResistance * gearRatio * b / motorKt)
             val voltage = ka * alpha + kv * omega
             return voltage / nominalVoltage
         }
@@ -215,7 +220,9 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
             val kk = KK_VOLTS // Volts to overcome kinetic friction
             val omega = Math.toRadians(omegaDegrees)
             val thresholdOmega = KS_OMEGA_THRESHOLD // rad/s
-            val voltage =  sign(power) * (kk + (ks - kk) * exp(-pow(omega / thresholdOmega,2))) // friction model
+            val voltage =   if (power > KS_POWER_THRESHOLD)
+                                sign(power) * (kk + (ks - kk) * exp(-pow(omega / thresholdOmega,2))) // friction model
+                            else 0.0
             return voltage / nominalVoltage
         }
         fun adjustForBatteryVoltage(power : Double, currentVoltage : Double) : Double {
