@@ -276,7 +276,9 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
             val direction = sign(target - start)
 
             // this creates an asymmetric acceleration profile...possibly add one for when it is terminating around 0 degrees (near the floor)
-            return if (direction > 0.0) {
+            return if(distance < 20.0)
+                ElbowConfig.ELBOW_MAX_ANGULAR_ACCELERATION
+            else if (direction > 0.0) {
                 if (s < 90.0) ElbowConfig.ELBOW_MAX_ANGULAR_ACCELERATION
                 else ElbowConfig.ELBOW_MAX_ANGULAR_DECELERATION
             } else {
