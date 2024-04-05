@@ -29,6 +29,10 @@ class ElbowTest() : AnchorOpMode() {
         driver = FTCGamepad(gamepad1)
         robot.init(this.world)
 
+        +UpdateTelemetry(robot) {
+
+        }
+
         +robot.scoringMechanism.setArmState(ScoringMechanism.State.TRAVEL)
     }
 

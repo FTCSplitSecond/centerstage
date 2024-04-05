@@ -1,22 +1,23 @@
 package org.firstinspires.ftc.teamcode.elbow.subsystems
 
+import com.acmerobotics.roadrunner.profile.AccelerationConstraint
 import com.acmerobotics.roadrunner.profile.MotionProfileGenerator
 import com.acmerobotics.roadrunner.profile.MotionState
+import com.acmerobotics.roadrunner.profile.VelocityConstraint
 import com.acmerobotics.roadrunner.util.epsilonEquals
-import com.arcrobotics.ftclib.controller.PIDController
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.util.ElapsedTime
 import dev.turtles.anchor.component.FinishReason
 import dev.turtles.anchor.entity.Subsystem
 import dev.turtles.electriceel.wrapper.HardwareManager
 import org.apache.commons.math3.util.FastMath.pow
-import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.B_VISCOUS_DAMPING_MULTIPLIER
+import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.B_VISCOUS_DAMPING_COEFFICIENT
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_HOME
-import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_KD
-import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_KI
-import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_KP
-import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_MAX_ANGULAR_ACCELERATION
-import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_MAX_ANGULAR_VELOCITY
+import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_PID_ANTI_WINDUP_LIMIT
+import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_PID_KD
+import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_PID_KI
+import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_PID_KP
+import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_PID_LP_HZ
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.KA_MULTIPLIER
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.KG_MULTIPLIER
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.KK_VOLTS
@@ -28,25 +29,32 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.robot.util.OpModeType
 import org.firstinspires.ftc.teamcode.swerve.utils.clamp
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
+import org.firstinspires.ftc.teamcode.util.LowPassFilter
+import org.firstinspires.ftc.teamcode.util.PIDController
+import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.exp
-import kotlin.math.max
 import kotlin.math.sign
 import kotlin.math.sqrt
 
 
 class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager, val telescope: TelescopeSubsytem) : Subsystem() {
 
-    var isEnabled = true
     var isTelemetryEnabled = true
     private val motor = hw.motor("elbow")
+    var isEnabled = true
+        set(value) {
+            field = value
+            if (!value)
+                motor power 0.0
+        }
 
 
     override fun init() {
         if (robot.opModeType == OpModeType.AUTONOMOUS)
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER)
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)
-        motor.brake(true)
+        motor.brake(false)
     }
 
 
@@ -60,15 +68,16 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
     var motionProfile = MotionProfileGenerator.generateMotionProfile(
         MotionState(currentAngle, 0.0, 0.0),
         MotionState(targetAngle, 0.0, 0.0),
-        { ELBOW_MAX_ANGULAR_VELOCITY },
-        { ELBOW_MAX_ANGULAR_ACCELERATION },
-    )
+        ElbowVelocityConstraint(currentAngle, targetAngle),
+        ElbowAccelerationConstraint(currentAngle, targetAngle))
+    var powerOverride = 0.0
 
     var deltaTimer = ElapsedTime()
     private var angularX : Double = currentAngle
     private var angularV : Double = 0.0
     private var angularA : Double = 0.0
-    private var lastMotionProfileTarget = motionProfile[0.0]
+    private var voltage = hw.voltage()
+    private var lastTargetAngularX = motionProfile[0.0].x
 
     private fun getEncoderTicksFromAngle(angle : Double) : Double {
         return angle/ DEGREES_PER_REVOLUTION * ELBOW_MOTOR_PPR // ticks
@@ -88,8 +97,11 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
             field = value
         }
 
-    private val controller = PIDController(ElbowConfig.ELBOW_KP, ElbowConfig.ELBOW_KI, ElbowConfig.ELBOW_KD)
-
+    private val controller = PIDController(ELBOW_PID_KP, ELBOW_PID_KI, ELBOW_PID_KD, ELBOW_PID_LP_HZ, ELBOW_PID_ANTI_WINDUP_LIMIT, 0.2)
+//    private val angularXLowPassFilter = LowPassFilter(ELBOW_PID_LP_HZ, angularX)
+    private val angularVLowPassFilter = LowPassFilter(ELBOW_PID_LP_HZ, angularV)
+    private val angularALowPassFilter = LowPassFilter(ELBOW_PID_LP_HZ, angularA)
+    private val voltageLowPassFilter = LowPassFilter(1.0, voltage)
 
     fun isAtTarget() : Boolean {
         return Math.abs(targetAngle-currentAngle)<PIDTolerance
@@ -97,14 +109,20 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
 
 
     override fun loop() {
+
+        // update pid values from config only if they have changed
+        if (!(controller.kp epsilonEquals  ELBOW_PID_KP && controller.ki epsilonEquals  ELBOW_PID_KI && controller.kd epsilonEquals  ELBOW_PID_KD ))
+            controller.updateCoefficients(ELBOW_PID_KP, ELBOW_PID_KI, ELBOW_PID_KD)
+
         val deltaT = deltaTimer.seconds()
         deltaTimer.reset()
         val newAngularX = currentAngle
         val newAngularV = (newAngularX - angularX) / deltaT
         val newAngularA = (newAngularV - angularV) / deltaT
         angularX = newAngularX
-        angularV = newAngularV
-        angularA = newAngularA
+        angularV = angularVLowPassFilter.compute(newAngularV)
+        angularA = angularALowPassFilter.compute(newAngularA)
+        voltage = voltageLowPassFilter.compute(hw.voltage())
 
         // using the current motion profile target as the starting point for the next motion profile
         // this is to ensure continuity between motion profiles (eliminates jitter where the motor as moved past current angle
@@ -117,28 +135,23 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
         val motionProfileTarget = motionProfile[motionProfileTimer.seconds()]
 
 
-        // update pid values from config only if they have changed
-        if (!(controller.p epsilonEquals  ELBOW_KP && controller.i epsilonEquals  ELBOW_KI && controller.d epsilonEquals  ELBOW_KD ))
-            controller.setPID(ELBOW_KP, ELBOW_KI, ELBOW_KD)
-
         val jt = getMoment(telescope.currentExtensionInches)
-        val gravityFeedForward = getGravityFeedforward(motionProfileTarget.x, jt)
+        val gravityFeedForward = getGravityFeedforward(angularX, jt)
 
-        val targetVelocity = motionProfileTarget.v
-        val feedforwardVAPower = getVAFeedForwardPower(targetVelocity, motionProfileTarget.a, jt)
-        val pidPower = controller.calculate(currentAngle, lastMotionProfileTarget.x)
+        val targetAngularX = motionProfileTarget.x
+        val targetAngularV = motionProfileTarget.v
+        val targetAngularA = motionProfileTarget.a
+        val feedforwardVAPower = getVAFeedForwardPower(targetAngularV, targetAngularA, jt)
+        val pidPower = controller.compute(lastTargetAngularX, angularX)
         val basePower = feedforwardVAPower + pidPower
-        val frictionPower = getFrictionAdjustment(angularV, basePower)
-        val totalPower = basePower + frictionPower + gravityFeedForward
-        val adjustedPower = adjustForBatteryVoltage(totalPower, hw.voltage())
+        val frictionPower = getFrictionAdjustment(targetAngularV, basePower)
+        val totalPower = if (powerOverride epsilonEquals 0.0) basePower + frictionPower + gravityFeedForward else powerOverride + gravityFeedForward
+        val adjustedPower = adjustForBatteryVoltage(totalPower, voltage)
 
         if (isEnabled)
             motor power adjustedPower
-        else {
-            motor power 0.0
-        }
 
-        lastMotionProfileTarget = motionProfileTarget
+        lastTargetAngularX = targetAngularX
 
         if(isTelemetryEnabled) {
             robot.telemetry.addLine("Elbow  : Telemetry Enabled")
@@ -148,6 +161,13 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
             robot.telemetry.addData("feedforwardVAPower", feedforwardVAPower)
             robot.telemetry.addData("gravityFeedForward", gravityFeedForward)
             robot.telemetry.addData("pidPower", pidPower)
+            robot.telemetry.addData("voltage", voltage)
+            robot.telemetry.addData("angularX", angularX)
+            robot.telemetry.addData("angularV", angularV)
+            robot.telemetry.addData("angularA", angularA)
+            robot.telemetry.addData("targetAngularX", targetAngularX)
+            robot.telemetry.addData("targetAngularV", targetAngularV)
+            robot.telemetry.addData("targetAngularA", targetAngularA)
             robot.telemetry.addData("frictionPower", frictionPower)
             robot.telemetry.addData("totalPower", totalPower)
             robot.telemetry.addData("adjustedPower", adjustedPower)
@@ -199,8 +219,7 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
             val omega = Math.toRadians(omegaDegrees)
             val alpha = Math.toRadians(alphaDegrees)
 
-            val empericallyMeasuredB = (2.0 * pow(motorKt/ gearRatio, 2)/ motorResistance)
-            val b = B_VISCOUS_DAMPING_MULTIPLIER * empericallyMeasuredB
+            val b = B_VISCOUS_DAMPING_COEFFICIENT
             // all of these are in Volts (will convert to nominal power later)
             val ka = KA_MULTIPLIER * motorResistance * gearRatio * jt / motorKt
             val kv = KV_MULTIPLIER * (motorKt/ gearRatio +  motorResistance * gearRatio * b / motorKt)
@@ -219,8 +238,8 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
             val ks = KS_VOLTS // Volts to overcome static friction
             val kk = KK_VOLTS // Volts to overcome kinetic friction
             val omega = Math.toRadians(omegaDegrees)
-            val thresholdOmega = KS_OMEGA_THRESHOLD // rad/s
-            val voltage =   if (power > KS_POWER_THRESHOLD)
+            val thresholdOmega = Math.toRadians(KS_OMEGA_THRESHOLD) // rad/s
+            val voltage =   if (abs(power) > KS_POWER_THRESHOLD)
                                 sign(power) * (kk + (ks - kk) * exp(-pow(omega / thresholdOmega,2))) // friction model
                             else 0.0
             return voltage / nominalVoltage
@@ -235,15 +254,35 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
     private fun generateMotionProfile(target: Double, currentX: Double, currentV: Double, currentA: Double) {
         if (!(previousTarget epsilonEquals target)) {
             previousTarget = target
+
             motionProfile = MotionProfileGenerator.generateMotionProfile(
                 MotionState(currentX, currentV, currentA),
                 MotionState(target, 0.0, 0.0),
-                { ELBOW_MAX_ANGULAR_VELOCITY },
-                { ELBOW_MAX_ANGULAR_ACCELERATION },
-            )
+                ElbowVelocityConstraint(currentX, target),
+                ElbowAccelerationConstraint(currentX, target))
+
             motionProfileTimer.reset()
         }
     }
+    class ElbowVelocityConstraint(private val start : Double, private val target : Double) : VelocityConstraint {
+        override fun get(s: Double): Double {
+            return ElbowConfig.ELBOW_MAX_ANGULAR_VELOCITY
+        }
+    }
+    class ElbowAccelerationConstraint(private val start : Double, private val target : Double) : AccelerationConstraint {
+        override fun get(s: Double): Double {
+            val distance = abs(target - start)
+            val percentPath = 100.0 * (s - start)/(target - start)
+            val direction = sign(target - start)
 
-
+            // this creates an asymmetric acceleration profile...possibly add one for when it is terminating around 0 degrees (near the floor)
+            return if (direction > 0.0) {
+                if (s < 90.0) ElbowConfig.ELBOW_MAX_ANGULAR_ACCELERATION
+                else ElbowConfig.ELBOW_MAX_ANGULAR_DECELERATION
+            } else {
+                if (s > 90.0) ElbowConfig.ELBOW_MAX_ANGULAR_ACCELERATION
+                else ElbowConfig.ELBOW_MAX_ANGULAR_DECELERATION
+            }
+        }
+    }
 }
