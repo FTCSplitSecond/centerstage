@@ -261,10 +261,9 @@ class RedFarcCloseAuto : AnchorOpMode() {
             parallel(
                 smec.setArmState(ScoringMechanism.State.STACK_INTAKE_CLOSE),
                 alignWithStack,
-                )
-            ),
+                ),
 
-            moveToStack,
+//            moveToStack,
 
             instant {robot.leftClaw.position = ClawPositions.CLOSED},
 

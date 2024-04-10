@@ -29,6 +29,7 @@ import kotlin.math.sign
 
 @TeleOp
 class MainTeleOp : AnchorOpMode() {
+class MainTeleOp : AnchorOpMode() {
     lateinit var driver: FTCGamepad
     lateinit var robot: Robot
 

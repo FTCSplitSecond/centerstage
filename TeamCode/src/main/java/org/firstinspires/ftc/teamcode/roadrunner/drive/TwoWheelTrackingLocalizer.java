@@ -69,8 +69,8 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 
         this.drive = drive;
 
-        parallelEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "fL"));
-        perpendicularEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "bL"));
+        parallelEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "frontLeft"));
+        perpendicularEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "backLeft"));
 
         correctionFromImuToFieldHeading = AngleUnit.normalizeRadians(startPose.getHeading() - drive.getRawExternalHeading());
         setPoseEstimate(startPose);
