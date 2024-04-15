@@ -130,7 +130,11 @@ class MainTeleOp : AnchorOpMode() {
                         ScoringMechanism.State.DEPOSIT,
                         ScoringMechanism.State.EXTENDED_INTAKE,
                         ScoringMechanism.State.CLOSE_INTAKE -> smec.setArmState(ScoringMechanism.State.TRAVEL)
-                        else -> smec.setArmState(ScoringMechanism.State.EXTENDED_INTAKE)
+                        else ->
+                            parallel(
+                                OpenBothClaw(robot.leftClaw, robot.rightClaw),
+                                smec.setArmState(ScoringMechanism.State.EXTENDED_INTAKE)
+                            )
                     }
                 }
         driver[Button.Key.TRIANGLE] onActivate instant {
@@ -138,11 +142,17 @@ class MainTeleOp : AnchorOpMode() {
         }
 
 
-        driver[Button.Key.RIGHT_JOYSTICK_PRESS] onActivate instant {
-            +when (smec.armState) {
-                ScoringMechanism.State.TRAVEL -> smec.setArmState(ScoringMechanism.State.DEPOSIT)
-                else -> smec.setArmState(ScoringMechanism.State.TRAVEL)
-            }
+//        driver[Button.Key.RIGHT_JOYSTICK_PRESS] onActivate instant {
+//            +when (smec.armState) {
+//                ScoringMechanism.State.TRAVEL -> smec.setArmState(ScoringMechanism.State.DEPOSIT)
+//                else -> smec.setArmState(ScoringMechanism.State.TRAVEL)
+//            }
+//        }
+
+        driver[Button.Key.CIRCLE] onActivate instant {
+            +series(
+                smec.setArmState(ScoringMechanism.State.DEPOSIT)
+            )
         }
         driver[Button.Key.SQUARE] onActivate instant {
             +series(

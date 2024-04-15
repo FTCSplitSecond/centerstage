@@ -49,8 +49,10 @@ class ScoringMechanism(
         CLIMB,
         STACK_INTAKE,
         STACK_INTAKE_CLOSE,
+        STACK_INTAKE_MIDDLE_CLOSE,
         PURPLE_DROP,
-        CYCLE_DROP
+        CYCLE_DROP,
+        CYCLE_DROP_2
     }
 
     var armState = State.TRAVEL
@@ -107,7 +109,7 @@ class ScoringMechanism(
         return KinematicResults(
             180.0 - elbow,
             telescopeLength - retractedTelescopeLength,
-            (elbow + WRIST_ANGLE) / 2 + WristConfig.WRIST_OFFSET,
+            (elbow + WRIST_ANGLE) + WristConfig.WRIST_OFFSET,
             depositCoRX
         )
     }
@@ -196,6 +198,14 @@ class ScoringMechanism(
                     ),
                 )
 
+                State.STACK_INTAKE_MIDDLE_CLOSE -> series(
+                    SetElbowPosition(elbow, ElbowPosition.StackIntake),
+                    parallel(
+                        SetTelescopePosition(telescope, TelescopePosition.StackIntakeClose),
+                        SetWristPosition(wrist, WristPosition.CloseIntake)
+                    ),
+                )
+
                 State.CLIMB -> parallel(
                     SetElbowPosition(elbow, ElbowPosition.Climb),
                     SetWristPosition(wrist, WristPosition.Travel),
@@ -227,6 +237,20 @@ class ScoringMechanism(
                             )
                         ),
                         SetTelescopePosition(telescope, TelescopePosition.CycleDrop)
+                    )
+                }
+
+                State.CYCLE_DROP_2 -> {
+                    val ikResults = runKinematics(depositPixelLevel)
+                    series(
+                        parallel(
+                            SetElbowPosition(elbow, ElbowPosition.CycleDrop),
+                            series(
+                                Delay(0.25),
+                                SetWristPosition(wrist, WristPosition.Adjust(ikResults.wristAngle))
+                            )
+                        ),
+                        SetTelescopePosition(telescope, TelescopePosition.CycleDrop2)
                     )
                 }
             },

@@ -112,7 +112,7 @@ public class CenterstageMecanumDrive extends MecanumDrive {
         this.hardwareMap = hardwareMap;
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
-                new Pose2d(DriveConstants.PID_TOLERANCE, DriveConstants.PID_TOLERANCE, Math.toRadians(1.0)), 1.0);
+                new Pose2d(DriveConstants.PID_TOLERANCE, DriveConstants.PID_TOLERANCE, Math.toRadians(1.0)), 0.5);
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
