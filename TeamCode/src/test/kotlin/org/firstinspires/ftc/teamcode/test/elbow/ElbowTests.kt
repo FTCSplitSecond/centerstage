@@ -23,5 +23,15 @@ class ElbowTests :  ShouldSpec({
                 power shouldBe (test.expectedPower plusOrMinus tolerance)
             }
         }
+        should("Calculated Kv values should match empirical data") {
+            val empiricalKv = 0.0026 // measured via curve fit in Nom Power / (deg/sec)
+            val omega = 30.0
+            val alpha = 0.0
+            val j0 = ElbowSubsystem.getMoment(0.0)
+            val tolerance = 0.001
+            val kvPower = ElbowSubsystem.getVAFeedForwardPower(omega, alpha, j0)
+            val kv = kvPower / omega
+            kv shouldBe (empiricalKv plusOrMinus tolerance)
+        }
     }
 })
