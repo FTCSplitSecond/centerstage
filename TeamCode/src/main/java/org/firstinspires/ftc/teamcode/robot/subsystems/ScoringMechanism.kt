@@ -231,7 +231,6 @@ class ScoringMechanism(
                 }
             },
             updateState
-
         )
     }
     fun getDepositXCenterOfRotation() : Double {

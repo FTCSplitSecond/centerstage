@@ -31,7 +31,7 @@ class RightClawSubsystem(private val robot : Robot, private val rightServo : Ser
         }
 
     init {
-        rightServo.axonPwmRange()
+        rightServo.pwmRange(500.0, 2400.0)
         updateServoFromPosition(position)
     }
 

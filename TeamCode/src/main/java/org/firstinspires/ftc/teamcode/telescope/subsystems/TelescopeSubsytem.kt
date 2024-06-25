@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.swerve.utils.clamp
 class TelescopeSubsytem(private val hardwareManager: HardwareManager, private val robot: Robot) : Subsystem() {
 
     var isTelemetryEnabled = false
-    var isEnalbed = true
+    var isEnalbed = false
 
     private val motor1 = hardwareManager.motor("telescope1")
     private val motor2 = hardwareManager.motor("telescope2")

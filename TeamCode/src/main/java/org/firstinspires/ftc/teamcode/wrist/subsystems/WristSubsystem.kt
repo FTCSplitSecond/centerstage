@@ -12,6 +12,7 @@ class WristSubsystem(private val wristServo: Servo, private val telemetry: Telem
                 telemetry)
 
     var isTelemetryEnabled = false
+    var isEnabled = true
     private val degreesPerMicrosecond = -180.0/2000.0
     private var movementStartTime = System.currentTimeMillis()
     var angle = WristPosition.Travel.angle
@@ -44,7 +45,9 @@ class WristSubsystem(private val wristServo: Servo, private val telemetry: Telem
     fun updateServoFromAngle(angle: Double) {
         val wristServoPulseWidth = getServoPulseWidthFromAngle(angle, WristConfig.WRIST_SERVO_ZERO_POSITION)
 
-        wristServo goto getServoPositionFromPulseWidth(wristServoPulseWidth, wristServo)
+        if (isEnabled) {
+            wristServo goto getServoPositionFromPulseWidth(wristServoPulseWidth, wristServo)
+        }
     }
     fun getServoPositionFromPulseWidth(pulseWidth : Double, servo : Servo) : Double {
         return (pulseWidth - servo.pwmRange().usPulseLower) / (servo.pwmRange().usPulseUpper - servo.pwmRange().usPulseLower)
