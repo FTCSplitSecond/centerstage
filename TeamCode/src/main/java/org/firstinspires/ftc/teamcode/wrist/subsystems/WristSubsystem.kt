@@ -11,7 +11,7 @@ class WristSubsystem(private val wristServo: Servo, private val telemetry: Telem
             this(hw.servo("wristServo"),
                 telemetry)
 
-    var isTelemetryEnabled = false
+    var isTelemetryEnabled = true
     var isEnabled = true
     private val degreesPerMicrosecond = -180.0/2000.0
     private var movementStartTime = System.currentTimeMillis()
