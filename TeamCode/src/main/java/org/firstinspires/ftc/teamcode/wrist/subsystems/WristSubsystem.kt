@@ -13,7 +13,7 @@ class WristSubsystem(private val wristServo: Servo, private val telemetry: Telem
 
     var isTelemetryEnabled = true
     var isEnabled = true
-    private val degreesPerMicrosecond = -180.0/2000.0
+    private val degreesPerMicrosecond = -90.0/660.0 // Found using 90deg/(uS 0deg) - (uS travel)
     private var movementStartTime = System.currentTimeMillis()
     var angle = WristPosition.Travel.angle
 

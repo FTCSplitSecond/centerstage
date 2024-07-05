@@ -18,6 +18,8 @@ class MecanumDriveBase(val robot : Robot) : Subsystem() {
     val telemetry = robot.telemetry
     var dt = CenterstageMecanumDrive(hardwareMap, robot.startPose)
 
+    private val enabled = true;
+
     fun driveFieldCentric(xVel: Double, yVel : Double, turnVel: Double) {
         val xVelocity = MathUtils.clamp(xVel, -1.0, 1.0)
         val yVelocity = MathUtils.clamp(yVel, -1.0, 1.0)
@@ -40,7 +42,10 @@ class MecanumDriveBase(val robot : Robot) : Subsystem() {
             else -> centerOfRobot
         }
 
-        dt.setWeightedDrivePower(Pose2d(input.x, input.y, turnVelocity), centerOfRotation)
+
+        if(enabled) {
+            dt.setWeightedDrivePower(Pose2d(input.x, input.y, turnVelocity), centerOfRotation)
+        }
     }
 
     override fun end(reason: FinishReason) {
