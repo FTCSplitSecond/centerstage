@@ -37,8 +37,8 @@ class TelescopeSubsytem(private val hardwareManager: HardwareManager, private va
             motor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER)
         motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)
 
-        motor1.reverse(true)
-        motor2.reverse(true)
+//        motor1.reverse(true)
+//        motor2.reverse(true)
     }
 
     val TELESCOPE_MOTOR_PPR = 145.1 * (18.0/19.0) // https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-13-7-1-ratio-24mm-length-8mm-rex-shaft-435-rpm-3-3-5v-encoder/
@@ -62,7 +62,7 @@ class TelescopeSubsytem(private val hardwareManager: HardwareManager, private va
         return extensionInches/ INCHES_PER_REVOLUTION * TELESCOPE_MOTOR_PPR // ticks
     }
     private fun getExtensionInchesFromEncoderTicks(encoderTicks : Double) : Double {
-        val driveMotorRevolutions = -encoderTicks / TELESCOPE_MOTOR_PPR //NEGATIVE BECAUSE OF REVERSED MOTOR DIRECTION
+        val driveMotorRevolutions = /*-*/encoderTicks / TELESCOPE_MOTOR_PPR //NEGATIVE BECAUSE OF REVERSED MOTOR DIRECTION
         val elbowAngleRevolutions: Double = (robot.elbow.currentAngle - ElbowConfig.ELBOW_HOME) / 360.0
         return (driveMotorRevolutions + elbowAngleRevolutions) * INCHES_PER_REVOLUTION // inches
     }

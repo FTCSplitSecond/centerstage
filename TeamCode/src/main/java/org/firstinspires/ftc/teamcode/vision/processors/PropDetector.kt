@@ -1,5 +1,6 @@
 import dev.turtles.electriceel.util.epsilonEquals
 import org.firstinspires.ftc.robotcore.external.Telemetry
+import org.firstinspires.ftc.teamcode.vision.processors.PropZoneDetected
 import org.opencv.core.Core
 import org.opencv.core.Mat
 import org.opencv.core.Rect
@@ -7,15 +8,9 @@ import org.opencv.core.Scalar
 import org.opencv.imgproc.Imgproc
 import org.openftc.easyopencv.OpenCvPipeline
 
-enum class PropZone {
-    LEFT,
-    CENTER,
-    RIGHT,
-    UNKNOWN
-}
 class PropDetector(val telemetry : Telemetry) : OpenCvPipeline() {
 
-    var zone = PropZone.UNKNOWN
+    var zone = PropZoneDetected.NONE
         private set
     val out = Mat()
     val HSV = Mat()
@@ -48,13 +43,13 @@ class PropDetector(val telemetry : Telemetry) : OpenCvPipeline() {
 
         if (max epsilonEquals averages[0]) {
             telemetry.addLine("Left")
-            zone = PropZone.LEFT
+            zone = PropZoneDetected.LEFT
         } else if (max epsilonEquals averages[1]) {
             telemetry.addLine("Center")
-            zone = PropZone.CENTER
+            zone = PropZoneDetected.CENTER
         } else {
             telemetry.addLine("Right")
-            zone = PropZone.RIGHT
+            zone = PropZoneDetected.RIGHT
         }
         telemetry.update()
 

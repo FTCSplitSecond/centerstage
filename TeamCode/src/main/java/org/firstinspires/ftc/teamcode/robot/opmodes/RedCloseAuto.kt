@@ -34,7 +34,7 @@ import org.openftc.easyopencv.OpenCvWebcam
 
 
 @Autonomous
-class RedCloseAuto2p0 : AnchorOpMode() {
+class RedCloseAuto : AnchorOpMode() {
     lateinit var robot: Robot
     lateinit var smec: ScoringMechanism
     lateinit var drive: CenterstageMecanumDrive

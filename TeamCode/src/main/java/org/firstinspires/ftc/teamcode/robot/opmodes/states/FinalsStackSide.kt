@@ -1,11 +1,10 @@
-package org.firstinspires.ftc.teamcode.robot.opmodes
+package org.firstinspires.ftc.teamcode.robot.opmodes.states
 
 import PropDetector
-import PropZone
+import org.firstinspires.ftc.teamcode.vision.processors.PropZoneDetected
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
-import dev.turtles.anchor.component.stock.delay
 import dev.turtles.anchor.component.stock.instant
 import dev.turtles.anchor.component.stock.parallel
 import dev.turtles.anchor.component.stock.series
@@ -13,7 +12,7 @@ import dev.turtles.electriceel.opmode.AnchorOpMode
 import dev.turtles.lilypad.Button
 import dev.turtles.lilypad.impl.FTCGamepad
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
-import org.firstinspires.ftc.teamcode.claw.commands.DropBothClaw
+import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.mecanum.commands.TrajectoryFollower
 import org.firstinspires.ftc.teamcode.roadrunner.drive.CenterstageMecanumDrive
@@ -46,26 +45,8 @@ class FinalsStackSide : AnchorOpMode() {
         drive = robot.driveBase.dt
         robot.elbow.isEnabled = true
         robot.init(this.world)
-        val cameraMonitorViewId = hardwareMap.appContext.resources.getIdentifier(
-            "cameraMonitorViewId",
-            "id",
-            hardwareMap.appContext.packageName
-        )
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(
-            hardwareMap.get(
-                WebcamName::class.java, "webcam1"
-            ), cameraMonitorViewId
-        )
-        webcam.openCameraDeviceAsync(object : OpenCvCamera.AsyncCameraOpenListener {
-            override fun onOpened() {
-                webcam.startStreaming(960, 720, OpenCvCameraRotation.UPRIGHT)
-            }
 
-            override fun onError(errorCode: Int) {}
-        })
-        webcam.setPipeline(detector)
-
-//        +OpenBothClaw(robot.leftClaw, robot.rightClaw)
+        +OpenBothClaw(robot.leftClaw, robot.rightClaw)
         +smec.setDepositPixelLevel(-0.5)
 
         driver[Button.Key.DPAD_LEFT] onActivate instant {
@@ -106,8 +87,9 @@ class FinalsStackSide : AnchorOpMode() {
     }
 
     override fun run() {
-        val zoneDetected = detector.zone
-        webcam.stopStreaming()
+//        val zoneDetected = robot.vision.propZoneDetected
+//        robot.vision.disablePropZoneDetector()
+        val zoneDetected = PropZoneDetected.CENTER
 
         val spinOffset = when (alliance) {
             Alliance.RED -> 0.0001
@@ -124,9 +106,9 @@ class FinalsStackSide : AnchorOpMode() {
         val purplePixelPoseAwayFromBackdrop =
             Pose2d(Vector2d(-38.0, 51.0), (startPose.heading-PI/7)).adjustForAlliance(alliance)
         val purplePixelPose = when (zoneDetected) {
-            PropZone.LEFT -> if (alliance == Alliance.BLUE) purplePixelPoseBackdropSide else purplePixelPoseAwayFromBackdrop
-            PropZone.CENTER, PropZone.UNKNOWN -> purplePixelPoseCenter
-            PropZone.RIGHT -> if (alliance == Alliance.BLUE) purplePixelPoseAwayFromBackdrop else purplePixelPoseBackdropSide
+            PropZoneDetected.LEFT -> if (alliance == Alliance.BLUE) purplePixelPoseBackdropSide else purplePixelPoseAwayFromBackdrop
+            PropZoneDetected.CENTER, PropZoneDetected.NONE -> purplePixelPoseCenter
+            PropZoneDetected.RIGHT -> if (alliance == Alliance.BLUE) purplePixelPoseAwayFromBackdrop else purplePixelPoseBackdropSide
         }
 
         val stackAxis = Pose2d(Vector2d(-48.0, 35.0), PI).adjustForAlliance(alliance)
@@ -156,9 +138,9 @@ class FinalsStackSide : AnchorOpMode() {
 //            Vector2d(nearBackDropLaneX, nearBackDropCenter.y - backDropZoneSpacing)
             Vector2d(nearBackDropLaneX, 30.0)
         val nearBackDropPosition = when (zoneDetected) {
-            PropZone.LEFT -> nearBackDropLeft
-            PropZone.CENTER, PropZone.UNKNOWN -> nearBackDropCenter
-            PropZone.RIGHT -> nearBackDropRight
+            PropZoneDetected.LEFT -> nearBackDropLeft
+            PropZoneDetected.CENTER, PropZoneDetected.NONE -> nearBackDropCenter
+            PropZoneDetected.RIGHT -> nearBackDropRight
         }
         val dropWhitePosition = Vector2d(
             backDropScoreX,

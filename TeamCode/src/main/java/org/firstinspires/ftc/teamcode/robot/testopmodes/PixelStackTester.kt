@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot.testopmodes
 
-import PropZone
+import org.firstinspires.ftc.teamcode.vision.processors.PropZoneDetected
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import dev.turtles.anchor.component.stock.instant
@@ -23,7 +23,7 @@ class PixelStackTester : AnchorOpMode() {
     lateinit var drive : CenterstageMecanumDrive
     lateinit var webcam : OpenCvWebcam
     var detector = PixelStackDetector(telemetry)
-    var zone = PropZone.UNKNOWN
+    var zone = PropZoneDetected.NONE
     override fun prerun() {
         val driver = FTCGamepad(gamepad1)
         robot = Robot(hardwareMap, this.hardwareManager, telemetry)
