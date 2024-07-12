@@ -130,9 +130,9 @@ class RedCenterAuto2p0 : AnchorOpMode() {
 //        val startPose = Pose2d(-32.0, 62.0, startHeading).adjustForAlliance(alliance)
         val awayFromWallPosition = Pose2d(Vector2d(-24.0, 48.0), PI).adjustForAlliance(alliance)
 
-        val purplePixelPoseBackdropSide = Pose2d(Vector2d(-14.0, 32.0), PI).adjustForAlliance(alliance)
+        val purplePixelPoseBackdropSide = Pose2d(Vector2d(-15.5, 31.0), PI).adjustForAlliance(alliance)
         val purplePixelPoseCenter = Pose2d(Vector2d(-36.0, 36.0), PI/2).adjustForAlliance(alliance)
-        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(-36.0, 32.0), PI).adjustForAlliance(alliance)
+        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(-38.0, 30.5), PI).adjustForAlliance(alliance)
         val purplePixelPose = when (zoneDetected) {
             PropZoneDetected.LEFT -> if(alliance== Alliance.BLUE) purplePixelPoseBackdropSide else purplePixelPoseAwayFromBackdrop
             PropZoneDetected.CENTER, PropZoneDetected.NONE -> purplePixelPoseCenter

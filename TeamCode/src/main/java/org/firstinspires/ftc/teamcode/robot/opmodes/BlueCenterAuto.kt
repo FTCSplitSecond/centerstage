@@ -35,14 +35,14 @@ import org.firstinspires.ftc.teamcode.vision.RelocalizeFromAprilTags
 
 
 @Autonomous
-class RedCenterAuto : AnchorOpMode() {
+class BlueCenterAuto : AnchorOpMode() {
     lateinit var robot: Robot
     lateinit var smec: ScoringMechanism
     lateinit var drive: CenterstageMecanumDrive
     lateinit var webcam: OpenCvWebcam
     var detector = PropDetector(telemetry)
-    val startPose = Pose2d(-39.0, -62.0, -PI / 2)
-    val alliance = Alliance.RED
+    val startPose = Pose2d(-33.0, 62.0, PI / 2)
+    val alliance = Alliance.BLUE
 
     override fun prerun() {
         val driver = FTCGamepad(gamepad1)
@@ -111,10 +111,10 @@ class RedCenterAuto : AnchorOpMode() {
     }
 
     override fun run() {
-        val parkLocation = AutoConfig.RED_CENTER_PARK
-        val delayA = AutoConfig.RED_CENTER_DELAYS[0]
-        val delayB = AutoConfig.RED_CENTER_DELAYS[1]
-        val delayC = AutoConfig.RED_CENTER_DELAYS[2]
+        val parkLocation = AutoConfig.BLUE_CENTER_PARK
+        val delayA = AutoConfig.BLUE_CENTER_DELAYS[0]
+        val delayB = AutoConfig.BLUE_CENTER_DELAYS[1]
+        val delayC = AutoConfig.BLUE_CENTER_DELAYS[2]
 
         val zoneDetected = detector.zone
         webcam.stopStreaming()
@@ -131,7 +131,7 @@ class RedCenterAuto : AnchorOpMode() {
         val awayFromWallPosition = Pose2d(Vector2d(-24.0, 48.0), PI).adjustForAlliance(alliance)
 
         val purplePixelPoseBackdropSide = Pose2d(Vector2d(-15.5, 31.0), PI).adjustForAlliance(alliance)
-        val purplePixelPoseCenter = Pose2d(Vector2d(-36.0, 36.0), PI/2).adjustForAlliance(alliance)
+        val purplePixelPoseCenter = Pose2d(Vector2d(-36.0, 36.0), -PI/2).adjustForAlliance(alliance)
         val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(-38.0, 30.5), PI).adjustForAlliance(alliance)
         val purplePixelPose = when (zoneDetected) {
             PropZoneDetected.LEFT -> if(alliance== Alliance.BLUE) purplePixelPoseBackdropSide else purplePixelPoseAwayFromBackdrop
@@ -147,9 +147,9 @@ class RedCenterAuto : AnchorOpMode() {
         val transitLaneBackDropSide = Vector2d(nearBackDropLaneX, transitLaneY).adjustForAlliance(alliance)
         val transitLanePixelStackSide = Vector2d(-106.0, transitLaneY).adjustForAlliance(alliance)
 
-        val leftClawStackPose = Pose2d(Vector2d(-106.0, 34.03), PI).adjustForAlliance(alliance)
-        //Right claw not tested
-        val rightClawStackPose = Pose2d(Vector2d(-106.0, 38.0), PI).adjustForAlliance(alliance)
+        val rightClawStackPose = Pose2d(Vector2d(-106.0, 34.0), PI).adjustForAlliance(alliance)
+        //Left claw not tested
+        val leftClawStackPose = Pose2d(Vector2d(-106.0, 38.0), PI).adjustForAlliance(alliance)
 
         val backDropScoringClawOffset = 0.0 // offset to help pixels land better if needed
         val backDropZoneSpacing = 7.0
@@ -187,10 +187,10 @@ class RedCenterAuto : AnchorOpMode() {
             .lineTo(transitLanePixelStackSide)
             .build()
         val moveToLeftClawStackTrajectory = drive.trajectoryBuilder(moveToPixelStacksTrajectory.end())
-            .lineToLinearHeading(Pose2d(Vector2d(leftClawStackPose.x + 1.0, leftClawStackPose.y), leftClawStackPose.heading))
+            .lineToLinearHeading(Pose2d(Vector2d(rightClawStackPose.x + 1.0, rightClawStackPose.y), rightClawStackPose.heading))
             .build()
         val moveToLeftClawStackIntakeTrajectory = drive.trajectoryBuilder(moveToLeftClawStackTrajectory.end())
-            .lineToLinearHeading(leftClawStackPose)
+            .lineToLinearHeading(rightClawStackPose)
             .build()
         val moveToTransitLaneFromPixelStacksTrajectory = drive.trajectoryBuilder(moveToLeftClawStackIntakeTrajectory.end())
             .lineTo(transitLanePixelStackSide)
@@ -215,7 +215,7 @@ class RedCenterAuto : AnchorOpMode() {
         val moveAwayFromWall = TrajectoryFollower(drive, moveAwayFromWallTrajectory)
         val moveToCloseIntake = smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
         val moveToScorePurplePixel = TrajectoryFollower(drive, moveToScorePurplePixelTrajectory)
-        val scorePurplePixel = instant { robot.leftClaw.position = ClawPositions.OPEN }
+        val scorePurplePixel = instant { robot.rightClaw.position = ClawPositions.OPEN }
         val moveToTravel = smec.setArmState(ScoringMechanism.State.TRAVEL)
         val moveToFarTransitLane = TrajectoryFollower(drive, moveToFarTransitLaneTrajectory)
 

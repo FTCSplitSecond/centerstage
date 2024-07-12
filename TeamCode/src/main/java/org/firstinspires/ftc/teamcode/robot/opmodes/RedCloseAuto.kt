@@ -231,7 +231,9 @@ class RedCloseAuto : AnchorOpMode() {
 
             moveAwayFromWall,
 
-            parallel(moveToScorePurplePixel, series(delay(0.5), moveToCloseIntake)),
+            moveToCloseIntake,
+
+            moveToScorePurplePixel,
 
             scorePurplePixel,
 

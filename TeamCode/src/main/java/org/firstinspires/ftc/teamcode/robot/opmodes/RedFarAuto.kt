@@ -130,7 +130,7 @@ class RedFarAuto : AnchorOpMode() {
 //        val startPose = Pose2d(-32.0, 62.0, startHeading).adjustForAlliance(alliance)
         val awayFromWallPosition = Pose2d(Vector2d(-84.0, 36.0), startPose.heading).adjustForAlliance(alliance)
 
-        val purplePixelPoseBackdropSide = Pose2d(Vector2d(-83.0, 34.0), 0.0).adjustForAlliance(alliance)
+        val purplePixelPoseBackdropSide = Pose2d(Vector2d(-98.0, 32.0), PI).adjustForAlliance(alliance)
         val purplePixelPoseCenter = Pose2d(Vector2d(-84.0, 14.0), startPose.heading).adjustForAlliance(alliance)
         val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(-96.0, 17.0), startPose.heading).adjustForAlliance(alliance)
         val purplePixelPose = when (zoneDetected) {
@@ -146,7 +146,7 @@ class RedFarAuto : AnchorOpMode() {
         val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(-98.0, transitLaneY), PI + spinOffset).adjustForAlliance(alliance)
         val transitLaneBackDropSide = Vector2d(nearBackDropLaneX, transitLaneY).adjustForAlliance(alliance)
 
-        val leftClawStackPose = Pose2d(Vector2d(-106.0, 10.0), PI).adjustForAlliance(alliance)
+        val leftClawStackPose = Pose2d(Vector2d(-105.0, 10.0), PI).adjustForAlliance(alliance)
 
         val nearCenterStackPose = Vector2d(-33.0, 12.0).adjustForAlliance(alliance)
         val centerStackAngle = (3*PI)/4 //45 degrees
@@ -246,7 +246,10 @@ class RedFarAuto : AnchorOpMode() {
 
         // commands
         val moveAwayFromWall = TrajectoryFollower(drive, moveAwayFromWallTrajectory)
-        val moveToCloseIntake = smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
+        val setArmStateForPurple = when(zoneDetected) {
+            PropZoneDetected.LEFT -> smec.setArmState(ScoringMechanism.State.PURPLE_DROP)
+            else -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
+        }
         val moveToScorePurplePixel = TrajectoryFollower(drive, moveToScorePurplePixelTrajectory)
         val scorePurplePixel = instant { robot.leftClaw.position = ClawPositions.OPEN }
         val moveToTravel = smec.setArmState(ScoringMechanism.State.TRAVEL)
@@ -306,7 +309,7 @@ class RedFarAuto : AnchorOpMode() {
 
             moveAwayFromWall,
 
-            parallel(moveToScorePurplePixel, moveToCloseIntake),
+            parallel(series( delay(0.5), setArmStateForPurple), moveToScorePurplePixel),
 
             instant { robot.leftClaw.position = ClawPositions.OPEN },
 
