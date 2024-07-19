@@ -55,7 +55,7 @@ class ScoringMechanism(
 
     var armState = State.TRAVEL
         private set;
-    var depositPixelLevel = -1.0
+    var depositPixelLevel = 1.0
         private set;
 
     /**
