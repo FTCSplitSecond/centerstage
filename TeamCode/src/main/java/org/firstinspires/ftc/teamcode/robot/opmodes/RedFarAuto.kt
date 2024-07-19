@@ -247,7 +247,7 @@ class RedFarAuto : AnchorOpMode() {
         // commands
         val moveAwayFromWall = TrajectoryFollower(drive, moveAwayFromWallTrajectory)
         val setArmStateForPurple = when(zoneDetected) {
-            PropZoneDetected.LEFT -> smec.setArmState(ScoringMechanism.State.PURPLE_DROP)
+            PropZoneDetected.RIGHT -> smec.setArmState(ScoringMechanism.State.PURPLE_DROP)
             else -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
         }
         val moveToScorePurplePixel = TrajectoryFollower(drive, moveToScorePurplePixelTrajectory)

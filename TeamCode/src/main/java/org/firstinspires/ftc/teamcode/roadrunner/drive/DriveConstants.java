@@ -72,7 +72,7 @@ public class DriveConstants {
     public static double OMEGA_WEIGHT = 0.6;
     public static int JOYSTICK_EXPONENT = 3;
 
-    public static double PID_TOLERANCE = 0.75;
+    public static double PID_TOLERANCE = 0.5;
 
     /*
      * Adjust the orientations here to match your robot. See the FTC SDK documentation for details.
