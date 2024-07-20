@@ -25,6 +25,9 @@ import org.firstinspires.ftc.teamcode.robot.util.Alliance
 import org.firstinspires.ftc.teamcode.robot.util.AutoConfig
 import org.firstinspires.ftc.teamcode.robot.util.ParkLocation
 import org.firstinspires.ftc.teamcode.robot.util.adjustForAlliance
+import org.firstinspires.ftc.teamcode.telescope.commands.SetTelescopePosition
+import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeConfig
+import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopePosition
 import org.firstinspires.ftc.teamcode.vision.AprilTagRelocalize
 import org.firstinspires.ftc.teamcode.vision.RelocalizeFromAprilTags
 import org.openftc.easyopencv.OpenCvCamera
@@ -130,30 +133,38 @@ class RedFarAuto : AnchorOpMode() {
 //        val startPose = Pose2d(-32.0, 62.0, startHeading).adjustForAlliance(alliance)
         val awayFromWallPosition = Pose2d(Vector2d(-84.0, 36.0), startPose.heading).adjustForAlliance(alliance)
 
-        val purplePixelPoseBackdropSide = Pose2d(Vector2d(-98.0, 32.0), PI).adjustForAlliance(alliance)
+        val purplePixelPoseBackdropSide = Pose2d(Vector2d(-103.0, 30.0), PI).adjustForAlliance(alliance)
         val purplePixelPoseCenter = Pose2d(Vector2d(-84.0, 14.0), startPose.heading).adjustForAlliance(alliance)
-        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(-96.0, 17.0), startPose.heading).adjustForAlliance(alliance)
+        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(-96.5, 17.0), startPose.heading).adjustForAlliance(alliance)
         val purplePixelPose = when (zoneDetected) {
             PropZoneDetected.LEFT -> if(alliance== Alliance.BLUE) purplePixelPoseBackdropSide else purplePixelPoseAwayFromBackdrop
             PropZoneDetected.CENTER, PropZoneDetected.NONE -> purplePixelPoseCenter
             PropZoneDetected.RIGHT -> if(alliance== Alliance.BLUE) purplePixelPoseAwayFromBackdrop else purplePixelPoseBackdropSide
         }
 
+
+
         val transitLaneY = 12.0
-        val nearBackDropLaneX = 34.0
+        val nearBackDropLaneX = 38.0
         val backDropScoreX = 46.0
 
-        val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(-98.0, transitLaneY), PI + spinOffset).adjustForAlliance(alliance)
+        val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(-98.0, 9.5), PI + spinOffset).adjustForAlliance(alliance)
+
+        val poseAfterPurplePixel = when (zoneDetected) {
+            PropZoneDetected.LEFT -> Pose2d(Vector2d(transitLanePoseAfterPurplePixel.x + 0.01, transitLanePoseAfterPurplePixel.y), startPose.heading)
+            else -> Pose2d(Vector2d(transitLanePoseAfterPurplePixel.x + 0.01, transitLanePoseAfterPurplePixel.y), transitLanePoseAfterPurplePixel.heading)
+        }
+
         val transitLaneBackDropSide = Vector2d(nearBackDropLaneX, transitLaneY).adjustForAlliance(alliance)
 
-        val leftClawStackPose = Pose2d(Vector2d(-105.0, 10.0), PI).adjustForAlliance(alliance)
+        val leftClawStackPose = Pose2d(Vector2d(-106.0, 10.0), PI).adjustForAlliance(alliance)
 
         val nearCenterStackPose = Vector2d(-33.0, 12.0).adjustForAlliance(alliance)
         val centerStackAngle = (3*PI)/4 //45 degrees
         val centerStackLeftClawPose = Pose2d(Vector2d(-36.0, 7.75), centerStackAngle).adjustForAlliance(alliance)
         val centerStackRightClawPose = Pose2d(Vector2d(-37.5, 9.0), centerStackAngle).adjustForAlliance(alliance)
 
-        val backDropScoringClawOffset = 3.0 //  offset to help pixels land better if needed
+        val backDropScoringClawOffset = 0.0 //  offset to help pixels land better if needed
         val backDropZoneSpacing = 7.0
         val backDropCenterY = 36.0
         val nearBackDropCenter = Vector2d(nearBackDropLaneX, backDropCenterY + backDropScoringClawOffset).adjustForAlliance(alliance)
@@ -184,7 +195,10 @@ class RedFarAuto : AnchorOpMode() {
         val moveToScorePurplePixelTrajectory = drive.trajectoryBuilder(moveAwayFromWallTrajectory.end())
                 .lineToLinearHeading(purplePixelPose)
                 .build()
-        val moveToFarTransitLaneTrajectory = drive.trajectoryBuilder(moveToScorePurplePixelTrajectory.end())
+        val moveToAfterPurplePixelTrajectory = drive.trajectoryBuilder(moveToScorePurplePixelTrajectory.end())
+            .lineToLinearHeading(poseAfterPurplePixel)
+            .build()
+        val moveToFarTransitLaneTrajectory = drive.trajectoryBuilder(moveToAfterPurplePixelTrajectory.end())
                 .lineToLinearHeading(transitLanePoseAfterPurplePixel)
                 .build()
         val moveToLeftClawStackTrajectory = drive.trajectoryBuilder(moveToFarTransitLaneTrajectory.end())
@@ -247,13 +261,19 @@ class RedFarAuto : AnchorOpMode() {
         // commands
         val moveAwayFromWall = TrajectoryFollower(drive, moveAwayFromWallTrajectory)
         val setArmStateForPurple = when(zoneDetected) {
-            PropZoneDetected.RIGHT -> smec.setArmState(ScoringMechanism.State.PURPLE_DROP)
+            PropZoneDetected.RIGHT -> series(
+                smec.setArmState(ScoringMechanism.State.PURPLE_DROP),
+                SetTelescopePosition(robot.telescope, TelescopePosition.PurplePush)
+            )
             else -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
         }
         val moveToScorePurplePixel = TrajectoryFollower(drive, moveToScorePurplePixelTrajectory)
         val scorePurplePixel = instant { robot.leftClaw.position = ClawPositions.OPEN }
         val moveToTravel = smec.setArmState(ScoringMechanism.State.TRAVEL)
-        val moveToFarTransitLane = TrajectoryFollower(drive, moveToFarTransitLaneTrajectory)
+        val moveToFarTransitLane = series(
+            TrajectoryFollower(drive, moveToAfterPurplePixelTrajectory),
+            TrajectoryFollower(drive, moveToFarTransitLaneTrajectory)
+        )
         val moveToWallStackIntake = TrajectoryFollower(drive, moveToLeftClawStackTrajectory)
         val moveToTransitLaneFromWallStack = TrajectoryFollower(drive, moveToTransitLaneFromPixelStacks)
         val moveToBackDropLane = TrajectoryFollower(drive, moveToBackDropLaneTrajectory)
@@ -309,7 +329,9 @@ class RedFarAuto : AnchorOpMode() {
 
             moveAwayFromWall,
 
-            parallel(series( delay(0.5), setArmStateForPurple), moveToScorePurplePixel),
+            moveToScorePurplePixel,
+
+            setArmStateForPurple,
 
             instant { robot.leftClaw.position = ClawPositions.OPEN },
 

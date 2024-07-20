@@ -17,14 +17,14 @@ public class ElbowConfig {
     public static double CYCLE_DROP = 165.0;
     public static double ELBOW_STACK_INTAKE = -3.0;
 
-    public static double ELBOW_STACK_INTAKE_CLOSE = -0.5;
+    public static double ELBOW_STACK_INTAKE_CLOSE = 0.0;
     public static double KG = 0.1;
     public static double KS = 0.00;
 
     public static double ELBOW_MAX_ANGULAR_VELOCITY = 800.0;
     public static double ELBOW_MAX_ANGULAR_ACCELERATION = 600.0; // (REMEMBER TO CHANGE THIS TO 600!!!!!)
     public static double ELBOW_CLIMB = 90.0;
-    public static double ELBOW_PURPLE_DROP = 176.0;
+    public static double ELBOW_PURPLE_DROP = 182.0;
 
     public static double ELBOW_TEST_INCREMENT = 5.0;
 

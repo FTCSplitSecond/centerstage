@@ -124,7 +124,7 @@ class BlueCloseAuto : AnchorOpMode() {
         val awayFromWallPosition = Vector2d(24.0, 36.0).adjustForAlliance(alliance)
         val purplePixelPoseBackdropSide = Pose2d(Vector2d(33.0, 30.0), PI).adjustForAlliance(alliance)
         val purplePixelPoseCenter = Pose2d(Vector2d(26.0, 23.0), PI).adjustForAlliance(alliance)
-        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(11.5, 32.0), PI).adjustForAlliance(alliance)
+        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(14.0, 32.0), PI).adjustForAlliance(alliance)
         // note here that zone right/left means different things for red and blue
         val purplePixelPose = when (zoneDetected) {
             PropZoneDetected.LEFT -> if(alliance== Alliance.BLUE) purplePixelPoseBackdropSide else purplePixelPoseAwayFromBackdrop
@@ -138,7 +138,7 @@ class BlueCloseAuto : AnchorOpMode() {
         val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(-36.0, transitLaneY), PI).adjustForAlliance(alliance)
         val transitLaneBackDropSide = Vector2d(nearBackDropLaneX, transitLaneY).adjustForAlliance(alliance)
         val transitLanePixelStackSide = Vector2d(-48.0, transitLaneY).adjustForAlliance(alliance)
-        val backDropScoringClawOffset = 0.0 // offset to help pixels land better if needed
+        val backDropScoringClawOffset = 1.5 // offset to help pixels land better if needed
         val backDropZoneSpacing = 6.5
         val backDropCenterY = 36.0
         val nearBackDropCenter = Vector2d(nearBackDropLaneX, backDropCenterY + backDropScoringClawOffset).adjustForAlliance(alliance)

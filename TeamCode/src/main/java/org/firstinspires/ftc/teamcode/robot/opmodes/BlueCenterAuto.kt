@@ -30,6 +30,8 @@ import org.openftc.easyopencv.OpenCvCameraRotation
 import org.openftc.easyopencv.OpenCvWebcam
 import kotlin.math.PI
 import org.firstinspires.ftc.teamcode.robot.util.adjustForAlliance
+import org.firstinspires.ftc.teamcode.telescope.commands.SetTelescopePosition
+import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopePosition
 import org.firstinspires.ftc.teamcode.vision.AprilTagRelocalize
 import org.firstinspires.ftc.teamcode.vision.RelocalizeFromAprilTags
 
@@ -128,30 +130,36 @@ class BlueCenterAuto : AnchorOpMode() {
         }
 //        val startHeading = getAllianceHeading(alliance)
 //        val startPose = Pose2d(-32.0, 62.0, startHeading).adjustForAlliance(alliance)
-        val awayFromWallPosition = Pose2d(Vector2d(-24.0, 48.0), PI).adjustForAlliance(alliance)
+        val awayFromWallPosition = when (zoneDetected) {
+            PropZoneDetected.CENTER, PropZoneDetected.NONE -> Pose2d(-36.1, 53.0, PI / 2).adjustForAlliance(alliance)
+            else -> Pose2d(Vector2d(-24.0, 48.0), PI).adjustForAlliance(alliance)
+        }
 
-        val purplePixelPoseBackdropSide = Pose2d(Vector2d(-15.5, 31.0), PI).adjustForAlliance(alliance)
-        val purplePixelPoseCenter = Pose2d(Vector2d(-36.0, 36.0), -PI/2).adjustForAlliance(alliance)
-        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(-38.0, 30.5), PI).adjustForAlliance(alliance)
+        val purplePixelPoseBackdropSide = Pose2d(Vector2d(-12.5, 28.0), PI).adjustForAlliance(alliance)
+        val purplePixelPoseCenter = Pose2d(Vector2d(-35.0, 55.5), PI/2).adjustForAlliance(alliance)
+        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(-34.5, 32.0), PI).adjustForAlliance(alliance)
         val purplePixelPose = when (zoneDetected) {
             PropZoneDetected.LEFT -> if(alliance== Alliance.BLUE) purplePixelPoseBackdropSide else purplePixelPoseAwayFromBackdrop
             PropZoneDetected.CENTER, PropZoneDetected.NONE -> purplePixelPoseCenter
             PropZoneDetected.RIGHT -> if(alliance== Alliance.BLUE) purplePixelPoseAwayFromBackdrop else purplePixelPoseBackdropSide
         }
 
-        val transitLaneY = 57.5
-        val nearBackDropLaneX = 34.0
+        val transitLaneY = 58.0
+        val nearBackDropLaneX = 36.0
         val backDropScoreX = 43.5
 
-        val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(-12.0, transitLaneY), PI + spinOffset).adjustForAlliance(alliance)
+        val transitLanePoseAfterPurplePixel = when (zoneDetected) {
+            PropZoneDetected.CENTER, PropZoneDetected.NONE -> Pose2d(Vector2d(-28.0, transitLaneY), PI + spinOffset).adjustForAlliance(alliance)
+            else -> Pose2d(Vector2d(-12.0, transitLaneY), PI + spinOffset).adjustForAlliance(alliance)
+        }
         val transitLaneBackDropSide = Vector2d(nearBackDropLaneX, transitLaneY).adjustForAlliance(alliance)
-        val transitLanePixelStackSide = Vector2d(-106.0, transitLaneY).adjustForAlliance(alliance)
+        val transitLanePixelStackSide = Vector2d(-103.0, transitLaneY).adjustForAlliance(alliance)
 
-        val rightClawStackPose = Pose2d(Vector2d(-106.0, 34.0), PI).adjustForAlliance(alliance)
+        val rightClawStackPose = Pose2d(Vector2d(-104.5, 29.0), PI).adjustForAlliance(alliance)
         //Left claw not tested
         val leftClawStackPose = Pose2d(Vector2d(-106.0, 38.0), PI).adjustForAlliance(alliance)
 
-        val backDropScoringClawOffset = 0.0 // offset to help pixels land better if needed
+        val backDropScoringClawOffset = -4.0 // offset to help pixels land better if needed
         val backDropZoneSpacing = 7.0
         val backDropCenterY = 36.0
         val nearBackDropCenter = Vector2d(nearBackDropLaneX, backDropCenterY + backDropScoringClawOffset).adjustForAlliance(alliance)
@@ -213,7 +221,13 @@ class BlueCenterAuto : AnchorOpMode() {
 
         // commands
         val moveAwayFromWall = TrajectoryFollower(drive, moveAwayFromWallTrajectory)
-        val moveToCloseIntake = smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
+        val setArmStateToPlacePurple = when(zoneDetected) {
+            PropZoneDetected.CENTER, PropZoneDetected.NONE -> series(
+                smec.setArmState(ScoringMechanism.State.PURPLE_DROP),
+                SetTelescopePosition(robot.telescope, TelescopePosition.PurplePush)
+            )
+            else -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
+        }
         val moveToScorePurplePixel = TrajectoryFollower(drive, moveToScorePurplePixelTrajectory)
         val scorePurplePixel = instant { robot.rightClaw.position = ClawPositions.OPEN }
         val moveToTravel = smec.setArmState(ScoringMechanism.State.TRAVEL)
@@ -249,9 +263,16 @@ class BlueCenterAuto : AnchorOpMode() {
 
             moveAwayFromWall,
 
-            moveToCloseIntake,
-
-            moveToScorePurplePixel,
+            when (zoneDetected) {
+                PropZoneDetected.CENTER, PropZoneDetected.NONE -> series(
+                    moveToScorePurplePixel,
+                    setArmStateToPlacePurple,
+                )
+                else -> series(
+                    setArmStateToPlacePurple,
+                    moveToScorePurplePixel
+                )
+            },
 
             scorePurplePixel,
 
@@ -269,11 +290,11 @@ class BlueCenterAuto : AnchorOpMode() {
 
             series(
                 parallel(
-                    instant { robot.leftClaw.position = ClawPositions.OPEN },
+                    instant { robot.rightClaw.position = ClawPositions.OPEN },
                     smec.setArmState(ScoringMechanism.State.STACK_INTAKE_CLOSE)
                 ),
                 moveLeftClawCloserTrajectory,
-                instant { robot.leftClaw.position = ClawPositions.CLOSED },
+                instant { robot.rightClaw.position = ClawPositions.CLOSED },
                 smec.setArmState(ScoringMechanism.State.TRAVEL)
             ),
 

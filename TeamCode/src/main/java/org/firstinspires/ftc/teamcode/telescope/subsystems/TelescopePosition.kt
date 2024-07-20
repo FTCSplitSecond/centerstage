@@ -5,6 +5,7 @@ sealed class TelescopePosition(val extension : Double) {
 
     object ExtendedIntake : TelescopePosition(TelescopeConfig.TELESCOPE_EXTENDED_INTAKE)
     object CycleDrop : TelescopePosition(11.0)
+    object PurplePush : TelescopePosition(5.5)
     object CloseIntake : TelescopePosition(TelescopeConfig.TELESCOPE_CLOSE_INTAKE)
     object Travel : TelescopePosition(TelescopeConfig.TELESCOPE_TRAVEL)
     object Climb : TelescopePosition(TelescopeConfig.TELESCOPE_CLIMB)
