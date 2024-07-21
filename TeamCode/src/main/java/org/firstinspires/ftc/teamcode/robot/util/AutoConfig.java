@@ -46,7 +46,7 @@ public class AutoConfig {
     // RED PARK LOCATIONS
     public static ParkLocation RED_CLOSE2P0_PARK = ParkLocation.OUTSIDE;
     public static ParkLocation RED_CENTER_PARK = ParkLocation.CENTER;
-    public static ParkLocation RED_CENTER2P0_PARK = ParkLocation.CENTER;
+    public static ParkLocation RED_CENTER2P0_PARK = ParkLocation.OUTSIDE;
     public static ParkLocation RED_FAR_PARK = ParkLocation.INSIDE;
     public static ParkLocation RED_FAR2P0_PARK = ParkLocation.INSIDE;
 

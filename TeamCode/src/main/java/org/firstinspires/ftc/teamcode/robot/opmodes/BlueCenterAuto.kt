@@ -46,6 +46,9 @@ class BlueCenterAuto : AnchorOpMode() {
     val startPose = Pose2d(-33.0, 62.0, PI / 2)
     val alliance = Alliance.BLUE
 
+    lateinit var parkLocation: ParkLocation
+    var delayA: Double = 0.0
+
     override fun prerun() {
         val driver = FTCGamepad(gamepad1)
         Robot.alliance = alliance
@@ -54,6 +57,8 @@ class BlueCenterAuto : AnchorOpMode() {
         drive = robot.driveBase.dt
         robot.elbow.isEnabled = true
         robot.init(this.world)
+        parkLocation = AutoConfig.BLUE_CENTER_PARK
+        delayA = AutoConfig.BLUE_CENTER_DELAYS[0]
 
         val cameraMonitorViewId = hardwareMap.appContext.resources.getIdentifier(
             "cameraMonitorViewId",
@@ -73,8 +78,6 @@ class BlueCenterAuto : AnchorOpMode() {
             override fun onError(errorCode: Int) {}
         })
         webcam.setPipeline(detector)
-
-        OpenBothClaw(robot.leftClaw, robot.rightClaw)
 
         driver[Button.Key.DPAD_LEFT] onActivate instant {
             robot.leftClaw.position = when (robot.leftClaw.position) {
@@ -104,6 +107,33 @@ class BlueCenterAuto : AnchorOpMode() {
                 }
             }
         }
+        driver[Button.Key.SQUARE] onActivate instant {
+            parkLocation = when(parkLocation) {
+                ParkLocation.INSIDE -> ParkLocation.CENTER
+                ParkLocation.CENTER -> ParkLocation.OUTSIDE
+                ParkLocation.OUTSIDE -> ParkLocation.INSIDE
+            }
+        }
+        driver[Button.Key.CIRCLE] onActivate instant {
+            parkLocation = when(parkLocation) {
+                ParkLocation.INSIDE -> ParkLocation.OUTSIDE
+                ParkLocation.CENTER -> ParkLocation.INSIDE
+                ParkLocation.OUTSIDE -> ParkLocation.CENTER
+            }
+        }
+        telemetry.addLine(when(parkLocation) {
+            ParkLocation.INSIDE -> "Park Inside"
+            ParkLocation.CENTER -> "Park Center"
+            ParkLocation.OUTSIDE -> "Park Outside"
+        })
+        driver[Button.Key.TRIANGLE] onActivate instant {
+            delayA = (delayA + 1.0).coerceIn(0.0, 30.0)
+        }
+        driver[Button.Key.CROSS] onActivate instant {
+            delayA = (delayA - 1.0).coerceIn(0.0, 30.0)
+        }
+        telemetry.addLine("Start Pose Delay: $delayA")
+
     }
     fun getAllianceHeading(alliance: Alliance): Double {
         return when (alliance) {
@@ -113,8 +143,7 @@ class BlueCenterAuto : AnchorOpMode() {
     }
 
     override fun run() {
-        val parkLocation = AutoConfig.BLUE_CENTER_PARK
-        val delayA = AutoConfig.BLUE_CENTER_DELAYS[0]
+        //val delayA = AutoConfig.BLUE_CENTER_DELAYS[0]
         val delayB = AutoConfig.BLUE_CENTER_DELAYS[1]
         val delayC = AutoConfig.BLUE_CENTER_DELAYS[2]
 
@@ -181,6 +210,12 @@ class BlueCenterAuto : AnchorOpMode() {
             ParkLocation.OUTSIDE -> parkOutsidePosition
         }
 
+        val afterParkOffsetX = when(parkLocation) {
+            ParkLocation.INSIDE -> 0.001
+            ParkLocation.CENTER -> 0.001
+            ParkLocation.OUTSIDE -> 6.0
+        }
+
         // trajectories
         val moveAwayFromWallTrajectory = drive.trajectoryBuilder(startPose)
             .lineToLinearHeading(awayFromWallPosition)
@@ -218,6 +253,9 @@ class BlueCenterAuto : AnchorOpMode() {
         val parkTrajectory = drive.trajectoryBuilder(backAwayFromBackDropTrajectory.end())
             .lineTo(parkPosition)
             .build()
+        val afterParkTrajectory = drive.trajectoryBuilder(parkTrajectory.end())
+            .lineTo(Vector2d(parkPosition.x + afterParkOffsetX, parkPosition.y))
+            .build()
 
         // commands
         val moveAwayFromWall = TrajectoryFollower(drive, moveAwayFromWallTrajectory)
@@ -253,7 +291,7 @@ class BlueCenterAuto : AnchorOpMode() {
                 delay(0.5),  // delay here is to not pull the pixel with us
                 moveToTravel))
 
-        val park = TrajectoryFollower(drive, parkTrajectory)
+        val park = series( TrajectoryFollower(drive, parkTrajectory), TrajectoryFollower(drive, afterParkTrajectory) )
         val relocalizeFromAprilTags = AprilTagRelocalize(robot.vision, robot)
 
         // Now we schedule the commands

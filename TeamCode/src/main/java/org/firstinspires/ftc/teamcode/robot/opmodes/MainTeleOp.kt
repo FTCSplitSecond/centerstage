@@ -78,9 +78,19 @@ class MainTeleOp : AnchorOpMode() {
         val routine = RoutineModule { true }
         driver.apply(routine)
 
-        driver[Button.Key.DPAD_DOWN] onActivate instant {
+        driver[Button.Key.DPAD_UP] onActivate instant {
             robot.awayFromDriverStationHeading = robot.driveBase.dt.poseEstimate.heading
         }
+        driver[Button.Key.DPAD_DOWN] onActivate instant {
+            robot.awayFromDriverStationHeading = robot.driveBase.dt.poseEstimate.heading + Math.PI
+        }
+        driver[Button.Key.DPAD_LEFT] onActivate instant {
+            robot.awayFromDriverStationHeading = robot.driveBase.dt.poseEstimate.heading - Math.PI / 2.0
+        }
+        driver[Button.Key.DPAD_RIGHT] onActivate instant {
+            robot.awayFromDriverStationHeading = robot.driveBase.dt.poseEstimate.heading + Math.PI / 2.0
+        }
+
         driver[Button.Key.LEFT_BUMPER] onActivate instant {
             robot.leftClaw.position = when (robot.leftClaw.position) {
                 ClawPositions.OPEN -> ClawPositions.CLOSED
@@ -124,7 +134,7 @@ class MainTeleOp : AnchorOpMode() {
                 else -> smec.setDepositPixelLevel(smec.depositPixelLevel + 1.0)
             }
         }
-        driver[Button.Key.LEFT_JOSTICK_PRESS] onActivate
+        driver[Button.Key.CIRCLE] onActivate
                 instant {
                     +when (smec.armState) {
                         ScoringMechanism.State.DEPOSIT,

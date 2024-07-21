@@ -42,6 +42,9 @@ class RedFarAuto2p0 : AnchorOpMode() {
     var detector = PropDetector(telemetry)
     val startPose = Pose2d(-88.0, -62.0, -PI / 2)
     val alliance = Alliance.RED
+
+    lateinit var parkLocation: ParkLocation
+    var delayA: Double = 0.0
     
     override fun prerun() {
         val driver = FTCGamepad(gamepad1)
@@ -168,6 +171,12 @@ class RedFarAuto2p0 : AnchorOpMode() {
             ParkLocation.OUTSIDE -> parkOutsidePosition
         }
 
+        val afterParkOffsetX = when(parkLocation) {
+            ParkLocation.INSIDE -> 0.001
+            ParkLocation.CENTER -> 6.0
+            ParkLocation.OUTSIDE -> 0.001
+        }
+
 
 
         // trajectories
@@ -203,6 +212,9 @@ class RedFarAuto2p0 : AnchorOpMode() {
         val parkTrajectory = drive.trajectoryBuilder(backAwayFromBackDropTrajectory.end())
                 .lineTo(parkPosition)
                 .build()
+        val afterParkTrajectory = drive.trajectoryBuilder(parkTrajectory.end())
+            .lineTo(Vector2d(parkPosition.x + afterParkOffsetX, parkPosition.y))
+            .build()
 
         // commands
         val moveAwayFromWall = TrajectoryFollower(drive, moveAwayFromWallTrajectory)
@@ -230,7 +242,7 @@ class RedFarAuto2p0 : AnchorOpMode() {
 //        val intakePixelsFromStack = instant {  } // add pixel intake here returns to transit lane when done
 //        val moveToTransitLaneFromPixelStacks = TrajectoryFollower(drive, moveToTransitLaneFromPixelStacksTrajectory)
 
-        val park = TrajectoryFollower(drive, parkTrajectory)
+        val park = series( TrajectoryFollower(drive, parkTrajectory), TrajectoryFollower(drive, afterParkTrajectory) )
         val relocalizeFromAprilTags = AprilTagRelocalize(robot.vision, robot)
 
         // Now we schedule the commands

@@ -43,6 +43,9 @@ class RedCloseAuto : AnchorOpMode() {
     val startPose = Pose2d(8.0, -62.0, -PI / 2)
     val alliance = Alliance.RED
 
+    lateinit var parkLocation: ParkLocation
+    var delayA: Double = 0.0
+
     override fun prerun() {
         val driver = FTCGamepad(gamepad1)
         robot = Robot(hardwareMap, this.hardwareManager, telemetry, startPose = startPose)
@@ -51,6 +54,8 @@ class RedCloseAuto : AnchorOpMode() {
         drive = robot.driveBase.dt
         robot.elbow.isEnabled = true
         robot.init(this.world)
+        parkLocation = AutoConfig.RED_CLOSE2P0_PARK
+        delayA = AutoConfig.RED_CLOSE2P0_DELAYS[0]
 
         val cameraMonitorViewId = hardwareMap.appContext.resources.getIdentifier(
             "cameraMonitorViewId",
@@ -101,6 +106,32 @@ class RedCloseAuto : AnchorOpMode() {
                 }
             }
         }
+        driver[Button.Key.SQUARE] onActivate instant {
+            parkLocation = when(parkLocation) {
+                ParkLocation.INSIDE -> ParkLocation.CENTER
+                ParkLocation.CENTER -> ParkLocation.OUTSIDE
+                ParkLocation.OUTSIDE -> ParkLocation.INSIDE
+            }
+        }
+        driver[Button.Key.CIRCLE] onActivate instant {
+            parkLocation = when(parkLocation) {
+                ParkLocation.INSIDE -> ParkLocation.OUTSIDE
+                ParkLocation.CENTER -> ParkLocation.INSIDE
+                ParkLocation.OUTSIDE -> ParkLocation.CENTER
+            }
+        }
+        telemetry.addLine(when(parkLocation) {
+            ParkLocation.INSIDE -> "Park Inside"
+            ParkLocation.CENTER -> "Park Center"
+            ParkLocation.OUTSIDE -> "Park Outside"
+        })
+        driver[Button.Key.TRIANGLE] onActivate instant {
+            delayA = (delayA + 1.0).coerceIn(0.0, 30.0)
+        }
+        driver[Button.Key.CROSS] onActivate instant {
+            delayA = (delayA - 1.0).coerceIn(0.0, 30.0)
+        }
+        telemetry.addLine("Start Pose Delay: $delayA")
     }
     fun getAllianceHeading(alliance: Alliance): Double {
         return when (alliance) {
@@ -109,8 +140,8 @@ class RedCloseAuto : AnchorOpMode() {
         }
     }
     override fun run() {
-        val parkLocation = AutoConfig.RED_CLOSE2P0_PARK
-        val delayA = AutoConfig.RED_CLOSE2P0_DELAYS[0]
+        //val parkLocation = AutoConfig.RED_CLOSE2P0_PARK
+        //val delayA = AutoConfig.RED_CLOSE2P0_DELAYS[0]
         val delayB = AutoConfig.RED_CLOSE2P0_DELAYS[1]
 
         val zoneDetected = detector.zone
@@ -160,6 +191,12 @@ class RedCloseAuto : AnchorOpMode() {
             ParkLocation.OUTSIDE -> parkOutsidePosition
         }
 
+        val afterParkOffsetX = when(parkLocation) {
+            ParkLocation.INSIDE -> 0.001
+            ParkLocation.CENTER -> 0.001
+            ParkLocation.OUTSIDE -> 6.0
+        }
+
         // trajectories
         val moveAwayFromWallTrajectory = drive.trajectoryBuilder(startPose)
             .lineTo(awayFromWallPosition)
@@ -194,6 +231,9 @@ class RedCloseAuto : AnchorOpMode() {
         val parkTrajectory = drive.trajectoryBuilder(backAwayFromBackDropTrajectory.end())
             .lineTo(parkPosition)
             .build()
+        val afterParkTrajectory = drive.trajectoryBuilder(parkTrajectory.end())
+            .lineTo(Vector2d(parkPosition.x + afterParkOffsetX, parkPosition.y))
+            .build()
 
         // commands
         val moveAwayFromWall = TrajectoryFollower(drive, moveAwayFromWallTrajectory)
@@ -221,7 +261,7 @@ class RedCloseAuto : AnchorOpMode() {
 //        val intakePixelsFromStack = instant {  } // add pixel intake here returns to transit lane when done
 //        val moveToTransitLaneFromPixelStacks = TrajectoryFollower(drive, moveToTransitLaneFromPixelStacksTrajectory)
 
-        val park = TrajectoryFollower(drive, parkTrajectory)
+        val park = series( TrajectoryFollower(drive, parkTrajectory), TrajectoryFollower(drive, afterParkTrajectory) )
         val relocalizeFromAprilTags = AprilTagRelocalize(robot.vision, robot)
 
         // Now we schedule the commands

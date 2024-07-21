@@ -46,6 +46,9 @@ class RedFarAuto : AnchorOpMode() {
     var detector = PropDetector(telemetry)
     val startPose = Pose2d(-88.0, -62.0, -PI / 2)
     val alliance = Alliance.RED
+
+    lateinit var parkLocation: ParkLocation
+    var delayA: Double = 0.0
     
     override fun prerun() {
         val driver = FTCGamepad(gamepad1)
@@ -55,6 +58,8 @@ class RedFarAuto : AnchorOpMode() {
         drive = robot.driveBase.dt
         robot.elbow.isEnabled = true
         robot.init(this.world)
+        parkLocation = AutoConfig.RED_FAR_PARK
+        delayA = AutoConfig.RED_FAR_DELAYS[0]
 
         val cameraMonitorViewId = hardwareMap.appContext.resources.getIdentifier(
             "cameraMonitorViewId",
@@ -105,6 +110,32 @@ class RedFarAuto : AnchorOpMode() {
                 }
             }
         }
+        driver[Button.Key.SQUARE] onActivate instant {
+            parkLocation = when(parkLocation) {
+                ParkLocation.INSIDE -> ParkLocation.CENTER
+                ParkLocation.CENTER -> ParkLocation.OUTSIDE
+                ParkLocation.OUTSIDE -> ParkLocation.INSIDE
+            }
+        }
+        driver[Button.Key.CIRCLE] onActivate instant {
+            parkLocation = when(parkLocation) {
+                ParkLocation.INSIDE -> ParkLocation.OUTSIDE
+                ParkLocation.CENTER -> ParkLocation.INSIDE
+                ParkLocation.OUTSIDE -> ParkLocation.CENTER
+            }
+        }
+        telemetry.addLine(when(parkLocation) {
+            ParkLocation.INSIDE -> "Park Inside"
+            ParkLocation.CENTER -> "Park Center"
+            ParkLocation.OUTSIDE -> "Park Outside"
+        })
+        driver[Button.Key.TRIANGLE] onActivate instant {
+            delayA = (delayA + 1.0).coerceIn(0.0, 30.0)
+        }
+        driver[Button.Key.CROSS] onActivate instant {
+            delayA = (delayA - 1.0).coerceIn(0.0, 30.0)
+        }
+        telemetry.addLine("Start Pose Delay: $delayA")
     }
     fun getAllianceHeading(alliance: Alliance): Double {
         return when (alliance) {
@@ -114,8 +145,8 @@ class RedFarAuto : AnchorOpMode() {
     }
 
     override fun run() {
-        val parkLocation = AutoConfig.RED_FAR_PARK
-        val delayA = AutoConfig.RED_FAR_DELAYS[0]
+        //val parkLocation = AutoConfig.RED_FAR_PARK
+        //val delayA = AutoConfig.RED_FAR_DELAYS[0]
         val delayB = AutoConfig.RED_FAR_DELAYS[1]
         val delayC = AutoConfig.RED_FAR_DELAYS[2]
 
@@ -186,7 +217,11 @@ class RedFarAuto : AnchorOpMode() {
             ParkLocation.OUTSIDE -> parkOutsidePosition
         }
 
-
+        val afterParkOffsetX = when(parkLocation) {
+            ParkLocation.INSIDE -> 0.001
+            ParkLocation.CENTER -> 0.001
+            ParkLocation.OUTSIDE -> 6.0
+        }
 
         // trajectories
         val moveAwayFromWallTrajectory = drive.trajectoryBuilder(startPose)
@@ -256,6 +291,9 @@ class RedFarAuto : AnchorOpMode() {
         val parkTrajectory = drive.trajectoryBuilder(backAwayFromBackDropTrajectory.end())
             .lineTo(parkPosition)
             .build()
+        val afterParkTrajectory = drive.trajectoryBuilder(parkTrajectory.end())
+            .lineTo(Vector2d(parkPosition.x + afterParkOffsetX, parkPosition.y))
+            .build()
 
 
         // commands
@@ -319,7 +357,7 @@ class RedFarAuto : AnchorOpMode() {
             smec.setArmState(ScoringMechanism.State.TRAVEL)
         )
 
-        val park = TrajectoryFollower(drive, parkTrajectory)
+        val park = series( TrajectoryFollower(drive, parkTrajectory), TrajectoryFollower(drive, afterParkTrajectory) )
         val relocalizeFromAprilTags = AprilTagRelocalize(robot.vision, robot)
 
         // Now we schedule the commands
