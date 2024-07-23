@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.turtles.anchor.component.stock.delay
 import dev.turtles.anchor.component.stock.idler
 import dev.turtles.anchor.component.stock.instant
+import dev.turtles.anchor.component.stock.parallel
 import dev.turtles.anchor.component.stock.series
 import dev.turtles.electriceel.opmode.DSLOpMode
 import dev.turtles.electriceel.util.Pose
@@ -19,7 +20,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference
 import org.firstinspires.ftc.teamcode.OffseasonBot
 import org.firstinspires.ftc.teamcode.common.component.DriveMecanum
+import org.firstinspires.ftc.teamcode.common.types.ClawSide
 import org.firstinspires.ftc.teamcode.common.types.OpModeType
+import org.firstinspires.ftc.teamcode.component.claw.CloseBothClaw
+import org.firstinspires.ftc.teamcode.component.claw.DropBothClaw
+import org.firstinspires.ftc.teamcode.component.claw.OpenBothClaw
 import org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants
 import org.firstinspires.ftc.teamcode.subsystem.ClawSubsystem
 import org.firstinspires.ftc.teamcode.subsystem.DepositSubsystem
@@ -49,10 +54,6 @@ class Teleop: DSLOpMode(false, {
     val drone = robot.drone
 
     drone.init()
-
-    + idler { _, _ ->
-        false
-    }
 
     + idler { deltaTime, _ ->
         // pray that this is above 25 :3
@@ -97,6 +98,93 @@ class Teleop: DSLOpMode(false, {
 
     val routine = RoutineModule { true }
     driver.apply(routine)
+
+    driver[Button.Key.TRIANGLE] onActivate instant { deposit.setArmState(DepositSubsystem.State.STACK_INTAKE_CLOSED) }
+
+    driver[Button.Key.LEFT_BUMPER] onActivate instant {
+        when (robot.claw.leftClaw) {
+            ClawSubsystem.ClawState.OPEN -> robot.claw.updateState(ClawSide.LEFT, ClawSubsystem.ClawState.CLOSED)
+            ClawSubsystem.ClawState.CLOSED -> {
+                when (deposit.armState) {
+                    DepositSubsystem.State.EXTENDED_INTAKE -> robot.claw.updateState(ClawSide.LEFT, ClawSubsystem.ClawState.OPEN)
+                    DepositSubsystem.State.CLOSED_INTAKE -> robot.claw.updateState(ClawSide.LEFT, ClawSubsystem.ClawState.OPEN)
+                    else -> robot.claw.updateState(ClawSide.LEFT, ClawSubsystem.ClawState.CLOSED)
+                }
+            }
+            else -> robot.claw.updateState(ClawSide.LEFT, ClawSubsystem.ClawState.CLOSED)
+        }
+    }
+
+    driver[Button.Key.RIGHT_BUMPER] onActivate instant {
+        when (robot.claw.rightClaw) {
+            ClawSubsystem.ClawState.OPEN -> robot.claw.updateState(ClawSide.RIGHT, ClawSubsystem.ClawState.CLOSED)
+            ClawSubsystem.ClawState.CLOSED -> {
+                when (deposit.armState) {
+                    DepositSubsystem.State.EXTENDED_INTAKE -> robot.claw.updateState(ClawSide.RIGHT, ClawSubsystem.ClawState.OPEN)
+                    DepositSubsystem.State.CLOSED_INTAKE -> robot.claw.updateState(ClawSide.RIGHT, ClawSubsystem.ClawState.OPEN)
+                    else -> robot.claw.updateState(ClawSide.RIGHT, ClawSubsystem.ClawState.CLOSED)
+                }
+            }
+            else -> robot.claw.updateState(ClawSide.RIGHT, ClawSubsystem.ClawState.CLOSED)
+        }
+    }
+
+    driverLeftTrigger onActivate instant {
+        + when (deposit.armState) {
+            DepositSubsystem.State.CLOSED_INTAKE -> parallel(
+                OpenBothClaw(robot.claw),
+                deposit.setArmState(DepositSubsystem.State.EXTENDED_INTAKE)
+            )
+            DepositSubsystem.State.EXTENDED_INTAKE -> deposit.setArmState(DepositSubsystem.State.CLOSED_INTAKE)
+            else -> deposit.setPixelLevel(deposit.depositPixelLevel - 1.0)
+        }
+    }
+
+    driverRightTrigger onActivate instant {
+        + when (deposit.armState) {
+            DepositSubsystem.State.CLOSED_INTAKE -> deposit.setArmState(DepositSubsystem.State.EXTENDED_INTAKE)
+            DepositSubsystem.State.EXTENDED_INTAKE -> deposit.setArmState(DepositSubsystem.State.CLOSED_INTAKE)
+            else -> deposit.setPixelLevel(deposit.depositPixelLevel + 1.0)
+        }
+    }
+
+    driver[Button.Key.LEFT_JOSTICK_PRESS] onActivate instant {
+        + when (deposit.armState) {
+            DepositSubsystem.State.DEPOSIT,
+            DepositSubsystem.State.EXTENDED_INTAKE,
+            DepositSubsystem.State.CLOSED_INTAKE -> deposit.setArmState(DepositSubsystem.State.TRAVEL)
+            else -> deposit.setArmState(DepositSubsystem.State.CLOSED_INTAKE)
+        }
+    }
+
+    driver[Button.Key.RIGHT_JOYSTICK_PRESS] onActivate instant {
+        + when (deposit.armState) {
+            DepositSubsystem.State.TRAVEL -> deposit.setArmState(DepositSubsystem.State.DEPOSIT)
+            else -> deposit.setArmState(DepositSubsystem.State.TRAVEL)
+        }
+    }
+
+    driver[Button.Key.SQUARE] onActivate instant {
+        + series(
+            CloseBothClaw(robot.claw),
+            deposit.setArmState(DepositSubsystem.State.TRAVEL)
+        )
+    }
+
+    driver[Button.Key.CROSS] onActivate instant {
+        + series(
+            DropBothClaw(robot.claw),
+            delay(0.125),
+            deposit.setArmState(DepositSubsystem.State.TRAVEL)
+        )
+    }
+
+    driver[Button.Key.START] onActivate instant {
+        + when (deposit.armState) {
+            DepositSubsystem.State.CLIMB -> deposit.setArmState(DepositSubsystem.State.TRAVEL)
+            else -> deposit.setArmState(DepositSubsystem.State.CLIMB)
+        }
+    }
 
     driver[Button.Key.DPAD_DOWN] onActivate instant {
         robot.driverStationOffset = robot.drivetrain.poseEstimate().heading
