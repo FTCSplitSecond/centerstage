@@ -4,7 +4,7 @@ import org.firstinspires.ftc.teamcode.common.component.SplitSecondComponent
 import org.firstinspires.ftc.teamcode.subsystem.elbow.ElbowPositions
 import org.firstinspires.ftc.teamcode.subsystem.elbow.ElbowSubsystem
 
-class SetElbowComponent(private val elbow: ElbowSubsystem, val position: ElbowPositions): SplitSecondComponent() {
+class SetElbowPosition(private val elbow: ElbowSubsystem, val position: ElbowPositions): SplitSecondComponent() {
     override fun start() {
         elbow.position = position
     }
