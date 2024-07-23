@@ -15,4 +15,16 @@ public class ClawConfig {
     public static double RIGHT_SERVO_CLOSED_AUTO_MICROSECONDS = 850.0;
 
     public static double estimatedTimeToComplete = 100; // 100 ms based on https://axon-robotics.com/products/micro
+
+    // Positions
+
+    public static double LEFT_CLAW_OPEN = 0.0;
+    public static double LEFT_CLAW_INTERMEDIATE = 0.0;
+    public static double LEFT_CLAW_CLOSED = 0.0;
+    public static double LEFT_CLAW_AUTO = 0.0;
+
+    public static double RIGHT_CLAW_OPEN = 0.0;
+    public static double RIGHT_CLAW_INTERMEDIATE = 0.0;
+    public static double RIGHT_CLAW_CLOSED = 0.0;
+    public static double RIGHT_CLAW_AUTO = 0.0;
 }
