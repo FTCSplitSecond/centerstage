@@ -8,16 +8,10 @@ import dev.turtles.anchor.component.stock.instant
 import dev.turtles.anchor.component.stock.parallel
 import dev.turtles.anchor.component.stock.series
 import dev.turtles.electriceel.opmode.DSLOpMode
-import dev.turtles.electriceel.util.Pose
-import dev.turtles.electriceel.util.Vector2
-import dev.turtles.electriceel.util.radians
 import dev.turtles.lilypad.Button
 import dev.turtles.lilypad.EventTrigger
 import dev.turtles.lilypad.impl.FTCGamepad
 import dev.turtles.lilypad.module.RoutineModule
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference
 import org.firstinspires.ftc.teamcode.OffseasonBot
 import org.firstinspires.ftc.teamcode.common.component.DriveMecanum
 import org.firstinspires.ftc.teamcode.common.types.ClawSide
