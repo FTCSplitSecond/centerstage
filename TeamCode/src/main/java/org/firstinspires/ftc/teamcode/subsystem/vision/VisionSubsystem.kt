@@ -11,7 +11,6 @@ import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
 import android.util.Size
 import com.acmerobotics.roadrunner.geometry.Pose2d
-import com.acmerobotics.roadrunner.geometry.Vector2d
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D
 import org.firstinspires.ftc.teamcode.subsystem.vision.detector.PropZoneDetected
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection
