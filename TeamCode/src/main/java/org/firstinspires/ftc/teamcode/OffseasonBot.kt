@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.common.types.OpModeType
 import org.firstinspires.ftc.teamcode.subsystem.ClawSubsystem
 import org.firstinspires.ftc.teamcode.subsystem.MecanumSubsystem
 import org.firstinspires.ftc.teamcode.subsystem.TelescopeSubsystem
+import org.firstinspires.ftc.teamcode.subsystem.elbow.ElbowSubsystem
 import org.firstinspires.ftc.teamcode.subsystem.wrist.WristSubsystem
 import kotlin.math.PI
 
@@ -38,12 +39,14 @@ class OffseasonBot(
     val drivetrain: MecanumSubsystem = MecanumSubsystem(this)
     val telescope: TelescopeSubsystem = TelescopeSubsystem(this)
     val claw: ClawSubsystem = ClawSubsystem(this)
+    val elbow: ElbowSubsystem = ElbowSubsystem(this)
     val wrist: WristSubsystem = WristSubsystem(this)
 
     fun init(world: World) {
         robot.add(drivetrain)
         robot.add(telescope)
         robot.add(claw)
+        robot.add(elbow)
         robot.add(wrist)
 
         world.add(robot)

@@ -27,16 +27,20 @@ class ClawSubsystem(
 
     var leftClaw = ClawState.CLOSED
     var rightClaw = ClawState.CLOSED
+    var pitchState = PivotState.STORED
 
     lateinit var leftServo: Servo
     lateinit var rightServo: Servo
+    lateinit var pivotServo: Servo
 
     override fun init() {
         leftServo = robot.hw.servo("leftClawServo")
         leftServo = robot.hw.servo("rightClawServo")
+        pivotServo = robot.hw.servo("")
 
         leftServo.axonPwmRange()
         rightServo.axonPwmRange()
+        pivotServo.axonPwmRange()
     }
 
     fun updateState(side: ClawSide, state: ClawState) {
