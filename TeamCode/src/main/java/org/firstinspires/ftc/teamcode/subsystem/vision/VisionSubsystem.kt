@@ -87,6 +87,6 @@ class VisionSubsystem(val robot: OffseasonBot): Subsystem() {
     }
 
     override fun end(reason: FinishReason) {
-        TODO("Not yet implemented")
+        backCamPortal.close()
     }
 }
