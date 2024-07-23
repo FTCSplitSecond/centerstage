@@ -8,16 +8,14 @@ import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.util.ElapsedTime
 import dev.turtles.anchor.component.FinishReason
 import dev.turtles.anchor.entity.Subsystem
-import dev.turtles.anchor.util.Timer
 import dev.turtles.electriceel.util.epsilonEquals
-import org.firstinspires.ftc.teamcode.OffseasonBot
+import org.firstinspires.ftc.teamcode.SplitSecondBot
 import org.firstinspires.ftc.teamcode.common.config.ElbowConfig
-import org.firstinspires.ftc.teamcode.common.config.TelescopeConfig.TELESCOPE_MAX
 import org.firstinspires.ftc.teamcode.common.ktx.adjustForKStatic
 import kotlin.math.abs
 import kotlin.math.cos
 
-class ElbowSubsystem(val robot: OffseasonBot): Subsystem() {
+class ElbowSubsystem(val robot: SplitSecondBot): Subsystem() {
 
     val telescope = robot.telescope
     val motor = robot.hw.motor("elbow")

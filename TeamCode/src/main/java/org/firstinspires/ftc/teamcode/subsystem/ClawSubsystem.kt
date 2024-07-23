@@ -3,13 +3,13 @@ package org.firstinspires.ftc.teamcode.subsystem
 import dev.turtles.anchor.component.FinishReason
 import dev.turtles.anchor.entity.Subsystem
 import dev.turtles.electriceel.wrapper.interfaces.Servo
-import org.firstinspires.ftc.teamcode.OffseasonBot
+import org.firstinspires.ftc.teamcode.SplitSecondBot
 import org.firstinspires.ftc.teamcode.common.config.ClawConfig
 import org.firstinspires.ftc.teamcode.common.types.ClawSide
 
 
 class ClawSubsystem(
-    val robot: OffseasonBot
+    val robot: SplitSecondBot
 ): Subsystem() {
 
     enum class ClawState {

@@ -4,10 +4,10 @@ import dev.turtles.anchor.component.FinishReason
 import dev.turtles.anchor.entity.Subsystem
 import dev.turtles.electriceel.wrapper.HardwareManager
 import dev.turtles.electriceel.wrapper.interfaces.Servo
-import org.firstinspires.ftc.teamcode.OffseasonBot
+import org.firstinspires.ftc.teamcode.SplitSecondBot
 import org.firstinspires.ftc.teamcode.common.config.WristConfig
 
-class WristSubsystem(val robot: OffseasonBot, r: HardwareManager): Subsystem() {
+class WristSubsystem(val robot: SplitSecondBot, r: HardwareManager): Subsystem() {
     val wristServo = r.servo("wristServo")
 
     var angle = WristPositions.Travel.angle

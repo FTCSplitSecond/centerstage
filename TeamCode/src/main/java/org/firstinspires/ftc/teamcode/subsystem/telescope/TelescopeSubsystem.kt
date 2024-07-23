@@ -10,7 +10,7 @@ import dev.turtles.anchor.component.FinishReason
 import dev.turtles.anchor.entity.Subsystem
 import dev.turtles.electriceel.util.epsilonEquals
 import dev.turtles.electriceel.wrapper.HardwareManager
-import org.firstinspires.ftc.teamcode.OffseasonBot
+import org.firstinspires.ftc.teamcode.SplitSecondBot
 import org.firstinspires.ftc.teamcode.common.config.ElbowConfig
 import org.firstinspires.ftc.teamcode.common.config.TelescopeConfig
 import org.firstinspires.ftc.teamcode.common.config.TelescopeConfig.TELESCOPE_KS
@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.common.ktx.adjustForKStatic
 import kotlin.math.PI
 import kotlin.math.abs
 
-class TelescopeSubsystem(val robot: OffseasonBot, r: HardwareManager): Subsystem() {
+class TelescopeSubsystem(val robot: SplitSecondBot, r: HardwareManager): Subsystem() {
 
     val leftMotor = r.motor("telescope1")
     val rightMotor = r.motor("telescope2")

@@ -6,11 +6,11 @@ import com.arcrobotics.ftclib.geometry.Vector2d
 import dev.turtles.anchor.component.FinishReason
 import dev.turtles.anchor.entity.Subsystem
 import dev.turtles.electriceel.util.clamp
-import org.firstinspires.ftc.teamcode.OffseasonBot
+import org.firstinspires.ftc.teamcode.SplitSecondBot
 import org.firstinspires.ftc.teamcode.common.config.TelescopeConfig
 import org.firstinspires.ftc.teamcode.roadrunner.drive.CenterstageMecanumDrive
 
-class MecanumSubsystem(val robot: OffseasonBot): Subsystem() {
+class MecanumSubsystem(val robot: SplitSecondBot): Subsystem() {
     val hardwareMap = robot.hwMap
     var drive = CenterstageMecanumDrive(hardwareMap, robot.startPose)
 
@@ -57,6 +57,6 @@ class MecanumSubsystem(val robot: OffseasonBot): Subsystem() {
     }
 
     override fun end(reason: FinishReason) {
-        OffseasonBot.lastKnownAutoPose = drive.poseEstimate
+        SplitSecondBot.lastKnownAutoPose = drive.poseEstimate
     }
 }

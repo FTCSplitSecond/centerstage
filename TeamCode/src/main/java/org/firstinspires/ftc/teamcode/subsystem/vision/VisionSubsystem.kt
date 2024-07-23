@@ -5,7 +5,7 @@ import dev.turtles.anchor.entity.Subsystem
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
-import org.firstinspires.ftc.teamcode.OffseasonBot
+import org.firstinspires.ftc.teamcode.SplitSecondBot
 import org.firstinspires.ftc.teamcode.subsystem.vision.detector.PropDetector
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
@@ -15,7 +15,7 @@ import org.apache.commons.math3.geometry.euclidean.twod.Vector2D
 import org.firstinspires.ftc.teamcode.subsystem.vision.detector.PropZoneDetected
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection
 
-class VisionSubsystem(val robot: OffseasonBot): Subsystem() {
+class VisionSubsystem(val robot: SplitSecondBot): Subsystem() {
     private val aprilTagProcessor = AprilTagProcessor.Builder()
         .setLensIntrinsics(1530.08, 1522.20, 1082.787, 551.41) // camera for "webcam1" c922
         .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)

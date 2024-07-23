@@ -23,7 +23,7 @@ import kotlin.math.PI
 /**
  * FTC #24789 CenterStage Bot
  */
-class OffseasonBot(
+class SplitSecondBot(
     val hwMap: HardwareMap,
     val hw: HardwareManager,
     val opModeType: OpModeType,
@@ -80,7 +80,7 @@ class OffseasonBot(
         var lastKnownAutoPose = Pose2d(0.0, 0.0, 0.0)
         var alliance: Alliance = Alliance.RED
 
-        private lateinit var instance: OffseasonBot
+        private lateinit var instance: SplitSecondBot
             private set
     }
 }
