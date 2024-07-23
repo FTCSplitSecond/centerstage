@@ -14,6 +14,7 @@ import dev.turtles.lilypad.impl.FTCGamepad
 import dev.turtles.lilypad.module.RoutineModule
 import org.firstinspires.ftc.teamcode.SplitSecondBot
 import org.firstinspires.ftc.teamcode.common.component.DriveMecanum
+import org.firstinspires.ftc.teamcode.common.types.Alliance
 import org.firstinspires.ftc.teamcode.common.types.ClawSide
 import org.firstinspires.ftc.teamcode.common.types.OpModeType
 import org.firstinspires.ftc.teamcode.component.claw.CloseBothClaw
@@ -32,6 +33,7 @@ class Teleop: DSLOpMode(false, {
     val robot = SplitSecondBot(
         hardwareMap,
         this.hardwareManager,
+        Alliance.RED,
         OpModeType.TELE_OP,
         Pose2d(0.0, 0.0, 0.0),
         telemetry
