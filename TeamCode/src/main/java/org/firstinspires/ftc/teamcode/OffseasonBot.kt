@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystem.DroneSubsystem
 import org.firstinspires.ftc.teamcode.subsystem.MecanumSubsystem
 import org.firstinspires.ftc.teamcode.subsystem.telescope.TelescopeSubsystem
 import org.firstinspires.ftc.teamcode.subsystem.elbow.ElbowSubsystem
+import org.firstinspires.ftc.teamcode.subsystem.vision.VisionSubsystem
 import org.firstinspires.ftc.teamcode.subsystem.wrist.WristSubsystem
 import kotlin.math.PI
 
@@ -51,6 +52,8 @@ class OffseasonBot(
 
     val deposit: DepositSubsystem = DepositSubsystem(claw, wrist, telescope, elbow)
 
+    lateinit var vision: VisionSubsystem
+
     val elbowEncoder = hw.motor("bR").encoder
     val telescopeEncoder = hw.motor("fR").encoder
 
@@ -61,6 +64,11 @@ class OffseasonBot(
         robot.add(elbow)
         robot.add(wrist)
         robot.add(drone)
+
+        if (isAuto) {
+            vision = VisionSubsystem(this)
+            robot.add(vision)
+        }
 
         world.add(robot)
     }
