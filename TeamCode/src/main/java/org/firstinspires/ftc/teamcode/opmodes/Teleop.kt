@@ -28,7 +28,6 @@ class Teleop: DSLOpMode(false, {
     )
 
     val driver = FTCGamepad(gamepad1)
-    val imu = robot.imu
     val dt = robot.drivetrain
 
     robot.init(world)

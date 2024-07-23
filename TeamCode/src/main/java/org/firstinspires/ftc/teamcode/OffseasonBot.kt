@@ -46,7 +46,7 @@ class OffseasonBot(
     val telescope: TelescopeSubsystem = TelescopeSubsystem(this, hw)
     val claw: ClawSubsystem = ClawSubsystem(this)
     val elbow: ElbowSubsystem = ElbowSubsystem(this)
-    val wrist: WristSubsystem = WristSubsystem(this)
+    val wrist: WristSubsystem = WristSubsystem(this, hw)
     val drone: DroneSubsystem = DroneSubsystem(hw)
 
     val deposit: DepositSubsystem = DepositSubsystem(claw, wrist, telescope, elbow)
