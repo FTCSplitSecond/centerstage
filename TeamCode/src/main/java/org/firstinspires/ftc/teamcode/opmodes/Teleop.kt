@@ -39,16 +39,6 @@ class Teleop: DSLOpMode(false, {
 
     drone.init()
 
-    var offset = 0.0
-    fun raw() = imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX,AngleUnit.RADIANS).firstAngle
-
-    fun resetIMU() {
-        offset = (-raw()).toDouble()
-    }
-
-    fun heading() =
-        (imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle + offset).radians.normalize()
-
     + idler { _, _ ->
         false
     }
