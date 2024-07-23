@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.util.Encoder;
+import org.firstinspires.ftc.teamcode.common.hardware.SSEncoder;
 
 import java.util.Arrays;
 import java.util.List;
@@ -56,7 +56,7 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     // Parallel wheel is parallel to the forward axis
     // Perpendicular is perpendicular to the forward axis
 
-    private Encoder parallelEncoder, perpendicularEncoder;
+    private SSEncoder parallelEncoder, perpendicularEncoder;
 
     private CenterstageMecanumDrive drive;
     private double correctionFromImuToFieldHeading = 0.0;
@@ -69,8 +69,8 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 
         this.drive = drive;
 
-        parallelEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "parallelEncoder"));
-        perpendicularEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "fL"));
+        parallelEncoder = new SSEncoder(hardwareMap.get(DcMotorEx.class, "fL"));
+        perpendicularEncoder = new SSEncoder(hardwareMap.get(DcMotorEx.class, "bL"));
 
         updateIMUHeadingCorrection(startPose.getHeading());
         setPoseEstimate(startPose);
