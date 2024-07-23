@@ -26,6 +26,7 @@ import kotlin.math.PI
 class SplitSecondBot(
     val hwMap: HardwareMap,
     val hw: HardwareManager,
+    val alliance: Alliance,
     val opModeType: OpModeType,
     val startPose: Pose2d,
     t: Telemetry,
@@ -78,7 +79,6 @@ class SplitSecondBot(
 
     companion object {
         var lastKnownAutoPose = Pose2d(0.0, 0.0, 0.0)
-        var alliance: Alliance = Alliance.RED
 
         private lateinit var instance: SplitSecondBot
             private set

@@ -44,6 +44,8 @@ class ElbowSubsystem(val robot: SplitSecondBot): Subsystem() {
     var v: Double = 0.0
     var a: Double = 0.0
 
+    var isEnabled = true
+
     private val deltaTimer = ElapsedTime()
 
     val currentAngle: Double
@@ -109,7 +111,5 @@ class ElbowSubsystem(val robot: SplitSecondBot): Subsystem() {
         val ELBOW_MOTOR_PPR = 751.8
         val DEGREES_PER_REV = 360 * (14.0 / 53.0) // [deg]
         val PID_TOL = 5.0 // [deg]
-
-        var isEnabled = true
     }
 }

@@ -8,4 +8,8 @@ class DropBothClaw(private val claw: ClawSubsystem): SplitSecondComponent() {
     override fun start() {
         claw.updateState(ClawSide.BOTH, ClawSubsystem.ClawState.OPEN)
     }
+
+//    override fun isComplete(): Boolean {
+//        val elaps
+//    }
 }
