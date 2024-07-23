@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystem
+package org.firstinspires.ftc.teamcode.subsystem.telescope
 
 import com.acmerobotics.roadrunner.profile.MotionProfileGenerator
 import com.acmerobotics.roadrunner.profile.MotionState
@@ -17,7 +17,6 @@ import org.firstinspires.ftc.teamcode.common.config.TelescopeConfig.TELESCOPE_KS
 import org.firstinspires.ftc.teamcode.common.config.TelescopeConfig.TELESCOPE_MAX
 import org.firstinspires.ftc.teamcode.common.config.TelescopeConfig.TELESCOPE_MIN
 import org.firstinspires.ftc.teamcode.common.ktx.adjustForKStatic
-import org.firstinspires.ftc.teamcode.common.types.OpModeType
 import kotlin.math.PI
 import kotlin.math.abs
 
@@ -52,6 +51,12 @@ class TelescopeSubsystem(val robot: OffseasonBot, r: HardwareManager): Subsystem
             rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)
         }
     }
+
+    var position: TelescopePositions = TelescopePositions.Travel
+        set(value) {
+            target = value.extension
+            field = value
+        }
 
     val currentExtensionInches: Double
         get() {

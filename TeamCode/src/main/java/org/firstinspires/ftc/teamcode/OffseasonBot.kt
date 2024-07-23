@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.subsystem.ClawSubsystem
 import org.firstinspires.ftc.teamcode.subsystem.DepositSubsystem
 import org.firstinspires.ftc.teamcode.subsystem.DroneSubsystem
 import org.firstinspires.ftc.teamcode.subsystem.MecanumSubsystem
-import org.firstinspires.ftc.teamcode.subsystem.TelescopeSubsystem
+import org.firstinspires.ftc.teamcode.subsystem.telescope.TelescopeSubsystem
 import org.firstinspires.ftc.teamcode.subsystem.elbow.ElbowSubsystem
 import org.firstinspires.ftc.teamcode.subsystem.wrist.WristSubsystem
 import kotlin.math.PI
@@ -75,5 +75,4 @@ class OffseasonBot(
         private lateinit var instance: OffseasonBot
             private set
     }
-
 }

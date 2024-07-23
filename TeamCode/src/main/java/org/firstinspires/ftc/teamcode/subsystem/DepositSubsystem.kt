@@ -1,9 +1,13 @@
 package org.firstinspires.ftc.teamcode.subsystem
 
+import dev.turtles.anchor.component.Component
+import dev.turtles.anchor.component.stock.instant
+import dev.turtles.anchor.component.stock.parallel
 import org.firstinspires.ftc.teamcode.common.config.IVKConfig
 import org.firstinspires.ftc.teamcode.common.config.IVKConfig.WRIST_ANGLE
 import org.firstinspires.ftc.teamcode.common.config.WristConfig
 import org.firstinspires.ftc.teamcode.subsystem.elbow.ElbowSubsystem
+import org.firstinspires.ftc.teamcode.subsystem.telescope.TelescopeSubsystem
 import org.firstinspires.ftc.teamcode.subsystem.wrist.WristSubsystem
 import org.joml.Vector2d
 import kotlin.math.PI
@@ -93,5 +97,20 @@ class DepositSubsystem(
         return kinResults
     }
 
+    fun getDepositXCenterOfRotation(): Double {
+        val ikResults = runKinematics(depositPixelLevel)
+        return ikResults.depositCoRX
+    }
 
+    fun setPixelLevel(pixelLevel: Double): Component {
+        depositPixelLevel = pixelLevel
+
+        return when (armState) {
+            State.DEPOSIT -> {
+                val ikResults = runKinematics(depositPixelLevel)
+                parallel()
+            }
+            else -> instant {}
+        }
+    }
 }
