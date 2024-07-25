@@ -13,7 +13,6 @@ import dev.turtles.lilypad.Button
 import dev.turtles.lilypad.impl.FTCGamepad
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.teamcode.claw.commands.DropBothClaw
-import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.mecanum.commands.TrajectoryFollower
 import org.firstinspires.ftc.teamcode.roadrunner.drive.CenterstageMecanumDrive
@@ -21,7 +20,6 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMechanism
 import org.firstinspires.ftc.teamcode.robot.util.Alliance
 import org.firstinspires.ftc.teamcode.robot.util.adjustForAlliance
-import org.firstinspires.ftc.teamcode.vision.RelocalizeFromAprilTags
 import org.firstinspires.ftc.teamcode.vision.processors.PropZoneDetected
 import kotlin.math.PI
 import org.firstinspires.ftc.teamcode.robot.util.AutoConfig
@@ -34,14 +32,14 @@ import org.openftc.easyopencv.OpenCvWebcam
 
 
 @Autonomous
-class BlueCloseAuto : AnchorOpMode() {
+class RedCloseAuto2p0 : AnchorOpMode() {
     lateinit var robot: Robot
     lateinit var smec: ScoringMechanism
     lateinit var drive: CenterstageMecanumDrive
     lateinit var webcam: OpenCvWebcam
     var detector = PropDetector(telemetry)
-    val startPose = Pose2d(16.0, 62.0, PI / 2)
-    val alliance = Alliance.BLUE
+    val startPose = Pose2d(8.0, -62.0, -PI / 2)
+    val alliance = Alliance.RED
 
     lateinit var parkLocation: ParkLocation
     var delayA: Double = 0.0
@@ -54,8 +52,8 @@ class BlueCloseAuto : AnchorOpMode() {
         drive = robot.driveBase.dt
         robot.elbow.isEnabled = true
         robot.init(this.world)
-        parkLocation = AutoConfig.BLUE_CLOSE2P0_PARK
-        delayA = AutoConfig.BLUE_CLOSE2P0_DELAYS[0]
+        parkLocation = AutoConfig.RED_CLOSE2P0_PARK
+        delayA = AutoConfig.RED_CLOSE2P0_DELAYS[0]
 
         val cameraMonitorViewId = hardwareMap.appContext.resources.getIdentifier(
             "cameraMonitorViewId",
@@ -120,18 +118,12 @@ class BlueCloseAuto : AnchorOpMode() {
                 ParkLocation.OUTSIDE -> ParkLocation.CENTER
             }
         }
-        telemetry.addLine(when(parkLocation) {
-            ParkLocation.INSIDE -> "Park Inside"
-            ParkLocation.CENTER -> "Park Center"
-            ParkLocation.OUTSIDE -> "Park Outside"
-        })
         driver[Button.Key.TRIANGLE] onActivate instant {
             delayA = (delayA + 1.0).coerceIn(0.0, 30.0)
         }
         driver[Button.Key.CROSS] onActivate instant {
             delayA = (delayA - 1.0).coerceIn(0.0, 30.0)
         }
-        telemetry.addLine("Start Pose Delay: $delayA")
     }
     fun getAllianceHeading(alliance: Alliance): Double {
         return when (alliance) {
@@ -140,9 +132,9 @@ class BlueCloseAuto : AnchorOpMode() {
         }
     }
     override fun run() {
-        //val parkLocation = AutoConfig.BLUE_CLOSE2P0_PARK
-        //val delayA = AutoConfig.BLUE_CLOSE2P0_DELAYS[0]
-        val delayB = AutoConfig.BLUE_CLOSE2P0_DELAYS[1]
+        //val parkLocation = AutoConfig.RED_CLOSE2P0_PARK
+        //val delayA = AutoConfig.RED_CLOSE2P0_DELAYS[0]
+        val delayB = AutoConfig.RED_CLOSE2P0_DELAYS[1]
 
         val zoneDetected = detector.zone
         webcam.stopStreaming()
@@ -150,12 +142,12 @@ class BlueCloseAuto : AnchorOpMode() {
 //        val zoneDetected = robot.vision.propZoneDetected
 //        robot.vision.disablePropZoneDetector()
 
-        // purple pixel is in the right claw, yellow is in the left
+        // purple pixel is in the left claw, yellow is in the right
         val startHeading = getAllianceHeading(alliance)
         val awayFromWallPosition = Vector2d(24.0, 36.0).adjustForAlliance(alliance)
-        val purplePixelPoseBackdropSide = Pose2d(Vector2d(33.0, 30.0), PI).adjustForAlliance(alliance)
+        val purplePixelPoseBackdropSide = Pose2d(Vector2d(34.0, 30.0), PI).adjustForAlliance(alliance)
         val purplePixelPoseCenter = Pose2d(Vector2d(26.0, 23.0), PI).adjustForAlliance(alliance)
-        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(14.0, 32.0), PI).adjustForAlliance(alliance)
+        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(11.5, 32.0), PI).adjustForAlliance(alliance)
         // note here that zone right/left means different things for red and blue
         val purplePixelPose = when (zoneDetected) {
             PropZoneDetected.LEFT -> if(alliance== Alliance.BLUE) purplePixelPoseBackdropSide else purplePixelPoseAwayFromBackdrop
@@ -169,7 +161,7 @@ class BlueCloseAuto : AnchorOpMode() {
         val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(-36.0, transitLaneY), PI).adjustForAlliance(alliance)
         val transitLaneBackDropSide = Vector2d(nearBackDropLaneX, transitLaneY).adjustForAlliance(alliance)
         val transitLanePixelStackSide = Vector2d(-48.0, transitLaneY).adjustForAlliance(alliance)
-        val backDropScoringClawOffset = 1.5 // offset to help pixels land better if needed
+        val backDropScoringClawOffset = 0.0 // offset to help pixels land better if needed
         val backDropZoneSpacing = 6.5
         val backDropCenterY = 36.0
         val nearBackDropCenter = Vector2d(nearBackDropLaneX, backDropCenterY + backDropScoringClawOffset).adjustForAlliance(alliance)
@@ -239,7 +231,7 @@ class BlueCloseAuto : AnchorOpMode() {
         val moveAwayFromWall = TrajectoryFollower(drive, moveAwayFromWallTrajectory)
         val moveToCloseIntake = smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
         val moveToScorePurplePixel = TrajectoryFollower(drive, moveToScorePurplePixelTrajectory)
-        val scorePurplePixel = instant { robot.rightClaw.position= ClawPositions.OPEN }
+        val scorePurplePixel = instant { robot.leftClaw.position= ClawPositions.OPEN }
         val moveToTravel = smec.setArmState(ScoringMechanism.State.TRAVEL)
 //        val moveToBackDropLane = TrajectoryFollower(drive, moveToBackDropLaneTrajectory)
         val moveToNearBackdrop = series( TrajectoryFollower(drive, moveAwayFromPurplePixelTrajectory), TrajectoryFollower(drive, moveToNearBackdropTrajectory) )
