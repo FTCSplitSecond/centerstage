@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowPosition
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowSubsystem
 import org.firstinspires.ftc.teamcode.telescope.commands.SetTelescopePosition
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopePosition
-import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
+import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsystem
 import org.firstinspires.ftc.teamcode.wrist.commands.SetWristPosition
 import org.firstinspires.ftc.teamcode.wrist.subsystems.WristConfig
 import org.firstinspires.ftc.teamcode.wrist.subsystems.WristPosition
@@ -31,7 +31,7 @@ class ScoringMechanism(
     private val leftClaw: LeftClawSubsystem,
     private val rightClaw: RightClawSubsystem,
     private val wrist: WristSubsystem,
-    private val telescope: TelescopeSubsytem,
+    private val telescope: TelescopeSubsystem,
     private val elbow: ElbowSubsystem, private val telemetry: Telemetry
 ) {
     data class KinematicResults(

@@ -246,7 +246,7 @@ public class CenterstageMecanumDrive extends MecanumDrive {
     private Double getOdoHeading() {
         return getPoseEstimate().getHeading();
     }
-    public Gyrodometry gyrodometry = new Gyrodometry(this::getRawExternalHeading, this::getOdoHeading);
+//    public Gyrodometry gyrodometry = new Gyrodometry(this::getRawExternalHeading, this::getOdoHeading);
     public void update() {
         updatePoseEstimate();
      //   gyrodometry.updateForGryrodometry();
@@ -389,9 +389,9 @@ public class CenterstageMecanumDrive extends MecanumDrive {
         return AngleUnit.normalizeRadians(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
     }
 
-    public double getExternalHeadingWithOffset() {
-        return AngleUnit.normalizeRadians(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - IMU_OFFSET);
-    }
+//    public double getExternalHeadingWithOffset() {
+//        return AngleUnit.normalizeRadians(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - IMU_OFFSET);
+//    }
 
     @Override
     public Double getExternalHeadingVelocity() {

@@ -3,14 +3,13 @@ package org.firstinspires.ftc.teamcode.robot.subsystems
 import com.acmerobotics.dashboard.FtcDashboard
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry
 import com.acmerobotics.roadrunner.geometry.Pose2d
-import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.hardware.HardwareMap
 import dev.turtles.anchor.entity.Entity
 import dev.turtles.anchor.world.World
 import dev.turtles.electriceel.wrapper.HardwareManager
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.drone_launcher.Subsystems.DroneSubsystem
-import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
+import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsystem
 import org.firstinspires.ftc.teamcode.claw.subsystems.LeftClawSubsystem
 import org.firstinspires.ftc.teamcode.claw.subsystems.RightClawSubsystem
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowSubsystem
@@ -46,7 +45,7 @@ class Robot(val hardwareMap: HardwareMap, val hw: HardwareManager, t: Telemetry,
     val leftClaw = LeftClawSubsystem(this, hw, telemetry)
     val rightClaw = RightClawSubsystem(this, hw, telemetry)
     val wrist = WristSubsystem(hw, telemetry)
-    val telescope = TelescopeSubsytem(hw, this)
+    val telescope = TelescopeSubsystem(hw, this)
     val elbow = ElbowSubsystem(this, hw, telescope)
     val droneLauncher = DroneSubsystem(hw, telemetry)
     val scoringMechanism = ScoringMechanism(leftClaw, rightClaw, wrist, telescope, elbow, telemetry);

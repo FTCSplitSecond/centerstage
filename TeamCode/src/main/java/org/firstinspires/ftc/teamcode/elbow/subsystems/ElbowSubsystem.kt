@@ -17,10 +17,10 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.robot.util.adjustPowerForKStatic
 import org.firstinspires.ftc.teamcode.swerve.utils.clamp
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeConfig.TELESCOPE_MAX
-import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsytem
+import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsystem
 
 
-class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager, val telescope: TelescopeSubsytem) : Subsystem() {
+class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager, val telescope: TelescopeSubsystem) : Subsystem() {
 
     var isEnabled = true
     var isTelemetryEnabled = false
@@ -41,17 +41,7 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
         private set
     val motionProfileTimer = ElapsedTime()
     var previousTarget = targetAngle
-    var motionProfile = MotionProfileGenerator.generateMotionProfile(
-        MotionState(currentAngle, 0.0, 0.0),
-        MotionState(targetAngle, 0.0, 0.0),
-        { ELBOW_MAX_ANGULAR_VELOCITY },
-        { ELBOW_MAX_ANGULAR_ACCELERATION },
-    )
-
     var deltaTimer = ElapsedTime()
-    private var angularX : Double = currentAngle
-    private var angularV : Double = 0.0
-    private var angularA : Double = 0.0
     private fun getEncoderTicksFromAngle(angle : Double) : Double {
         return angle/ DEGREES_PER_REVOLUTION * ELBOW_MOTOR_PPR // ticks
     }
@@ -59,11 +49,18 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
         return  encoderTicks/ ELBOW_MOTOR_PPR * DEGREES_PER_REVOLUTION + ELBOW_HOME // degrees
     }
 
-    val currentAngle : Double
-        get() {
-            return getAngleFromEncoderTicks(motor.encoder.getCounts())
-        }
+    var currentAngle : Double = getAngleFromEncoderTicks(motor.encoder.getCounts())
+        private set
 
+    private var angularX : Double = currentAngle
+    private var angularV : Double = 0.0
+    private var angularA : Double = 0.0
+    private var motionProfile = MotionProfileGenerator.generateMotionProfile(
+        MotionState(currentAngle, 0.0, 0.0),
+        MotionState(targetAngle, 0.0, 0.0),
+        { ELBOW_MAX_ANGULAR_VELOCITY },
+        { ELBOW_MAX_ANGULAR_ACCELERATION },
+    )
     var position : ElbowPosition = ElbowPosition.Travel
         set(value) {
             targetAngle = value.angle
@@ -79,6 +76,7 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
 
 
     override fun loop() {
+        currentAngle = getAngleFromEncoderTicks(motor.encoder.getCounts())
         val deltaT = deltaTimer.seconds()
         deltaTimer.reset()
         val newAngularX = currentAngle
@@ -114,7 +112,7 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
             robot.telemetry.addData("Current Angle Degree", currentAngle)
             robot.telemetry.addData("Angle Error Degree", targetAngle - currentAngle)
             robot.telemetry.addData("Is At Target", this.isAtTarget())
-            robot.telemetry.addData("motor.getCurrrent (mA)", motor.getCurrent() * 1000)
+            robot.telemetry.addData("motor.getCurrent (mA)", motor.getCurrent() * 1000)
             robot.telemetry.addData("Apple", motionProfile[motionProfileTimer.seconds()].x)
         }
     }
