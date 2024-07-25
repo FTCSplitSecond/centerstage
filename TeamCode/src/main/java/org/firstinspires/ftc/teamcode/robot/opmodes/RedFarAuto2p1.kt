@@ -55,8 +55,8 @@ class RedFarAuto2p1 : AnchorOpMode() {
         drive = robot.driveBase.dt
         robot.elbow.isEnabled = true
         robot.init(this.world)
-        parkLocation = AutoConfig.RED_FAR_PARK
-        delayA = AutoConfig.RED_FAR_DELAYS[0]
+        parkLocation = AutoConfig.RED_FAR2P1_PARK
+        delayA = AutoConfig.RED_FAR2P1_DELAYS[0]
 
         val cameraMonitorViewId = hardwareMap.appContext.resources.getIdentifier(
             "cameraMonitorViewId",
@@ -144,8 +144,8 @@ class RedFarAuto2p1 : AnchorOpMode() {
     override fun run() {
         //val parkLocation = AutoConfig.RED_FAR_PARK
         //val delayA = AutoConfig.RED_FAR_DELAYS[0]
-        val delayB = AutoConfig.RED_FAR_DELAYS[1]
-        val delayC = AutoConfig.RED_FAR_DELAYS[2]
+        val delayB = AutoConfig.RED_FAR2P1_DELAYS[1]
+        val delayC = AutoConfig.RED_FAR2P1_DELAYS[2]
 
         val zoneDetected = detector.zone
         webcam.stopStreaming()
