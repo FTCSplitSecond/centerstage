@@ -45,31 +45,27 @@ public class AutoConfig {
 
     // RED PARK LOCATIONS
     public static ParkLocation RED_CLOSE2P0_PARK = ParkLocation.OUTSIDE;
-    public static ParkLocation RED_CENTER_PARK = ParkLocation.CENTER;
-    public static ParkLocation RED_CENTER2P0_PARK = ParkLocation.OUTSIDE;
-    public static ParkLocation RED_FAR_PARK = ParkLocation.INSIDE;
+    public static ParkLocation RED_CLOSE2P1_PARK = ParkLocation.OUTSIDE;
     public static ParkLocation RED_FAR2P0_PARK = ParkLocation.INSIDE;
+    public static ParkLocation RED_FAR2P1_PARK = ParkLocation.INSIDE;
 
     // BLUE PARK LOCATIONS
 
     public static ParkLocation BLUE_CLOSE2P0_PARK = ParkLocation.OUTSIDE;
-    public static ParkLocation BLUE_CENTER_PARK = ParkLocation.CENTER;
-    public static ParkLocation BLUE_CENTER2P0_PARK = ParkLocation.CENTER;
-    public static ParkLocation BLUE_FAR_PARK = ParkLocation.INSIDE;
+    public static ParkLocation BLUE_CLOSE2P1_PARK = ParkLocation.OUTSIDE;
     public static ParkLocation BLUE_FAR2P0_PARK = ParkLocation.INSIDE;
+    public static ParkLocation BLUE_FAR2P1_PARK = ParkLocation.INSIDE;
 
     // RED DELAYS
     public static double[] RED_CLOSE2P0_DELAYS = new double[]{0.0, 0.0};
-    public static double[] RED_CENTER_DELAYS = new double[]{0.0, 0.0, 0.0};
-    public static double[] RED_CENTER2P0_DELAYS = new double[]{0.0, 0.0, 0.0};
-    public static double[] RED_FAR_DELAYS = new double[]{0.0, 0.0, 0.0};
+    public static double[] RED_CLOSE2P1_DELAYS = new double[]{0.0, 0.0};
     public static double[] RED_FAR2P0_DELAYS = new double[]{0.0, 0.0, 0.0};
+    public static double[] RED_FAR2P1_DELAYS = new double[]{0.0, 0.0, 0.0};
 
     //BLUE DELAYS
     public static double[] BLUE_CLOSE2P0_DELAYS = new double[]{0.0, 0.0};
-    public static double[] BLUE_CENTER_DELAYS = new double[]{0.0, 0.0, 0.0};
-    public static double[] BLUE_CENTER2P0_DELAYS = new double[]{0.0, 0.0, 0.0};
-    public static double[] BLUE_FAR_DELAYS = new double[]{0.0, 0.0, 0.0};
+    public static double[] BLUE_CLOSE2P1_DELAYS = new double[]{0.0, 0.0};
     public static double[] BLUE_FAR2P0_DELAYS = new double[]{0.0, 0.0, 0.0};
+    public static double[] BLUE_FAR2P1_DELAYS = new double[]{0.0, 0.0, 0.0};
 
 }

@@ -10,7 +10,6 @@ import dev.turtles.anchor.component.stock.instant
 import dev.turtles.anchor.component.stock.parallel
 import dev.turtles.anchor.component.stock.series
 import dev.turtles.electriceel.opmode.AnchorOpMode
-import dev.turtles.electriceel.util.Pose
 import dev.turtles.lilypad.Button
 import dev.turtles.lilypad.impl.FTCGamepad
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
@@ -28,7 +27,6 @@ import org.firstinspires.ftc.teamcode.robot.util.adjustForAlliance
 import org.firstinspires.ftc.teamcode.telescope.commands.SetTelescopePosition
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopePosition
 import org.firstinspires.ftc.teamcode.vision.AprilTagRelocalize
-import org.firstinspires.ftc.teamcode.vision.RelocalizeFromAprilTags
 import org.openftc.easyopencv.OpenCvCamera
 import org.openftc.easyopencv.OpenCvCameraFactory
 import org.openftc.easyopencv.OpenCvCameraRotation
@@ -37,14 +35,14 @@ import kotlin.math.PI
 
 
 @Autonomous
-class BlueFarAuto : AnchorOpMode() {
+class RedFarAuto2p1 : AnchorOpMode() {
     lateinit var robot: Robot
     lateinit var smec: ScoringMechanism
     lateinit var drive: CenterstageMecanumDrive
     lateinit var webcam: OpenCvWebcam
     var detector = PropDetector(telemetry)
-    val startPose = Pose2d(-81.0, 62.0, PI / 2)
-    val alliance = Alliance.BLUE
+    val startPose = Pose2d(-88.0, -62.0, -PI / 2)
+    val alliance = Alliance.RED
 
     lateinit var parkLocation: ParkLocation
     var delayA: Double = 0.0
@@ -57,8 +55,8 @@ class BlueFarAuto : AnchorOpMode() {
         drive = robot.driveBase.dt
         robot.elbow.isEnabled = true
         robot.init(this.world)
-        parkLocation = AutoConfig.BLUE_FAR_PARK
-        delayA = AutoConfig.BLUE_FAR_DELAYS[0]
+        parkLocation = AutoConfig.RED_FAR_PARK
+        delayA = AutoConfig.RED_FAR_DELAYS[0]
 
         val cameraMonitorViewId = hardwareMap.appContext.resources.getIdentifier(
             "cameraMonitorViewId",
@@ -144,10 +142,10 @@ class BlueFarAuto : AnchorOpMode() {
     }
 
     override fun run() {
-       // val parkLocation = AutoConfig.BLUE_FAR_PARK
-        //val delayA = AutoConfig.BLUE_FAR_DELAYS[0]
-        val delayB = AutoConfig.BLUE_FAR_DELAYS[1]
-        val delayC = AutoConfig.BLUE_FAR_DELAYS[2]
+        //val parkLocation = AutoConfig.RED_FAR_PARK
+        //val delayA = AutoConfig.RED_FAR_DELAYS[0]
+        val delayB = AutoConfig.RED_FAR_DELAYS[1]
+        val delayC = AutoConfig.RED_FAR_DELAYS[2]
 
         val zoneDetected = detector.zone
         webcam.stopStreaming()
@@ -163,14 +161,16 @@ class BlueFarAuto : AnchorOpMode() {
 //        val startPose = Pose2d(-32.0, 62.0, startHeading).adjustForAlliance(alliance)
         val awayFromWallPosition = Pose2d(Vector2d(-84.0, 36.0), startPose.heading).adjustForAlliance(alliance)
 
-        val purplePixelPoseBackdropSide = Pose2d(Vector2d(-100.0, 32.0), PI).adjustForAlliance(alliance)
-        val purplePixelPoseCenter = Pose2d(Vector2d(-84.0, 12.5), startPose.heading).adjustForAlliance(alliance)
-        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(-98.0, 17.0), startPose.heading).adjustForAlliance(alliance)
+        val purplePixelPoseBackdropSide = Pose2d(Vector2d(-103.0, 30.0), PI).adjustForAlliance(alliance)
+        val purplePixelPoseCenter = Pose2d(Vector2d(-84.0, 14.0), startPose.heading).adjustForAlliance(alliance)
+        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(-96.5, 17.0), startPose.heading).adjustForAlliance(alliance)
         val purplePixelPose = when (zoneDetected) {
             PropZoneDetected.LEFT -> if(alliance== Alliance.BLUE) purplePixelPoseBackdropSide else purplePixelPoseAwayFromBackdrop
             PropZoneDetected.CENTER, PropZoneDetected.NONE -> purplePixelPoseCenter
             PropZoneDetected.RIGHT -> if(alliance== Alliance.BLUE) purplePixelPoseAwayFromBackdrop else purplePixelPoseBackdropSide
         }
+
+
 
         val transitLaneY = 12.0
         val nearBackDropLaneX = 38.0
@@ -179,15 +179,16 @@ class BlueFarAuto : AnchorOpMode() {
         val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(-98.0, 9.5), PI + spinOffset).adjustForAlliance(alliance)
 
         val poseAfterPurplePixel = when (zoneDetected) {
-            PropZoneDetected.RIGHT -> Pose2d(Vector2d(transitLanePoseAfterPurplePixel.x + 0.01, transitLanePoseAfterPurplePixel.y), startPose.heading)
+            PropZoneDetected.LEFT -> Pose2d(Vector2d(transitLanePoseAfterPurplePixel.x + 0.01, transitLanePoseAfterPurplePixel.y), startPose.heading)
             else -> Pose2d(Vector2d(transitLanePoseAfterPurplePixel.x + 0.01, transitLanePoseAfterPurplePixel.y), transitLanePoseAfterPurplePixel.heading)
         }
+
         val transitLaneBackDropSide = Vector2d(nearBackDropLaneX, transitLaneY).adjustForAlliance(alliance)
 
-        val rightClawStackPose = Pose2d(Vector2d(-104.5, 10.0), PI).adjustForAlliance(alliance)
+        val leftClawStackPose = Pose2d(Vector2d(-106.0, 10.0), PI).adjustForAlliance(alliance)
 
         val nearCenterStackPose = Vector2d(-33.0, 12.0).adjustForAlliance(alliance)
-        val centerStackAngle = -(3*PI)/4 //45 degrees
+        val centerStackAngle = (3*PI)/4 //45 degrees
         val centerStackLeftClawPose = Pose2d(Vector2d(-36.0, 7.75), centerStackAngle).adjustForAlliance(alliance)
         val centerStackRightClawPose = Pose2d(Vector2d(-37.5, 9.0), centerStackAngle).adjustForAlliance(alliance)
 
@@ -219,22 +220,21 @@ class BlueFarAuto : AnchorOpMode() {
             ParkLocation.OUTSIDE -> 6.0
         }
 
-
         // trajectories
         val moveAwayFromWallTrajectory = drive.trajectoryBuilder(startPose)
             .lineToLinearHeading(awayFromWallPosition)
             .build()
         val moveToScorePurplePixelTrajectory = drive.trajectoryBuilder(moveAwayFromWallTrajectory.end())
-            .lineToLinearHeading(purplePixelPose)
-            .build()
+                .lineToLinearHeading(purplePixelPose)
+                .build()
         val moveToAfterPurplePixelTrajectory = drive.trajectoryBuilder(moveToScorePurplePixelTrajectory.end())
             .lineToLinearHeading(poseAfterPurplePixel)
             .build()
         val moveToFarTransitLaneTrajectory = drive.trajectoryBuilder(moveToAfterPurplePixelTrajectory.end())
-            .lineToLinearHeading(transitLanePoseAfterPurplePixel)
-            .build()
+                .lineToLinearHeading(transitLanePoseAfterPurplePixel)
+                .build()
         val moveToLeftClawStackTrajectory = drive.trajectoryBuilder(moveToFarTransitLaneTrajectory.end())
-                .lineToLinearHeading(rightClawStackPose)
+                .lineToLinearHeading(leftClawStackPose)
                 .build()
         val moveToTransitLaneFromPixelStacks = drive.trajectoryBuilder(moveToLeftClawStackTrajectory.end())
                 .lineToLinearHeading(transitLanePoseAfterPurplePixel)
@@ -296,14 +296,14 @@ class BlueFarAuto : AnchorOpMode() {
         // commands
         val moveAwayFromWall = TrajectoryFollower(drive, moveAwayFromWallTrajectory)
         val setArmStateForPurple = when(zoneDetected) {
-            PropZoneDetected.LEFT -> series(
+            PropZoneDetected.RIGHT -> series(
                 smec.setArmState(ScoringMechanism.State.PURPLE_DROP),
                 SetTelescopePosition(robot.telescope, TelescopePosition.PurplePush)
             )
             else -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
         }
         val moveToScorePurplePixel = TrajectoryFollower(drive, moveToScorePurplePixelTrajectory)
-        val scorePurplePixel = instant { robot.rightClaw.position = ClawPositions.OPEN }
+        val scorePurplePixel = instant { robot.leftClaw.position = ClawPositions.OPEN }
         val moveToTravel = smec.setArmState(ScoringMechanism.State.TRAVEL)
         val moveToFarTransitLane = series(
             TrajectoryFollower(drive, moveToAfterPurplePixelTrajectory),
@@ -368,7 +368,7 @@ class BlueFarAuto : AnchorOpMode() {
 
             setArmStateForPurple,
 
-            instant { robot.rightClaw.position = ClawPositions.OPEN },
+            instant { robot.leftClaw.position = ClawPositions.OPEN },
 
             moveToTravel,
 
@@ -378,11 +378,11 @@ class BlueFarAuto : AnchorOpMode() {
 
             series(
                 parallel(
-                    instant { robot.rightClaw.position = ClawPositions.OPEN },
+                    instant { robot.leftClaw.position = ClawPositions.OPEN },
                     smec.setArmState(ScoringMechanism.State.STACK_INTAKE_CLOSE)
                 ),
                 moveToWallStackIntake,
-                instant { robot.rightClaw.position = ClawPositions.CLOSED },
+                instant { robot.leftClaw.position = ClawPositions.CLOSED },
                 smec.setArmState(ScoringMechanism.State.TRAVEL)
             ),
 

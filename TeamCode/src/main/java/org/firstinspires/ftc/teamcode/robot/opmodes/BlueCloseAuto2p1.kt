@@ -13,9 +13,7 @@ import dev.turtles.electriceel.opmode.AnchorOpMode
 import dev.turtles.lilypad.Button
 import dev.turtles.lilypad.impl.FTCGamepad
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
-import org.firstinspires.ftc.teamcode.claw.commands.CloseBothClaw
 import org.firstinspires.ftc.teamcode.claw.commands.DropBothClaw
-import org.firstinspires.ftc.teamcode.claw.commands.OpenBothClaw
 import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.mecanum.commands.TrajectoryFollower
 import org.firstinspires.ftc.teamcode.roadrunner.drive.CenterstageMecanumDrive
@@ -33,11 +31,10 @@ import org.firstinspires.ftc.teamcode.robot.util.adjustForAlliance
 import org.firstinspires.ftc.teamcode.telescope.commands.SetTelescopePosition
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopePosition
 import org.firstinspires.ftc.teamcode.vision.AprilTagRelocalize
-import org.firstinspires.ftc.teamcode.vision.RelocalizeFromAprilTags
 
 
 @Autonomous
-class BlueCenterAuto : AnchorOpMode() {
+class BlueCloseAuto2p1 : AnchorOpMode() {
     lateinit var robot: Robot
     lateinit var smec: ScoringMechanism
     lateinit var drive: CenterstageMecanumDrive
@@ -57,8 +54,8 @@ class BlueCenterAuto : AnchorOpMode() {
         drive = robot.driveBase.dt
         robot.elbow.isEnabled = true
         robot.init(this.world)
-        parkLocation = AutoConfig.BLUE_CENTER_PARK
-        delayA = AutoConfig.BLUE_CENTER_DELAYS[0]
+        parkLocation = AutoConfig.BLUE_CLOSE2P1_PARK
+        delayA = AutoConfig.BLUE_CLOSE2P1_DELAYS[0]
 
         val cameraMonitorViewId = hardwareMap.appContext.resources.getIdentifier(
             "cameraMonitorViewId",
@@ -144,8 +141,8 @@ class BlueCenterAuto : AnchorOpMode() {
 
     override fun run() {
         //val delayA = AutoConfig.BLUE_CENTER_DELAYS[0]
-        val delayB = AutoConfig.BLUE_CENTER_DELAYS[1]
-        val delayC = AutoConfig.BLUE_CENTER_DELAYS[2]
+        val delayB = AutoConfig.BLUE_CLOSE2P1_DELAYS[1]
+        val delayC = AutoConfig.BLUE_CLOSE2P1_DELAYS[2]
 
         val zoneDetected = detector.zone
         webcam.stopStreaming()
@@ -159,14 +156,11 @@ class BlueCenterAuto : AnchorOpMode() {
         }
 //        val startHeading = getAllianceHeading(alliance)
 //        val startPose = Pose2d(-32.0, 62.0, startHeading).adjustForAlliance(alliance)
-        val awayFromWallPosition = when (zoneDetected) {
-            PropZoneDetected.CENTER, PropZoneDetected.NONE -> Pose2d(-36.1, 53.0, PI / 2).adjustForAlliance(alliance)
-            else -> Pose2d(Vector2d(-24.0, 48.0), PI).adjustForAlliance(alliance)
-        }
-
-        val purplePixelPoseBackdropSide = Pose2d(Vector2d(-12.5, 28.0), PI).adjustForAlliance(alliance)
-        val purplePixelPoseCenter = Pose2d(Vector2d(-35.0, 55.5), PI/2).adjustForAlliance(alliance)
-        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(-34.5, 32.0), PI).adjustForAlliance(alliance)
+        val awayFromWallPosition = Vector2d(24.0, 36.0).adjustForAlliance(alliance)
+        val purplePixelPoseBackdropSide = Pose2d(Vector2d(34.0, 30.0), PI).adjustForAlliance(alliance)
+        val purplePixelPoseCenter = Pose2d(Vector2d(26.0, 23.0), PI).adjustForAlliance(alliance)
+        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(11.5, 32.0), PI).adjustForAlliance(alliance)
+        // note here that zone right/left means different things for red and blue
         val purplePixelPose = when (zoneDetected) {
             PropZoneDetected.LEFT -> if(alliance== Alliance.BLUE) purplePixelPoseBackdropSide else purplePixelPoseAwayFromBackdrop
             PropZoneDetected.CENTER, PropZoneDetected.NONE -> purplePixelPoseCenter
@@ -177,16 +171,13 @@ class BlueCenterAuto : AnchorOpMode() {
         val nearBackDropLaneX = 36.0
         val backDropScoreX = 43.5
 
-        val transitLanePoseAfterPurplePixel = when (zoneDetected) {
-            PropZoneDetected.CENTER, PropZoneDetected.NONE -> Pose2d(Vector2d(-28.0, transitLaneY), PI + spinOffset).adjustForAlliance(alliance)
-            else -> Pose2d(Vector2d(-12.0, transitLaneY), PI + spinOffset).adjustForAlliance(alliance)
-        }
-        val transitLaneBackDropSide = Vector2d(nearBackDropLaneX, transitLaneY).adjustForAlliance(alliance)
-        val transitLanePixelStackSide = Vector2d(-103.0, transitLaneY).adjustForAlliance(alliance)
 
-        val rightClawStackPose = Pose2d(Vector2d(-104.5, 29.0), PI).adjustForAlliance(alliance)
-        //Left claw not tested
-        val leftClawStackPose = Pose2d(Vector2d(-106.0, 38.0), PI).adjustForAlliance(alliance)
+        val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(20.0, transitLaneY), PI + spinOffset).adjustForAlliance(alliance)
+
+        val transitLaneBackDropSide = Vector2d(nearBackDropLaneX, transitLaneY).adjustForAlliance(alliance)
+        val transitLanePixelStackSide = Vector2d(-55.0, transitLaneY).adjustForAlliance(alliance)
+
+        val rightClawStackPose = Pose2d(Vector2d(-56.5, 29.0), PI).adjustForAlliance(alliance)
 
         val backDropScoringClawOffset = -4.0 // offset to help pixels land better if needed
         val backDropZoneSpacing = 7.0
@@ -218,15 +209,15 @@ class BlueCenterAuto : AnchorOpMode() {
 
         // trajectories
         val moveAwayFromWallTrajectory = drive.trajectoryBuilder(startPose)
-            .lineToLinearHeading(awayFromWallPosition)
+            .lineTo(awayFromWallPosition)
             .build()
         val moveToScorePurplePixelTrajectory = drive.trajectoryBuilder(moveAwayFromWallTrajectory.end())
             .lineToLinearHeading(purplePixelPose)
             .build()
-        val moveToFarTransitLaneTrajectory = drive.trajectoryBuilder(moveToScorePurplePixelTrajectory.end())
+        val moveToCloseTransitLaneTrajectory = drive.trajectoryBuilder(moveToScorePurplePixelTrajectory.end())
             .lineToLinearHeading(transitLanePoseAfterPurplePixel)
             .build()
-        val moveToPixelStacksTrajectory = drive.trajectoryBuilder(moveToFarTransitLaneTrajectory.end())
+        val moveToPixelStacksTrajectory = drive.trajectoryBuilder(moveToCloseTransitLaneTrajectory.end())
             .lineTo(transitLanePixelStackSide)
             .build()
         val moveToLeftClawStackTrajectory = drive.trajectoryBuilder(moveToPixelStacksTrajectory.end())
@@ -259,17 +250,11 @@ class BlueCenterAuto : AnchorOpMode() {
 
         // commands
         val moveAwayFromWall = TrajectoryFollower(drive, moveAwayFromWallTrajectory)
-        val setArmStateToPlacePurple = when(zoneDetected) {
-            PropZoneDetected.CENTER, PropZoneDetected.NONE -> series(
-                smec.setArmState(ScoringMechanism.State.PURPLE_DROP),
-                SetTelescopePosition(robot.telescope, TelescopePosition.PurplePush)
-            )
-            else -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
-        }
+        val goToCloseIntake = smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
         val moveToScorePurplePixel = TrajectoryFollower(drive, moveToScorePurplePixelTrajectory)
         val scorePurplePixel = instant { robot.rightClaw.position = ClawPositions.OPEN }
         val moveToTravel = smec.setArmState(ScoringMechanism.State.TRAVEL)
-        val moveToFarTransitLane = TrajectoryFollower(drive, moveToFarTransitLaneTrajectory)
+        val moveToCloseTransitLane = TrajectoryFollower(drive, moveToCloseTransitLaneTrajectory)
 
         //Pixel Stacks
         val moveToPixelStacksLane = TrajectoryFollower(drive, moveToPixelStacksTrajectory)
@@ -301,16 +286,9 @@ class BlueCenterAuto : AnchorOpMode() {
 
             moveAwayFromWall,
 
-            when (zoneDetected) {
-                PropZoneDetected.CENTER, PropZoneDetected.NONE -> series(
-                    moveToScorePurplePixel,
-                    setArmStateToPlacePurple,
-                )
-                else -> series(
-                    setArmStateToPlacePurple,
-                    moveToScorePurplePixel
-                )
-            },
+            goToCloseIntake,
+
+            moveToScorePurplePixel,
 
             scorePurplePixel,
 
@@ -318,7 +296,7 @@ class BlueCenterAuto : AnchorOpMode() {
 
             delay(delayB),
 
-            moveToFarTransitLane,
+            moveToCloseTransitLane,
 
             //delay(8.0),
 
