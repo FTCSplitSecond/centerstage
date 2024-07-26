@@ -149,22 +149,13 @@ class MainTeleOp : AnchorOpMode() {
                         ScoringMechanism.State.DEPOSIT,
                         ScoringMechanism.State.EXTENDED_INTAKE,
                         ScoringMechanism.State.CLOSE_INTAKE -> smec.setArmState(ScoringMechanism.State.TRAVEL)
+
                         else -> parallel(
                             smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE),
                             OpenBothClaw(robot.leftClaw, robot.rightClaw)
                         )
                     }
                 }
-        driver[Button.Key.TRIANGLE] onActivate instant {
-            +when (smec.armState) {
-                ScoringMechanism.State.TRAVEL -> series(
-                    smec.setArmState(ScoringMechanism.State.DEPOSIT),
-                    smec.setDepositPixelLevelSharedBackdrop()
-                )
-                else -> smec.setArmState(ScoringMechanism.State.TRAVEL)
-            }
-
-        }
 
 
         driver[Button.Key.RIGHT_JOYSTICK_PRESS] onActivate instant {

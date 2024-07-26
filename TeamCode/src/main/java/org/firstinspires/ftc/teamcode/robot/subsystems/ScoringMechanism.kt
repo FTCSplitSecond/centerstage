@@ -58,8 +58,6 @@ class ScoringMechanism(
     var depositPixelLevel = 1.0
         private set;
 
-    val sharedBackdropDepositLevel = 7.0
-
     /**
      * Does inverse kinematics to derive:
      * <ul>
@@ -252,15 +250,6 @@ class ScoringMechanism(
             }
             else -> instant { } // do nothing
         }
-    }
-
-    fun setDepositPixelLevelSharedBackdrop(currentState:State = armState): Component {
-        val ikResults = runKinematics(sharedBackdropDepositLevel)
-        return parallel(
-            SetTelescopePosition(telescope, TelescopePosition.Adjust(ikResults.telescopeExtension)),
-            SetElbowPosition(elbow, ElbowPosition.Adjust(ikResults.elbowAngle)),
-            SetWristPosition(wrist, WristPosition.Adjust(ikResults.wristAngle))
-        )
     }
 
     fun setDepositPixelLevelAuto(pixelLevel: Double): Component {
