@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.elbow.subsystems
 
+import android.util.Log
 import com.acmerobotics.roadrunner.profile.MotionProfileGenerator
 import com.acmerobotics.roadrunner.profile.MotionState
 import com.acmerobotics.roadrunner.util.epsilonEquals
@@ -12,27 +13,30 @@ import dev.turtles.electriceel.wrapper.HardwareManager
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_HOME
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_MAX_ANGULAR_ACCELERATION
 import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.ELBOW_MAX_ANGULAR_VELOCITY
+import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.HOMING_ANGULARVELOCITY_THRESHOLD
+import org.firstinspires.ftc.teamcode.elbow.subsystems.ElbowConfig.HOMING_POWER
 import org.firstinspires.ftc.teamcode.robot.util.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.robot.util.adjustPowerForKStatic
 import org.firstinspires.ftc.teamcode.swerve.utils.clamp
-import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeConfig.TELESCOPE_MAX
+import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeConfig.HOMING_VELOCITY_THRESHOLD
 import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopeSubsystem
+import kotlin.math.abs
 
 
 class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager, val telescope: TelescopeSubsystem) : Subsystem() {
 
     var isEnabled = true
     var isTelemetryEnabled = false
+    var isHoming = false
+    private var hasHomingPowerBeenSet = false
     private val motor = hw.motor("elbow")
-
 
     override fun init() {
         if (robot.opModeType == OpModeType.AUTONOMOUS)
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER)
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)
     }
-
 
     val ELBOW_MOTOR_PPR = 751.8 // https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-13-7-1-ratio-24mm-length-8mm-rex-shaft-435-rpm-3-3-5v-encoder/
     val DEGREES_PER_REVOLUTION = 360.0*(14.0/53.0)  //degrees
@@ -94,15 +98,34 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
             ElbowConfig.ELBOW_MIN,
             ElbowConfig.ELBOW_MAX)
         generateMotionProfile(clampedTarget, currentMotionProfileX, angularV, angularA)
+        val gravityAdjustment = Math.cos(Math.toRadians(currentAngle))  * ElbowConfig.KG
+        val pidPower = controller.calculate(currentAngle, motionProfile[motionProfileTimer.seconds()].x).adjustPowerForKStatic(ElbowConfig.KS)
+        motor power pidPower + gravityAdjustment
 
         if (isEnabled) {
-            val minExtension = 13.5
-            val maxTotalExtension = minExtension + TELESCOPE_MAX
-            val currentTotalExtension = minExtension + telescope.currentExtensionInches
-//            val gravityAdjustment = Math.cos(Math.toRadians(currentAngle)) * (currentTotalExtension/maxTotalExtension) * ElbowConfig.KG
-            val gravityAdjustment = Math.cos(Math.toRadians(currentAngle))  * ElbowConfig.KG
-            val pidPower = controller.calculate(currentAngle, motionProfile[motionProfileTimer.seconds()].x).adjustPowerForKStatic(ElbowConfig.KS)
-            motor power pidPower + gravityAdjustment
+            if(isHoming){
+                Log.d("elbow","homing angular velocity $angularV, abs threshold is $HOMING_ANGULARVELOCITY_THRESHOLD")
+                if(!hasHomingPowerBeenSet) {
+                    Log.d("elbow","homing starting")
+                    Log.d("elbow","homing power set to $HOMING_POWER")
+                    motor power HOMING_POWER
+                    hasHomingPowerBeenSet = true
+                } else if(abs(angularV) < HOMING_ANGULARVELOCITY_THRESHOLD) {
+                    Log.d("elbow","homing completed")
+                    motor power 0.0
+                    // we are at the end stop, reset the encoders, re-initialize the current/target
+                    // and end homing sequence
+                    motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER)
+                    motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)
+                    currentAngle = ELBOW_HOME
+                    position = ElbowPosition.Travel
+                    isHoming = false
+                    hasHomingPowerBeenSet = false
+                } else {
+                    motor power HOMING_POWER
+                }
+            }
+
         } else motor power 0.0
 
         if(isTelemetryEnabled) {
@@ -112,8 +135,6 @@ class ElbowSubsystem(private val robot: Robot, private val hw : HardwareManager,
             robot.telemetry.addData("Current Angle Degree", currentAngle)
             robot.telemetry.addData("Angle Error Degree", targetAngle - currentAngle)
             robot.telemetry.addData("Is At Target", this.isAtTarget())
-            robot.telemetry.addData("motor.getCurrent (mA)", motor.getCurrent() * 1000)
-            robot.telemetry.addData("Apple", motionProfile[motionProfileTimer.seconds()].x)
         }
     }
 

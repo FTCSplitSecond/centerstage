@@ -22,11 +22,11 @@ class TelescopeSubsystem(hardwareManager: HardwareManager, private val robot: Ro
 
     var isTelemetryEnabled = false
     var isEnabled = true
+    var isHoming = false
+    private var hasHomingPowerBeenSet = false
 
     private val motor1 = hardwareManager.motor("telescope1")
     private val motor2 = hardwareManager.motor("telescope2")
-
-
 
     init {
         if (robot.opModeType == OpModeType.AUTONOMOUS)
@@ -79,7 +79,7 @@ class TelescopeSubsystem(hardwareManager: HardwareManager, private val robot: Ro
     private val controller = PIDController(TELESCOPE_KP, TELESCOPE_KI, TELESCOPE_KD)
 
     fun isAtTarget() : Boolean {
-        return abs(targetExtensionInches-currentExtensionInches) <pidTolerance
+        return abs(targetExtensionInches-currentExtensionInches) < pidTolerance
     }
 
     override fun init() {
@@ -102,8 +102,39 @@ class TelescopeSubsystem(hardwareManager: HardwareManager, private val robot: Ro
         val pidPower = controller.calculate(currentExtensionInches, motionProfile[motionProfileTimer.seconds()].x).adjustPowerForKStatic(TELESCOPE_KS)
 
         if(isEnabled) {
-            motor1 power pidPower
-            motor2 power pidPower
+            if(isHoming) {
+                // if homing, we firs set the motor powers to a small/slow negative power to retract the telescope
+                // then we check if the velocity is below a certain threshold, if it is, them the telescope has hit its end stop
+                // and we set the motor powers to 0.0, reset the encoder like on startup and set isHoming to false (resume pid control on next loop)
+
+                if(!hasHomingPowerBeenSet) {
+                    motor1 power HOMING_POWER
+                    motor2 power HOMING_POWER
+                    hasHomingPowerBeenSet = true
+                } else if(abs(V) < HOMING_VELOCITY_THRESHOLD) {
+                    motor1 power 0.0
+                    motor2 power 0.0
+                    // we are at the end stop, reset the encoders, re-initialize the current/target
+                    // and end homing sequence
+                    motor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER)
+                    motor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER)
+                    motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)
+                    motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)
+                    currentExtensionInches = 0.0
+                    position = TelescopePosition.Travel
+                    isHoming = false
+                    hasHomingPowerBeenSet = false
+                } else {
+                    motor1 power HOMING_POWER
+                    motor2 power HOMING_POWER
+                }
+            } else {
+                motor1 power pidPower
+                motor2 power pidPower
+            }
+        } else {
+            motor1 power 0.0
+            motor2 power 0.0
         }
 
         if(isTelemetryEnabled) {
@@ -112,8 +143,6 @@ class TelescopeSubsystem(hardwareManager: HardwareManager, private val robot: Ro
             robot.telemetry.addData("Current Extension Inches", currentExtensionInches)
             robot.telemetry.addData("Extension Error Inches", targetExtensionInches - currentExtensionInches)
             robot.telemetry.addData("Is At Target", this.isAtTarget())
-            robot.telemetry.addData("motor.getCurrent (mA)", motor1.getCurrent() * 1000.0)
-            robot.telemetry.addData("motor.position", motor1.encoder.getCounts())
         }
     }
 

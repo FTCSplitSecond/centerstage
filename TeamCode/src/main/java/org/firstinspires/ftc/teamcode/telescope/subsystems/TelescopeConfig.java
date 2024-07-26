@@ -4,6 +4,8 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class TelescopeConfig {
+    public static double HOMING_POWER = -0.5;
+    public static double HOMING_VELOCITY_THRESHOLD = 0.1; // inches per second
     public static double TELESCOPE_KP = 0.3;
     public static double TELESCOPE_KI = 0.0;
     public static double TELESCOPE_KD = 0.0025;

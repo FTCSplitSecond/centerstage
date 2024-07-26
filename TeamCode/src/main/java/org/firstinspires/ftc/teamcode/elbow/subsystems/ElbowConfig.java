@@ -4,6 +4,8 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class ElbowConfig {
+    public static double HOMING_POWER = -0.5;
+    public static double HOMING_ANGULARVELOCITY_THRESHOLD = 5.0; // deg per second
 
     public static double ELBOW_KP = 0.04;
     public static double ELBOW_KI = 0.0;

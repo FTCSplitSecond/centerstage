@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.robot.opmodes
 
-import LaunchDrone
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.turtles.anchor.component.stock.delay
 import dev.turtles.anchor.component.stock.instant
@@ -18,13 +17,14 @@ import org.firstinspires.ftc.teamcode.claw.subsystems.ClawPositions
 import org.firstinspires.ftc.teamcode.drone_launcher.Commands.SetDroneForInit
 import org.firstinspires.ftc.teamcode.drone_launcher.Subsystems.PitchPositions
 import org.firstinspires.ftc.teamcode.drone_launcher.Subsystems.TriggerPositions
+import org.firstinspires.ftc.teamcode.elbow.commands.HomeElbow
 import org.firstinspires.ftc.teamcode.mecanum.commands.DriveMecanum
 import org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants
 import org.firstinspires.ftc.teamcode.robot.commands.UpdateTelemetry
 import org.firstinspires.ftc.teamcode.robot.util.OpModeType
 import org.firstinspires.ftc.teamcode.robot.subsystems.Robot
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMechanism
-import org.firstinspires.ftc.teamcode.robot.util.adjustPowerForKStatic
+import org.firstinspires.ftc.teamcode.telescope.commands.HomeTelescope
 import kotlin.math.absoluteValue
 import kotlin.math.pow
 import kotlin.math.sign
@@ -71,6 +71,15 @@ class MainTeleOp : AnchorOpMode() {
         val triggerThreshold = 0.2
         val driverRightTrigger = EventTrigger { driver[Button.Trigger.RIGHT] > triggerThreshold }
         val driverLeftTrigger = EventTrigger { driver[Button.Trigger.LEFT] > triggerThreshold }
+
+        // Homing stuff via the gunner controller
+        val gunner = FTCGamepad(gamepad2)
+        gunner[Button.Key.DPAD_RIGHT] onActivate
+                HomeTelescope(robot.telescope)
+        gunner[Button.Key.DPAD_LEFT] onActivate
+                HomeElbow(robot.elbow)
+        gunner[Button.Key.DPAD_UP] onActivate
+                series(HomeTelescope(robot.telescope), HomeElbow(robot.elbow))
 
         driver[Button.Key.TRIANGLE] onActivate
                 smec.setArmState(ScoringMechanism.State.STACK_INTAKE_CLOSE)
