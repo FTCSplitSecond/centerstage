@@ -41,7 +41,7 @@ class BlueFarAuto2p1 : AnchorOpMode() {
     lateinit var drive: CenterstageMecanumDrive
     lateinit var webcam: OpenCvWebcam
     var detector = PropDetector(telemetry)
-    val startPose = Pose2d(-81.0, 62.0, PI / 2)
+    val startPose = Pose2d(-33.0, 62.0, PI / 2)
     val alliance = Alliance.BLUE
 
     lateinit var parkLocation: ParkLocation
@@ -159,11 +159,11 @@ class BlueFarAuto2p1 : AnchorOpMode() {
         }
 //        val startHeading = getAllianceHeading(alliance)
 //        val startPose = Pose2d(-32.0, 62.0, startHeading).adjustForAlliance(alliance)
-        val awayFromWallPosition = Pose2d(Vector2d(-84.0, 36.0), startPose.heading).adjustForAlliance(alliance)
+        val awayFromWallPosition = Pose2d(Vector2d(-36.0, 36.0), startPose.heading).adjustForAlliance(alliance)
 
-        val purplePixelPoseBackdropSide = Pose2d(Vector2d(-100.0, 32.0), PI).adjustForAlliance(alliance)
-        val purplePixelPoseCenter = Pose2d(Vector2d(-84.0, 12.5), startPose.heading).adjustForAlliance(alliance)
-        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(-98.0, 17.0), startPose.heading).adjustForAlliance(alliance)
+        val purplePixelPoseBackdropSide = Pose2d(Vector2d(-52.0, 28.0), PI).adjustForAlliance(alliance)
+        val purplePixelPoseCenter = Pose2d(Vector2d(-36.0, 12.5), startPose.heading).adjustForAlliance(alliance)
+        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(-50.0, 17.0), startPose.heading).adjustForAlliance(alliance)
         val purplePixelPose = when (zoneDetected) {
             PropZoneDetected.LEFT -> if(alliance== Alliance.BLUE) purplePixelPoseBackdropSide else purplePixelPoseAwayFromBackdrop
             PropZoneDetected.CENTER, PropZoneDetected.NONE -> purplePixelPoseCenter
@@ -174,7 +174,7 @@ class BlueFarAuto2p1 : AnchorOpMode() {
         val nearBackDropLaneX = 38.0
         val backDropScoreX = 46.0
 
-        val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(-98.0, 9.5), PI + spinOffset).adjustForAlliance(alliance)
+        val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(-50.0, 9.5), PI + spinOffset).adjustForAlliance(alliance)
 
         val poseAfterPurplePixel = when (zoneDetected) {
             PropZoneDetected.RIGHT -> Pose2d(Vector2d(transitLanePoseAfterPurplePixel.x + 0.01, transitLanePoseAfterPurplePixel.y), startPose.heading)
@@ -182,12 +182,7 @@ class BlueFarAuto2p1 : AnchorOpMode() {
         }
         val transitLaneBackDropSide = Vector2d(nearBackDropLaneX, transitLaneY).adjustForAlliance(alliance)
 
-        val rightClawStackPose = Pose2d(Vector2d(-104.5, 10.0), PI).adjustForAlliance(alliance)
-
-        val nearCenterStackPose = Vector2d(-33.0, 12.0).adjustForAlliance(alliance)
-        val centerStackAngle = -(3*PI)/4 //45 degrees
-        val centerStackLeftClawPose = Pose2d(Vector2d(-36.0, 7.75), centerStackAngle).adjustForAlliance(alliance)
-        val centerStackRightClawPose = Pose2d(Vector2d(-37.5, 9.0), centerStackAngle).adjustForAlliance(alliance)
+        val rightClawStackPose = Pose2d(Vector2d(-58.5, 10.0), PI).adjustForAlliance(alliance)
 
         val backDropScoringClawOffset = 0.0 //  offset to help pixels land better if needed
         val backDropZoneSpacing = 7.0

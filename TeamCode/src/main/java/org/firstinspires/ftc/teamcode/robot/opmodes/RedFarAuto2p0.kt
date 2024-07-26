@@ -24,6 +24,8 @@ import org.firstinspires.ftc.teamcode.robot.util.Alliance
 import org.firstinspires.ftc.teamcode.robot.util.AutoConfig
 import org.firstinspires.ftc.teamcode.robot.util.ParkLocation
 import org.firstinspires.ftc.teamcode.robot.util.adjustForAlliance
+import org.firstinspires.ftc.teamcode.telescope.commands.SetTelescopePosition
+import org.firstinspires.ftc.teamcode.telescope.subsystems.TelescopePosition
 import org.firstinspires.ftc.teamcode.vision.AprilTagRelocalize
 import org.firstinspires.ftc.teamcode.vision.RelocalizeFromAprilTags
 import org.openftc.easyopencv.OpenCvCamera
@@ -40,7 +42,7 @@ class RedFarAuto2p0 : AnchorOpMode() {
     lateinit var drive: CenterstageMecanumDrive
     lateinit var webcam: OpenCvWebcam
     var detector = PropDetector(telemetry)
-    val startPose = Pose2d(-88.0, -62.0, -PI / 2)
+    val startPose = Pose2d(-40.0, -62.0, -PI / 2)
     val alliance = Alliance.RED
 
     lateinit var parkLocation: ParkLocation
@@ -130,26 +132,35 @@ class RedFarAuto2p0 : AnchorOpMode() {
         }
 //        val startHeading = getAllianceHeading(alliance)
 //        val startPose = Pose2d(-32.0, 62.0, startHeading).adjustForAlliance(alliance)
-        val awayFromWallPosition = Pose2d(Vector2d(-84.0, 36.0), startPose.heading).adjustForAlliance(alliance)
+        val awayFromWallPosition = Pose2d(Vector2d(-36.0, 36.0), startPose.heading).adjustForAlliance(alliance)
 
-        val purplePixelPoseBackdropSide = Pose2d(Vector2d(-83.0, 34.0), 0.0).adjustForAlliance(alliance)
-        val purplePixelPoseCenter = Pose2d(Vector2d(-84.0, 14.0), startPose.heading).adjustForAlliance(alliance)
-        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(-96.0, 17.0), startPose.heading).adjustForAlliance(alliance)
+        val purplePixelPoseBackdropSide = Pose2d(Vector2d(-55.0, 30.0), PI).adjustForAlliance(alliance)
+        val purplePixelPoseCenter = Pose2d(Vector2d(-36.0, 14.0), startPose.heading).adjustForAlliance(alliance)
+        val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(-48.5, 17.0), startPose.heading).adjustForAlliance(alliance)
         val purplePixelPose = when (zoneDetected) {
             PropZoneDetected.LEFT -> if(alliance== Alliance.BLUE) purplePixelPoseBackdropSide else purplePixelPoseAwayFromBackdrop
             PropZoneDetected.CENTER, PropZoneDetected.NONE -> purplePixelPoseCenter
             PropZoneDetected.RIGHT -> if(alliance== Alliance.BLUE) purplePixelPoseAwayFromBackdrop else purplePixelPoseBackdropSide
         }
 
+
+
         val transitLaneY = 12.0
-        val nearBackDropLaneX = 34.0
+        val nearBackDropLaneX = 38.0
         val backDropScoreX = 46.0
 
-        val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(-98.0, transitLaneY), PI + spinOffset).adjustForAlliance(alliance)
-        val transitLaneBackDropSide = Vector2d(nearBackDropLaneX, transitLaneY).adjustForAlliance(alliance)
-        val transitLanePixelStackSide = Vector2d(-96.0, transitLaneY).adjustForAlliance(alliance)
+        val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(-50.0, 9.5), PI + spinOffset).adjustForAlliance(alliance)
 
-        val backDropScoringClawOffset = 0.0 // offset to help pixels land better if needed
+        val poseAfterPurplePixel = when (zoneDetected) {
+            PropZoneDetected.LEFT -> Pose2d(Vector2d(transitLanePoseAfterPurplePixel.x + 0.01, transitLanePoseAfterPurplePixel.y), startPose.heading)
+            else -> Pose2d(Vector2d(transitLanePoseAfterPurplePixel.x + 0.01, transitLanePoseAfterPurplePixel.y), transitLanePoseAfterPurplePixel.heading)
+        }
+
+        val transitLaneBackDropSide = Vector2d(nearBackDropLaneX, transitLaneY).adjustForAlliance(alliance)
+
+        val leftClawStackPose = Pose2d(Vector2d(-58.0, 10.0), PI).adjustForAlliance(alliance)
+
+        val backDropScoringClawOffset = 0.0 //  offset to help pixels land better if needed
         val backDropZoneSpacing = 7.0
         val backDropCenterY = 36.0
         val nearBackDropCenter = Vector2d(nearBackDropLaneX, backDropCenterY + backDropScoringClawOffset).adjustForAlliance(alliance)
@@ -173,56 +184,101 @@ class RedFarAuto2p0 : AnchorOpMode() {
 
         val afterParkOffsetX = when(parkLocation) {
             ParkLocation.INSIDE -> 0.001
-            ParkLocation.CENTER -> 6.0
-            ParkLocation.OUTSIDE -> 0.001
+            ParkLocation.CENTER -> 0.001
+            ParkLocation.OUTSIDE -> 6.0
         }
-
-
 
         // trajectories
         val moveAwayFromWallTrajectory = drive.trajectoryBuilder(startPose)
             .lineToLinearHeading(awayFromWallPosition)
             .build()
         val moveToScorePurplePixelTrajectory = drive.trajectoryBuilder(moveAwayFromWallTrajectory.end())
-                .lineToLinearHeading(purplePixelPose)
-                .build()
-        val moveToFarTransitLaneTrajectory = drive.trajectoryBuilder(moveToScorePurplePixelTrajectory.end())
-                .lineToLinearHeading(transitLanePoseAfterPurplePixel)
-                .build()
+            .lineToLinearHeading(purplePixelPose)
+            .build()
+        val moveToAfterPurplePixelTrajectory = drive.trajectoryBuilder(moveToScorePurplePixelTrajectory.end())
+            .lineToLinearHeading(poseAfterPurplePixel)
+            .build()
+        val moveToFarTransitLaneTrajectory = drive.trajectoryBuilder(moveToAfterPurplePixelTrajectory.end())
+            .lineToLinearHeading(transitLanePoseAfterPurplePixel)
+            .build()
+//        val moveToLeftClawStackTrajectory = drive.trajectoryBuilder(moveToFarTransitLaneTrajectory.end())
+//            .lineToLinearHeading(leftClawStackPose)
+//            .build()
+//        val moveToTransitLaneFromPixelStacks = drive.trajectoryBuilder(moveToLeftClawStackTrajectory.end())
+//            .lineToLinearHeading(transitLanePoseAfterPurplePixel)
+//            .build()
         val moveToBackDropLaneTrajectory = drive.trajectoryBuilder(moveToFarTransitLaneTrajectory.end())
-                .lineTo(transitLaneBackDropSide)
-                .build()
+            .lineTo(transitLaneBackDropSide)
+            .build()
         val moveToNearBackdropTrajectory = drive.trajectoryBuilder(moveToBackDropLaneTrajectory.end())
-                .lineToLinearHeading(Pose2d(nearBackDropPosition, PI))
-                .build()
+            .lineToLinearHeading(Pose2d(nearBackDropPosition, PI))
+            .build()
         val moveToScoreBackDropTrajectory = drive.trajectoryBuilder(moveToNearBackdropTrajectory.end())
-                .lineTo(backDropScoringPosition) // front is facing away from BB, possibly add a velocity/acceleration constraint here as we might ram the BB
-                .build()
+            .lineTo(backDropScoringPosition) // front is facing away from BB, possibly add a velocity/acceleration constraint here as we might ram the BB
+            .build()
         val backAwayFromBackDropTrajectory = drive.trajectoryBuilder(moveToScoreBackDropTrajectory.end())
-                .lineTo(nearBackDropPosition) // front is facing away from BB, possibly add a velocity/acceleration constraint here as we might ram the BB
-                .build()
-//        val moveToTransitLaneToPixelStacksTrajectory = drive.trajectoryBuilder(backAwayFromBackDropTrajectory.end())
-//                .lineTo(transitLaneBackDropSide)
-//                .lineTo(transitLanePixelStackSide)
-//                .build()
-//        val moveToTransitLaneFromPixelStacksTrajectory = drive.trajectoryBuilder(moveToTransitLaneToPixelStacksTrajectory.end())
+            .lineTo(nearBackDropPosition) // front is facing away from BB, possibly add a velocity/acceleration constraint here as we might ram the BB
+            .build()
+        //FOR CENTER STACKS
+//        val moveToTransitLaneFromDepositTrajectory = drive.trajectoryBuilder(backAwayFromBackDropTrajectory.end())
 //                .lineTo(transitLaneBackDropSide)
 //                .build()
-
+//        val moveToNearCenterStackTrajectory = drive.trajectoryBuilder(moveToTransitLaneFromDepositTrajectory.end())
+//                .lineTo(Vector2d(nearCenterStackPose.x + 0.1, nearCenterStackPose.y + 0.1))
+//                .build()
+//        val turnToFaceCenterStackTrajectory = drive.trajectoryBuilder(moveToNearCenterStackTrajectory.end())
+//                .lineToLinearHeading(Pose2d(nearCenterStackPose, centerStackAngle))
+//                .build()
+//        val moveToCenterStackLeftClawTrajectory = drive.trajectoryBuilder(turnToFaceCenterStackTrajectory.end())
+//                .lineToLinearHeading(centerStackLeftClawPose)
+//                .build()
+//        val moveToCenterStackRightClawTrajectory = drive.trajectoryBuilder(moveToCenterStackLeftClawTrajectory.end())
+//                .lineToLinearHeading(centerStackRightClawPose)
+//                .build()
+//        val moveToTransitLaneFromCenterStackTrajectory = drive.trajectoryBuilder(moveToCenterStackRightClawTrajectory.end())
+//                .lineToLinearHeading(Pose2d(nearCenterStackPose, PI))
+//                .build()
+//        val moveToBackdropLaneFromCenterTrajectory = drive.trajectoryBuilder(moveToTransitLaneFromCenterStackTrajectory.end())
+//                .lineTo(transitLaneBackDropSide)
+//                .build()
+//        val moveToNearBackdropAfterCenterTrajectory = drive.trajectoryBuilder(moveToBackdropLaneFromCenterTrajectory.end())
+//            .lineToLinearHeading(Pose2d(nearBackDropPosition, PI))
+//            .build()
+//        val moveToScoreBackDropAfterCenterTrajectory = drive.trajectoryBuilder(moveToNearBackdropAfterCenterTrajectory.end())
+//            .lineTo(backDropScoringPosition) // front is facing away from BB, possibly add a velocity/acceleration constraint here as we might ram the BB
+//            .build()
+//        val backAwayFromBackDropAfterCenterTrajectory = drive.trajectoryBuilder(moveToScoreBackDropAfterCenterTrajectory.end())
+//            .lineTo(nearBackDropPosition) // front is facing away from BB, possibly add a velocity/acceleration constraint here as we might ram the BB
+//            .build()
+//        val parkCenterTrajectory = drive.trajectoryBuilder(backAwayFromBackDropAfterCenterTrajectory.end())
+//                .lineTo(parkCenterPosition)
+//                .build()
         val parkTrajectory = drive.trajectoryBuilder(backAwayFromBackDropTrajectory.end())
-                .lineTo(parkPosition)
-                .build()
+            .lineTo(parkPosition)
+            .build()
         val afterParkTrajectory = drive.trajectoryBuilder(parkTrajectory.end())
             .lineTo(Vector2d(parkPosition.x + afterParkOffsetX, parkPosition.y))
             .build()
 
+
         // commands
         val moveAwayFromWall = TrajectoryFollower(drive, moveAwayFromWallTrajectory)
-        val moveToCloseIntake = smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
+        val setArmStateForPurple = when(zoneDetected) {
+            PropZoneDetected.RIGHT -> series(
+                smec.setArmState(ScoringMechanism.State.PURPLE_DROP),
+                SetTelescopePosition(robot.telescope, TelescopePosition.PurplePush)
+            )
+            else -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
+        }
         val moveToScorePurplePixel = TrajectoryFollower(drive, moveToScorePurplePixelTrajectory)
         val scorePurplePixel = instant { robot.leftClaw.position = ClawPositions.OPEN }
         val moveToTravel = smec.setArmState(ScoringMechanism.State.TRAVEL)
-        val moveToFarTransitLane = TrajectoryFollower(drive, moveToFarTransitLaneTrajectory)
+        val moveToFarTransitLane = series(
+            TrajectoryFollower(drive, moveToAfterPurplePixelTrajectory),
+            TrajectoryFollower(drive, moveToFarTransitLaneTrajectory)
+        )
+//        val moveToWallStackIntake = TrajectoryFollower(drive, moveToLeftClawStackTrajectory)
+//        val moveToTransitLaneFromWallStack = TrajectoryFollower(drive, moveToTransitLaneFromPixelStacks)
         val moveToBackDropLane = TrajectoryFollower(drive, moveToBackDropLaneTrajectory)
         val moveToNearBackdrop = TrajectoryFollower(drive, moveToNearBackdropTrajectory)
         val moveToDeposit = parallel(
@@ -237,10 +293,17 @@ class RedFarAuto2p0 : AnchorOpMode() {
                 delay(0.5),  // delay here is to not pull the pixel with us
                 moveToTravel))
 
-        // used for extra cycles
-//        val moveToTransitLaneToPixelStacks = TrajectoryFollower(drive, moveToTransitLaneToPixelStacksTrajectory)
-//        val intakePixelsFromStack = instant {  } // add pixel intake here returns to transit lane when done
-//        val moveToTransitLaneFromPixelStacks = TrajectoryFollower(drive, moveToTransitLaneFromPixelStacksTrajectory)
+        // FOR CENTER STACKS
+//        val moveToTransitLaneFromDeposit = TrajectoryFollower(drive, moveToTransitLaneFromDepositTrajectory)
+//        val moveToNearCenterStack = TrajectoryFollower(drive, moveToNearCenterStackTrajectory)
+//        val turnToFaceCenterStack = TrajectoryFollower(drive, turnToFaceCenterStackTrajectory)
+//        val moveToCenterStackLeftClaw = TrajectoryFollower(drive, moveToCenterStackLeftClawTrajectory)
+//        val moveToCenterStackRightClaw = TrajectoryFollower(drive, moveToCenterStackRightClawTrajectory)
+//        val moveToTransitLaneFromCenterStack = TrajectoryFollower(drive, moveToTransitLaneFromCenterStackTrajectory)
+//        val moveToBackdropLaneFromCenter = TrajectoryFollower(drive, moveToBackdropLaneFromCenterTrajectory)
+//        val moveToNearBackdropAfterCenter = TrajectoryFollower(drive, moveToNearBackdropAfterCenterTrajectory)
+//        val moveToScoreBackdropAfterCenter = TrajectoryFollower(drive, moveToScoreBackDropAfterCenterTrajectory)
+//        val backAwayFromBackdropAfterCenter = TrajectoryFollower(drive, backAwayFromBackDropAfterCenterTrajectory)
 
         val park = series( TrajectoryFollower(drive, parkTrajectory), TrajectoryFollower(drive, afterParkTrajectory) )
         val relocalizeFromAprilTags = AprilTagRelocalize(robot.vision, robot)
@@ -252,7 +315,9 @@ class RedFarAuto2p0 : AnchorOpMode() {
 
             moveAwayFromWall,
 
-            parallel(moveToScorePurplePixel, moveToCloseIntake),
+            moveToScorePurplePixel,
+
+            setArmStateForPurple,
 
             instant { robot.leftClaw.position = ClawPositions.OPEN },
 
@@ -261,6 +326,18 @@ class RedFarAuto2p0 : AnchorOpMode() {
             delay(delayB),
 
             moveToFarTransitLane,
+
+//            series(
+//                parallel(
+//                    instant { robot.leftClaw.position = ClawPositions.OPEN },
+//                    smec.setArmState(ScoringMechanism.State.STACK_INTAKE_CLOSE)
+//                ),
+//                moveToWallStackIntake,
+//                instant { robot.leftClaw.position = ClawPositions.CLOSED },
+//                smec.setArmState(ScoringMechanism.State.TRAVEL)
+//            ),
+//
+//            moveToTransitLaneFromWallStack,
 
             moveToBackDropLane,
 
@@ -276,17 +353,34 @@ class RedFarAuto2p0 : AnchorOpMode() {
 
             backAwayFromBackDrop,
 
-            // add extra cycles here to the pixel stack
-//            moveToTransitLaneToPixelStacks,
-//            intakePixelsFromStack,
-//            moveToTransitLaneFromPixelStacks,
+            // FOR CENTER STACKS
+//            moveToTransitLaneFromDeposit,
 //
-//            parallel(moveToNearBackdrop, moveToDeposit),
-//            relocalizeFromApriltags,
+//            moveToNearCenterStack,
 //
-//            moveToScoreBackDrop,
+//            turnToFaceCenterStack,
+//
+//            moveToCenterStackLeftClaw,
+//
+//            intakeStackLeftClaw,
+//
+//            moveToCenterStackRightClaw,
+//
+//            intakeStackRightClaw,
+//
+//            moveToTransitLaneFromCenterStack,
+//
+//            moveToBackdropLaneFromCenter,
+//
+//            parallel(moveToNearBackdropAfterCenter, moveToDeposit),
+//
+//            relocalizeFromAprilTags,
+//
+//            moveToScoreBackdropAfterCenter,
+//
 //            scoreBackDrop,
-//            backAwayFromBackDrop,
+//
+//            backAwayFromBackdropAfterCenter,
 
             parallel(moveToTravel, park)
         )
