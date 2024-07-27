@@ -156,7 +156,7 @@ class BlueCloseAuto2p0 : AnchorOpMode() {
         }
         val transitLaneY = 60.0
         val nearBackDropLaneX = 34.0
-        val backDropScoreX = 42.0
+        val backDropScoreX = 43.0
 
         val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(-36.0, transitLaneY), PI).adjustForAlliance(alliance)
         val transitLaneBackDropSide = Vector2d(nearBackDropLaneX, transitLaneY).adjustForAlliance(alliance)

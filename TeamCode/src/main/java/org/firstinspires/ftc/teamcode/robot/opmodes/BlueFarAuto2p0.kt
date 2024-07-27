@@ -174,7 +174,7 @@ class BlueFarAuto2p0 : AnchorOpMode() {
 
         val transitLaneY = 12.0
         val nearBackDropLaneX = 38.0
-        val backDropScoreX = 46.0
+        val backDropScoreX = 47.0
 
         val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(-50.0, 9.5), PI + spinOffset).adjustForAlliance(alliance)
 

@@ -217,13 +217,12 @@ class ScoringMechanism(
                 )
 
                 State.CYCLE_DROP -> {
-                    val ikResults = runKinematics(depositPixelLevel)
                     series(
                         parallel(
-                            SetElbowPosition(elbow, ElbowPosition.CycleDrop),
+                            SetElbowPosition(elbow, ElbowPosition.StackIntake),
                             series(
                                 Delay(0.25),
-                                SetWristPosition(wrist, WristPosition.Adjust(ikResults.wristAngle))
+                                SetWristPosition(wrist, WristPosition.CloseIntake)
                             )
                         ),
                         SetTelescopePosition(telescope, TelescopePosition.CycleDrop)

@@ -82,7 +82,7 @@ class MainTeleOp : AnchorOpMode() {
                 series(HomeTelescope(robot.telescope), HomeElbow(robot.elbow))
 
         driver[Button.Key.TRIANGLE] onActivate
-                smec.setArmState(ScoringMechanism.State.STACK_INTAKE_CLOSE)
+                smec.setArmState(ScoringMechanism.State.CYCLE_DROP)
 
         val routine = RoutineModule { true }
         driver.apply(routine)
