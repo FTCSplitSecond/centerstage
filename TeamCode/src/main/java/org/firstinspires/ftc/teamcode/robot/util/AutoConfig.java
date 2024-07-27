@@ -46,6 +46,7 @@ public class AutoConfig {
     // RED PARK LOCATIONS
     public static ParkLocation RED_CLOSE2P0_PARK = ParkLocation.OUTSIDE;
     public static ParkLocation RED_CLOSE2P1_PARK = ParkLocation.OUTSIDE;
+    public static ParkLocation RED_CLOSE2P2_PARK = ParkLocation.OUTSIDE;
     public static ParkLocation RED_FAR2P0_PARK = ParkLocation.INSIDE;
     public static ParkLocation RED_FAR2P1_PARK = ParkLocation.INSIDE;
 
@@ -53,18 +54,21 @@ public class AutoConfig {
 
     public static ParkLocation BLUE_CLOSE2P0_PARK = ParkLocation.OUTSIDE;
     public static ParkLocation BLUE_CLOSE2P1_PARK = ParkLocation.OUTSIDE;
+    public static ParkLocation BLUE_CLOSE2P2_PARK = ParkLocation.OUTSIDE;
     public static ParkLocation BLUE_FAR2P0_PARK = ParkLocation.INSIDE;
     public static ParkLocation BLUE_FAR2P1_PARK = ParkLocation.INSIDE;
 
     // RED DELAYS
     public static double[] RED_CLOSE2P0_DELAYS = new double[]{0.0, 0.0};
     public static double[] RED_CLOSE2P1_DELAYS = new double[]{0.0, 0.0};
+    public static double[] RED_CLOSE2P2_DELAYS = new double[]{0.0, 0.0};
     public static double[] RED_FAR2P0_DELAYS = new double[]{0.0, 0.0, 0.0};
     public static double[] RED_FAR2P1_DELAYS = new double[]{0.0, 0.0, 0.0};
 
     //BLUE DELAYS
     public static double[] BLUE_CLOSE2P0_DELAYS = new double[]{0.0, 0.0};
     public static double[] BLUE_CLOSE2P1_DELAYS = new double[]{0.0, 0.0};
+    public static double[] BLUE_CLOSE2P2_DELAYS = new double[]{0.0, 0.0};
     public static double[] BLUE_FAR2P0_DELAYS = new double[]{0.0, 0.0, 0.0};
     public static double[] BLUE_FAR2P1_DELAYS = new double[]{0.0, 0.0, 0.0};
 

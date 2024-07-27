@@ -40,7 +40,7 @@ class BlueCloseAuto2p1 : AnchorOpMode() {
     lateinit var drive: CenterstageMecanumDrive
     lateinit var webcam: OpenCvWebcam
     var detector = PropDetector(telemetry)
-    val startPose = Pose2d(-33.0, 62.0, PI / 2)
+    val startPose = Pose2d(16.0, 62.0, PI / 2)
     val alliance = Alliance.BLUE
 
     lateinit var parkLocation: ParkLocation
@@ -172,14 +172,14 @@ class BlueCloseAuto2p1 : AnchorOpMode() {
         val backDropScoreX = 43.5
 
 
-        val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(20.0, transitLaneY), PI + spinOffset).adjustForAlliance(alliance)
+        val transitLanePoseAfterPurplePixel = Pose2d(Vector2d(36.0, transitLaneY), PI + spinOffset).adjustForAlliance(alliance)
 
         val transitLaneBackDropSide = Vector2d(nearBackDropLaneX, transitLaneY).adjustForAlliance(alliance)
         val transitLanePixelStackSide = Vector2d(-55.0, transitLaneY).adjustForAlliance(alliance)
 
         val rightClawStackPose = Pose2d(Vector2d(-56.5, 29.0), PI).adjustForAlliance(alliance)
 
-        val backDropScoringClawOffset = -4.0 // offset to help pixels land better if needed
+        val backDropScoringClawOffset = -2.0 // offset to help pixels land better if needed
         val backDropZoneSpacing = 7.0
         val backDropCenterY = 36.0
         val nearBackDropCenter = Vector2d(nearBackDropLaneX, backDropCenterY + backDropScoringClawOffset).adjustForAlliance(alliance)
