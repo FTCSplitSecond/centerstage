@@ -183,7 +183,7 @@ class ScoringMechanism(
                 State.STACK_INTAKE -> series(
                     SetElbowPosition(elbow, ElbowPosition.StackIntake),
                     parallel(
-                        SetTelescopePosition(telescope, TelescopePosition.StackIntake),
+                        SetTelescopePosition(telescope, TelescopePosition.StackIntakeClose),
                         SetWristPosition(wrist, WristPosition.ExtendedIntake)
                     ),
                 )

@@ -138,8 +138,9 @@ class MainTeleOp : AnchorOpMode() {
         }
         driverRightTrigger onActivate instant {
             +when (smec.armState) {
-                ScoringMechanism.State.CLOSE_INTAKE -> smec.setArmState(ScoringMechanism.State.EXTENDED_INTAKE)
-                ScoringMechanism.State.EXTENDED_INTAKE -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
+                ScoringMechanism.State.CLOSE_INTAKE -> smec.setArmState(ScoringMechanism.State.STACK_INTAKE)
+                ScoringMechanism.State.STACK_INTAKE -> smec.setArmState(ScoringMechanism.State.STACK_INTAKE_CLOSE)
+                ScoringMechanism.State.STACK_INTAKE_CLOSE -> smec.setArmState(ScoringMechanism.State.CLOSE_INTAKE)
                 else -> smec.setDepositPixelLevel(smec.depositPixelLevel + 1.0)
             }
         }

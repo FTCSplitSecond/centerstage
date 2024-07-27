@@ -17,7 +17,7 @@ public class ElbowConfig {
     public static double ELBOW_CLOSE_INTAKE = -10.0; //   degrees
     public static double ELBOW_TRAVEL = 0.0; //  degrees
     public static double CYCLE_DROP = 165.0;
-    public static double ELBOW_STACK_INTAKE = -3.0;
+    public static double ELBOW_STACK_INTAKE = -1.5;
 
     public static double ELBOW_STACK_INTAKE_CLOSE = 0.0;
     public static double KG = 0.1;

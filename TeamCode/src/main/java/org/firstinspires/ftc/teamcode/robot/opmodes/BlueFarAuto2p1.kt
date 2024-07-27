@@ -161,7 +161,7 @@ class BlueFarAuto2p1 : AnchorOpMode() {
 //        val startPose = Pose2d(-32.0, 62.0, startHeading).adjustForAlliance(alliance)
         val awayFromWallPosition = Pose2d(Vector2d(-36.0, 36.0), startPose.heading).adjustForAlliance(alliance)
 
-        val purplePixelPoseBackdropSide = Pose2d(Vector2d(-52.0, 28.0), PI).adjustForAlliance(alliance)
+        val purplePixelPoseBackdropSide = Pose2d(Vector2d(-52.0, 32.0), PI).adjustForAlliance(alliance)
         val purplePixelPoseCenter = Pose2d(Vector2d(-36.0, 12.5), startPose.heading).adjustForAlliance(alliance)
         val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(-50.0, 17.0), startPose.heading).adjustForAlliance(alliance)
         val purplePixelPose = when (zoneDetected) {

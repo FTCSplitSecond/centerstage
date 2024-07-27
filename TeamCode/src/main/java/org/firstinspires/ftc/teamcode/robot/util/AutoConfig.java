@@ -47,7 +47,7 @@ public class AutoConfig {
     public static ParkLocation RED_CLOSE2P0_PARK = ParkLocation.OUTSIDE;
     public static ParkLocation RED_CLOSE2P1_PARK = ParkLocation.OUTSIDE;
     public static ParkLocation RED_CLOSE2P2_PARK = ParkLocation.OUTSIDE;
-    public static ParkLocation RED_FAR2P0_PARK = ParkLocation.INSIDE;
+    public static ParkLocation RED_FAR2P0_PARK = ParkLocation.OUTSIDE;
     public static ParkLocation RED_FAR2P1_PARK = ParkLocation.INSIDE;
 
     // BLUE PARK LOCATIONS
@@ -55,7 +55,7 @@ public class AutoConfig {
     public static ParkLocation BLUE_CLOSE2P0_PARK = ParkLocation.OUTSIDE;
     public static ParkLocation BLUE_CLOSE2P1_PARK = ParkLocation.OUTSIDE;
     public static ParkLocation BLUE_CLOSE2P2_PARK = ParkLocation.OUTSIDE;
-    public static ParkLocation BLUE_FAR2P0_PARK = ParkLocation.INSIDE;
+    public static ParkLocation BLUE_FAR2P0_PARK = ParkLocation.OUTSIDE;
     public static ParkLocation BLUE_FAR2P1_PARK = ParkLocation.INSIDE;
 
     // RED DELAYS

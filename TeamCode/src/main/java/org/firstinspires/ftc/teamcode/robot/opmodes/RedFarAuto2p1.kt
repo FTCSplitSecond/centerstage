@@ -161,7 +161,7 @@ class RedFarAuto2p1 : AnchorOpMode() {
 //        val startPose = Pose2d(-32.0, 62.0, startHeading).adjustForAlliance(alliance)
         val awayFromWallPosition = Pose2d(Vector2d(-36.0, 36.0), startPose.heading).adjustForAlliance(alliance)
 
-        val purplePixelPoseBackdropSide = Pose2d(Vector2d(-55.0, 30.0), PI).adjustForAlliance(alliance)
+        val purplePixelPoseBackdropSide = Pose2d(Vector2d(-55.0, 32.0), PI).adjustForAlliance(alliance)
         val purplePixelPoseCenter = Pose2d(Vector2d(-36.0, 14.0), startPose.heading).adjustForAlliance(alliance)
         val purplePixelPoseAwayFromBackdrop = Pose2d(Vector2d(-48.5, 17.0), startPose.heading).adjustForAlliance(alliance)
         val purplePixelPose = when (zoneDetected) {
@@ -187,7 +187,7 @@ class RedFarAuto2p1 : AnchorOpMode() {
 
         val leftClawStackPose = Pose2d(Vector2d(-58.0, 10.0), PI).adjustForAlliance(alliance)
 
-        val backDropScoringClawOffset = 0.0 //  offset to help pixels land better if needed
+        val backDropScoringClawOffset = -3.0 //  offset to help pixels land better if needed
         val backDropZoneSpacing = 7.0
         val backDropCenterY = 36.0
         val nearBackDropCenter = Vector2d(nearBackDropLaneX, backDropCenterY + backDropScoringClawOffset).adjustForAlliance(alliance)
